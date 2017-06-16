@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx" xmlns:aop="http://www.springframework.org/schema/aop" xmlns:context="http://www.springframework.org/schema/context" xsi:schemaLocation="
+http://www.springframework.org/schema/beans 
+http://www.springframework.org/schema/beans/spring-beans-4.0.xsd 
+http://www.springframework.org/schema/tx 
+http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+http://www.springframework.org/schema/context 
+http://www.springframework.org/schema/context/spring-context-4.0.xsd 
+http://www.springframework.org/schema/aop 
+http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+">
+	<!-- 自动扫描 -->  
+    <context:component-scan base-package="com.autoCustomer.entity" />
+    
+    <!-- 引入配置文件 -->  
+    <bean id="propertyConfigurer"  class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">  
+        <property name="location" value="classpath:jdbc.properties" />  
+    </bean>  
+    
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"  
+        destroy-method="close">  
+        <property name="driverClassName" value="${jdbc.driver}" />  
+        <property name="url" value="${jdbc.url}" />  
+        <property name="username" value="${jdbc.username}" />  
+        <property name="password" value="${jdbc.password}" />  
+        <!-- 初始化连接大小 -->  
+        <property name="initialSize" value="${jdbc.initialSize}"></property>  
+        <!-- 连接池最大数量 -->  
+        <property name="maxActive" value="${jdbc.maxActive}"></property>  
+        <!-- 连接池最大空闲 -->  
+        <property name="maxIdle" value="${jdbc.maxIdle}"></property>  
+        <!-- 连接池最小空闲 -->  
+        <property name="minIdle" value="${jdbc.minIdle}"></property>  
+        <!-- 获取连接最大等待时间 -->  
+        <property name="maxWait" value="${jdbc.maxWait}"></property>  
+    </bean> 
+    
+    <!-- 默认数据库配置 -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+       <property name="basePackage" value="com.autoCustomer.dao" />
+       <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory_1" />
+    </bean> 
+   
+    
+    <bean id="sqlSessionFactory_1" class="org.mybatis.spring.SqlSessionFactoryBean">
+       <!--  <property name="configLocation" value="classpath:webDB-spring/configuration.xml"/> -->
+        <property name="mapperLocations" value="classpath:com/autoCustomer/mapping/*.xml"/>
+        <property name="dataSource" ref="dataSource"/>
+        <property name="typeAliasesPackage" value="com.autoCustomer.entity"/>
+    </bean>
+     
+     
+     <!-- spring事务 -->
+    <bean id="transactionManager_1" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+                        
+</beans>
