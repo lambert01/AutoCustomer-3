@@ -10,11 +10,11 @@ http://www.springframework.org/schema/aop
 http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
 ">
 	<!-- 自动扫描 -->  
-    <context:component-scan base-package="com.autoCustomer.entity" />
+    <context:component-scan base-package="com.autoCustomer" />
     
     <!-- 引入配置文件 -->  
     <bean id="propertyConfigurer"  class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">  
-        <property name="location" value="classpath:jdbc.properties" />  
+        <property name="location" value="/WEB-INF/classes/jdbc.properties" />  
     </bean>  
     
     <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"  
@@ -38,11 +38,11 @@ http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
     <!-- 默认数据库配置 -->
     <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
        <property name="basePackage" value="com.autoCustomer.dao" />
-       <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory_1" />
+       <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
     </bean> 
    
     
-    <bean id="sqlSessionFactory_1" class="org.mybatis.spring.SqlSessionFactoryBean">
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
        <!--  <property name="configLocation" value="classpath:webDB-spring/configuration.xml"/> -->
         <property name="mapperLocations" value="classpath:com/autoCustomer/mapping/*.xml"/>
         <property name="dataSource" ref="dataSource"/>
