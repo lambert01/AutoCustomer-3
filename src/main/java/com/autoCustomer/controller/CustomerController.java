@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.autoCustomer.demo.CustomerDemo;
 import com.autoCustomer.service.AddcustomerService;
 import com.autoCustomer.service.CustomerService;
 import com.autoCustomer.service.DePercentageService;
@@ -52,7 +53,7 @@ public class CustomerController {
 	
 	
 	/**
-	 * 创建客户信息
+	 * 联调创建客户信息
 	 * @param data
 	 * @throws UnsupportedEncodingException 
 	 */
@@ -70,5 +71,18 @@ public class CustomerController {
 		}
 		String message = addcustomerService.addcustomer(data);
 		return message;
+	}
+	
+	/**
+	 * 自动创建客户,客户的创建时间调用方法返回符合要求的时间
+	 */
+	@RequestMapping("/createCustomer")
+	public void createCustomer(){
+		JSONObject customer = addcustomerService.getcustomer();
+		String dateJoin = percentageService.getRanCreateTime();
+		customer.put("dateJoin", dateJoin);
+		addcustomerService.addcustomer(customer.toString());
+		
+		
 	}
 }
