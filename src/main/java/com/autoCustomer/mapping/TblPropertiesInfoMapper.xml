@@ -35,7 +35,7 @@
     delete from tbl_properties_info
     where infoId = #{infoid,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.budweiser.entity.TblPropertiesInfo" >
+  <insert id="insert" parameterType="com.autoCustomer.entity.TblPropertiesInfo" >
     insert into tbl_properties_info (infoId, kind, name, 
       value, status, createdate, 
       updatedate)
@@ -43,7 +43,7 @@
       #{value,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR}, #{createdate,jdbcType=TIMESTAMP}, 
       #{updatedate,jdbcType=DATE})
   </insert>
-  <insert id="insertSelective" parameterType="com.budweiser.entity.TblPropertiesInfo" >
+  <insert id="insertSelective" parameterType="com.autoCustomer.entity.TblPropertiesInfo" >
     insert into tbl_properties_info
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="infoid != null" >
@@ -92,7 +92,7 @@
       </if>
     </trim>
   </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.budweiser.entity.TblPropertiesInfo" >
+  <update id="updateByPrimaryKeySelective" parameterType="com.autoCustomer.entity.TblPropertiesInfo" >
     update tbl_properties_info
     <set >
       <if test="kind != null" >
@@ -116,7 +116,7 @@
     </set>
     where infoId = #{infoid,jdbcType=INTEGER}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.budweiser.entity.TblPropertiesInfo" >
+  <update id="updateByPrimaryKey" parameterType="com.autoCustomer.entity.TblPropertiesInfo" >
     update tbl_properties_info
     set kind = #{kind,jdbcType=VARCHAR},
       name = #{name,jdbcType=VARCHAR},
