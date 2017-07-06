@@ -17,7 +17,7 @@ import org.dom4j.io.SAXReader;
  */
 public class LocalUtil {
 	//各地区xml文件路径
-	private static final String LOCAL_LIST_PATH = "src/main/resources/LocList.xml";
+	private static final String LOCAL_LIST_PATH = "WEB-INF/LocList.xml";
 	//所有国家名称List
 	private static final List<String> COUNTRY_REGION = new ArrayList<String>();
 	private static LocalUtil localutil;
