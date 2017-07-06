@@ -1,10 +1,5 @@
 ﻿package com.autoCustomer.util;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -21,19 +16,9 @@ public class LocalUtil2 {
 	 * 读取地区比例配置
 	 * @return
 	 */
-	private static List<String> getLocalSetsByfile(){
+	private static List<String> getLocalSetsByfile(String addressSet){
 		List<String> arrs = new ArrayList<String>();
-		FileInputStream fis = null;
-		InputStreamReader isr = null;
-		BufferedReader br = null; // 用于包装InputStreamReader,提高处理性能。因为BufferedReader有缓冲的，而InputStreamReader没有。
-		try {
-			String str = "";
-			fis = new FileInputStream("src/main/resources/localset.txt");// FileInputStream
-			// 从文件系统中的某个文件中获取字节
-			isr = new InputStreamReader(fis, "utf-8");// InputStreamReader 是字节流通向字符流的桥梁,
-			br = new BufferedReader(isr);// 从字符输入流中读取文件中的内容,封装了一个new InputStreamReader的对象
-			while ((str = br.readLine())!=null){
-				JSONObject obj = JSONObject.fromObject(str);
+				JSONObject obj = JSONObject.fromObject(addressSet);
 				String[] baoyouqus = obj.get("包邮区").toString().split(",");
 				List<String> listbaoyouqus = Arrays.asList(baoyouqus);
 				String[] yanhais = obj.get("沿海").toString().split(",");
@@ -90,21 +75,7 @@ public class LocalUtil2 {
 						break;
 					}
 				}
-			}
-		}catch(FileNotFoundException e){
-			System.out.println("找不到指定文件");
-		}catch(IOException e){
-			System.out.println("读取文件失败");
-		}finally{
-			try{
-				br.close();
-				isr.close();
-				fis.close();
-				// 关闭的时候最好按照先后顺序关闭最后开的先关闭所以先关s,再关n,最后关m
-			}catch(IOException e){
-				e.printStackTrace();
-			}
-		}
+			
 		return arrs;
 	}
 
@@ -112,8 +83,8 @@ public class LocalUtil2 {
 	 * 返回包邮区的概率50%,返回沿海非包邮地区的概率30%,返回内地地区的概率20%
 	 * @return
 	 */
-	public static String getProvinceAndCity(){
-		List<String> arrs = getLocalSetsByfile();
+	public static String getProvinceAndCity(String addressSet){
+		List<String> arrs = getLocalSetsByfile(addressSet);
 		int size = arrs.size();
 		int index = (int)(Math.random()*size);
 		String str = arrs.get(index);
