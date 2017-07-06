@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.autoCustomer.dao.DePercentageMapper" >
+ 
+ 	<resultMap id="BaseResultMap" type="com.autoCustomer.entity.DePercentage" >
+ 		<id column="id" property="id" jdbcType="INTEGER" />
+    	<result column="spread" property="spread" jdbcType="VARCHAR" />
+    	<result column="type" property="type" jdbcType="VARCHAR" />
+    	<result column="message" property="message" jdbcType="VARCHAR" />
+    	<result column="start_date" property="startDate" jdbcType="DATE" />
+   	 	<result column="end_date" property="endDate" jdbcType="DATE" />
+ 		<result column="percentage" property="percentage" jdbcType="DOUBLE" />
+ 	</resultMap>
+  
+  	<select id="selectByType" resultType="Map" parameterType="java.lang.String">
+  		select start_date,end_date,percentage,spread,message from de_percentage
+  		 where type=#{type} order by percentage
+  	</select>
+  
+</mapper>
