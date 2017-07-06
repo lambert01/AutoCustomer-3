@@ -30,10 +30,7 @@ public class CustomerDemo {
 			// createCustomerEvent(customerId,accessToken);
 			
 			String listid = createList(accessToken,"");
-			String code = updateList(customerId,listid,accessToken);
-			
-	
-
+			String code = addcustomertoList(customerId,listid,accessToken);
 	}
 
 	/**
@@ -224,7 +221,7 @@ public class CustomerDemo {
 	 * @param json
 	 * @return
 	 */
-	public static String updateList(String customerId,String listId, String access_token){
+	public static String addcustomertoList(String customerId,String listId, String access_token){
 		String url = URL + "v1/listMembers" + "?access_token=" + access_token;
 		JSONObject obj = new JSONObject();
 		JSONObject obj2 = new JSONObject();
