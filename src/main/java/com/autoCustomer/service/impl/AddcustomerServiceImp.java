@@ -12,6 +12,7 @@ import javax.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import com.autoCustomer.dao.TblPropertiesInfoMapper;
+import com.autoCustomer.demo.CustomerDemo;
 import com.autoCustomer.service.AddcustomerService;
 import com.autoCustomer.util.ImageUtil;
 import com.autoCustomer.util.LocalUtil2;
@@ -91,7 +92,8 @@ public class AddcustomerServiceImp implements AddcustomerService {
 
 		cust.put("email", MessageUtil.getEmail(6, 9));
 		cust.put("dateCreated", TimeUtil.getStringTime());
-		cust.put("img", ImageUtil.getHttpLink());
+		ImageUtil img = new ImageUtil();
+		cust.put("img", img.getHttpLink());
 		cust.put("name", MessageUtil.getChineseName(sex));
 		cust.put("country", "中国");
 		if("北京".equals(province)||"天津".equals(province)||"重庆".equals(province) ||"上海".equals(province)||"澳门".equals(province)||"香港".equals(province)){
