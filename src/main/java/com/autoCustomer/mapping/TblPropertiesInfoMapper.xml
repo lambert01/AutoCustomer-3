@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.autoCustomer.dao.TblPropertiesInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.autoCustomer.entity.TblPropertiesInfo" >
+    <id column="infoId" property="infoid" jdbcType="INTEGER" />
+    <result column="kind" property="kind" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="value" property="value" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
+    <result column="createdate" property="createdate" jdbcType="TIMESTAMP" />
+    <result column="updatedate" property="updatedate" jdbcType="DATE" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    infoId, kind, name, value, status, createdate, updatedate
+  </sql>
+  
+  <update id="updateValue" parameterType="Map">
+  	update tbl_properties_info set value = #{value,jdbcType=VARCHAR} 
+  		where kind = #{kind,jdbcType=VARCHAR} 
+  </update>
+  
+  <select id="selectPropertyInfoByKind" resultType="java.lang.String" parameterType="java.lang.String">
+	select value
+    from tbl_properties_info
+    where kind = #{kind,jdbcType=VARCHAR} 
+  </select>
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from tbl_properties_info
+    where infoId = #{infoid,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from tbl_properties_info
+    where infoId = #{infoid,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.budweiser.entity.TblPropertiesInfo" >
+    insert into tbl_properties_info (infoId, kind, name, 
+      value, status, createdate, 
+      updatedate)
+    values (#{infoid,jdbcType=INTEGER}, #{kind,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, 
+      #{value,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR}, #{createdate,jdbcType=TIMESTAMP}, 
+      #{updatedate,jdbcType=DATE})
+  </insert>
+  <insert id="insertSelective" parameterType="com.budweiser.entity.TblPropertiesInfo" >
+    insert into tbl_properties_info
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="infoid != null" >
+        infoId,
+      </if>
+      <if test="kind != null" >
+        kind,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="value != null" >
+        value,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="createdate != null" >
+        createdate,
+      </if>
+      <if test="updatedate != null" >
+        updatedate,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="infoid != null" >
+        #{infoid,jdbcType=INTEGER},
+      </if>
+      <if test="kind != null" >
+        #{kind,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="value != null" >
+        #{value,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="createdate != null" >
+        #{createdate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedate != null" >
+        #{updatedate,jdbcType=DATE},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.budweiser.entity.TblPropertiesInfo" >
+    update tbl_properties_info
+    <set >
+      <if test="kind != null" >
+        kind = #{kind,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="value != null" >
+        value = #{value,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="createdate != null" >
+        createdate = #{createdate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedate != null" >
+        updatedate = #{updatedate,jdbcType=DATE},
+      </if>
+    </set>
+    where infoId = #{infoid,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.budweiser.entity.TblPropertiesInfo" >
+    update tbl_properties_info
+    set kind = #{kind,jdbcType=VARCHAR},
+      name = #{name,jdbcType=VARCHAR},
+      value = #{value,jdbcType=VARCHAR},
+      status = #{status,jdbcType=VARCHAR},
+      createdate = #{createdate,jdbcType=TIMESTAMP},
+      updatedate = #{updatedate,jdbcType=DATE}
+    where infoId = #{infoid,jdbcType=INTEGER}
+  </update>
+</mapper>
