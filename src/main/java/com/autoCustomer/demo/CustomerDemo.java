@@ -65,13 +65,13 @@ public class CustomerDemo {
 		JSONObject cust = new JSONObject();
 		String moblie = MessageUtil.getMobile();
 		int sex = MessageUtil.getGender();
-		String provinceAndcity = LocalUtil2.getProvinceAndCity(); //json字符串
+		String json = "{\"包邮区\":\"江苏,浙江,上海\",\"沿海\":\"辽宁,河北,北京,天津,山东,福建,广东,海南,广西,香港\",\"比例\":\"5:3:2\"}";
+		String provinceAndcity = LocalUtil2.getProvinceAndCity(json); //json字符串
 		JSONObject obj = JSONObject.fromObject(provinceAndcity);
 		String province =obj.getString("province");
 		String city =obj.getString("city");
 		String county =obj.getString("countys");
 
-		//cust.put("email", moblie+"@qq.com");
 		cust.put("email", MessageUtil.getEmail(6, 9));
 		cust.put("dateCreated", TimeUtil.getStringTime());
 		cust.put("img", ImageUtil.getHttpLink());
@@ -124,7 +124,7 @@ public class CustomerDemo {
 	}
 
 	/**
-	 * 创建标签,返回创建的标签id
+	 * 创建标签,标签也有所属的组群,返回创建的标签id
 	 * @return 
 	 */
 	public static String createTag(String access_token){
