@@ -30,6 +30,7 @@ public class CustomerTest {
 			// System.out.println(customerId);
 			// addCustomerTag(customerId,accessToken);
 			// createCustomerEvent(customerId,accessToken);
+			
 			String listid = createList(accessToken);
 			String code = updateList(listid,accessToken);
 			System.out.println("code is "+code);
