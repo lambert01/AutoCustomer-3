@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.autoCustomer.demo.CustomerDemo;
 import com.autoCustomer.service.AddcustomerService;
 import com.autoCustomer.service.CustomerService;
 import com.autoCustomer.service.DePercentageService;
@@ -78,10 +77,13 @@ public class CustomerController {
 	 */
 	@RequestMapping("/createCustomer")
 	public void createCustomer(){
-		JSONObject customer = addcustomerService.getcustomer();
+		JSONObject obj = addcustomerService.getcustomer();
 		String dateJoin = percentageService.getRanCreateTime();
-		customer.put("dateJoin", dateJoin);
-		addcustomerService.addcustomer(customer.toString());
+		JSONObject customer = (JSONObject)obj.get("customer");
+	 	customer.put("dateCreated", dateJoin);
+		customer.put("dateJoin", dateJoin); 
+		System.out.println("obj.toString() "+obj.toString());
+		addcustomerService.addcustomer(obj.toString());
 		
 		
 	}
