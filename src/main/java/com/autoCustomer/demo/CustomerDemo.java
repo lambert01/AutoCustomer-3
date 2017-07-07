@@ -6,12 +6,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
-import com.autoCustomer.util.ImageUtil;
 import com.autoCustomer.util.LocalUtil2;
 import com.autoCustomer.util.MessageUtil;
 import com.autoCustomer.util.SendUtils;
 import com.autoCustomer.util.TagUtil;
-import com.autoCustomer.util.TimeUtil;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -73,7 +71,6 @@ public class CustomerDemo {
 		String county =obj.getString("countys");
 
 		cust.put("email", MessageUtil.getEmail(6, 9));
-		cust.put("dateCreated", TimeUtil.getStringTime());
 		//cust.put("img", ImageUtil.getHttpLink());
 		cust.put("name", MessageUtil.getChineseName(sex));
 		cust.put("country", "中国");
