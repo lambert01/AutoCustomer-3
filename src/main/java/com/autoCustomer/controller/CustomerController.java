@@ -80,7 +80,7 @@ public class CustomerController {
 		JSONObject obj = addcustomerService.getcustomer();
 		String dateJoin = percentageService.getRanCreateTime();
 		JSONObject customer = (JSONObject)obj.get("customer");
-	 	customer.put("dateCreated", dateJoin);
+		//dateJon要符合utc时间格式
 		customer.put("dateJoin", dateJoin); 
 		System.out.println("obj.toString() "+obj.toString());
 		addcustomerService.addcustomer(obj.toString());
