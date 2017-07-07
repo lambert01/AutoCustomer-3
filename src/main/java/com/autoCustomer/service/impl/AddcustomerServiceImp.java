@@ -10,9 +10,10 @@ import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
 
+import com.autoCustomer.dao.DeImageMapper;
 import com.autoCustomer.dao.TblPropertiesInfoMapper;
+import com.autoCustomer.entity.DeImage;
 import com.autoCustomer.service.AddcustomerService;
-import com.autoCustomer.util.ImageUtil;
 import com.autoCustomer.util.LocalUtil2;
 import com.autoCustomer.util.MessageUtil;
 import com.autoCustomer.util.SendUtils;
@@ -28,6 +29,9 @@ public class AddcustomerServiceImp implements AddcustomerService {
 	
 	@Resource
 	private TblPropertiesInfoMapper tblPropertiesInfoDao;
+	
+	@Resource
+	private DeImageMapper imagedao;
 	
 	private static final String ADDRESS_SET ="address_set";
 	private static final String URL = "http://api.convertwork.cn/";
@@ -88,8 +92,7 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		String county =obj.getString("countys");
 
 		cust.put("email", MessageUtil.getEmail(6, 9));
-		ImageUtil img = new ImageUtil();
-		cust.put("img", img.getHttpLink());
+		cust.put("img", getImage());
 		cust.put("name", MessageUtil.getChineseName(sex));
 		cust.put("country", "中国");
 		if("北京".equals(province)||"天津".equals(province)||"重庆".equals(province) ||"上海".equals(province)||"澳门".equals(province)||"香港".equals(province)){
@@ -227,6 +230,19 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		obj2.put("data", obj);
 		String returnCode = SendUtils.post(url, obj2.toString());
 		return returnCode;
+	}
+	
+	/**
+	 * 随机返回一个图片的路径
+	 * @return
+	 */
+	private String getImage(){
+		List<DeImage> arrs = imagedao.selectAllImage();
+		int size = arrs.size();
+		int index = (int) (Math.random() * size);
+		DeImage image = arrs.get(index);
+		return image.getImageurl();
+		
 	}
 
 }
