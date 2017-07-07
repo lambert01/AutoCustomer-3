@@ -78,7 +78,6 @@ public class AddcustomerServiceImp implements AddcustomerService {
 	}
 	
 
-	
 	/**
 	 * 创建符合格式要求的客户json字符串
 	 * @param openid
