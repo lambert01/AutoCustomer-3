@@ -77,13 +77,9 @@ public class CustomerController {
 	 */
 	@RequestMapping("/createCustomer")
 	public void createCustomer(){
-		JSONObject obj = addcustomerService.getcustomer();
-		String dateJoin = percentageService.getRanCreateTime();
-		JSONObject customer = (JSONObject)obj.get("customer");
-		//dateJon要符合utc时间格式
-		customer.put("dateJoin", dateJoin); 
-		System.out.println("obj.toString() "+obj.toString());
-		addcustomerService.addcustomer(obj.toString());
+		JSONObject customer = addcustomerService.getcustomer();
+		System.out.println("customer.toString() "+customer.toString());
+		addcustomerService.addcustomer(customer.toString());
 		
 		
 	}
