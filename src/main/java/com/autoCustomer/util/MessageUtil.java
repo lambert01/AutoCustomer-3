@@ -40,7 +40,7 @@ public class MessageUtil {
 		String first = firstName.substring(index, index + 1);
 		String str = boy;
 		int length = boy.length();
-		if (sex == 0) {
+		if (sex == 2) {
 			str = girl;
 			length = girl.length();
 		}
