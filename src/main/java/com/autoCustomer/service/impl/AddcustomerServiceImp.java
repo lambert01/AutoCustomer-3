@@ -54,6 +54,9 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		JSONObject returnobj = JSONObject.fromObject(retunrstr);
 		System.out.println("创建客户返回的json是"+returnobj);
 		String id = returnobj.getString("id");
+		String dateJoin = returnobj.getString("dateJoin");
+		String event = createCustomerEvent(id, accessToken,dateJoin);
+		System.out.println("event is "+event);
 		return id;
 
 	}
@@ -189,18 +192,19 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		}
 
 
-	/**
-	 * 给客户绑定事件
-	 * @param URL
-	 * @param json
-	 * @return
-	 */
-	public  String createCustomerEvent(String customerId,String access_token){
+    /**
+     * 给客户绑定事件
+     * @param customerId
+     * @param access_token
+     * @param dateTime
+     * @return
+     */
+	public  String createCustomerEvent(String customerId,String access_token,String dateTime){
 		String domain = getPropertyInfo(DOMIAN_NAME);
 		String url = domain + "/v1/customerevents?access_token=" + access_token;
 		JSONObject obj = new JSONObject();
 		obj.put("customerId", customerId);
-		obj.put("date", percentageService.getRanCreateTime());
+		obj.put("date",dateTime);
 		obj.put("event", "submit_form");
 		obj.put("targetId", "111");
 		obj.put("targetName", "阿斯达");
