@@ -32,7 +32,7 @@ public class AddcustomerServiceImp implements AddcustomerService {
 	private TblPropertiesInfoMapper tblPropertiesInfoDao;
 	
 	@Resource
-	private DePercentageService percentageService;
+	private DePercentageService percentageService; //获得符合要求的utc时间
 	
 	@Resource
 	private DeImageMapper imagedao;
@@ -53,7 +53,7 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		String retunrstr = SendUtils.post(url, customer);
 		JSONObject returnobj = JSONObject.fromObject(retunrstr);
 		System.out.println("创建客户返回的json是"+returnobj);
-		String id = returnobj.get("id").toString();
+		String id = returnobj.getString("id");
 		return id;
 
 	}
@@ -74,13 +74,7 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		return access_token;
 	}
 	
-	public String getPropertyInfo(String kind){
-		List<String> list = tblPropertiesInfoDao.selectPropertyInfoByKind(kind);
-		if(list!=null && list.size()>0){
-			return list.get(0);
-		}
-		return "";
-	}
+
 	
 	/**
 	 * 创建符合格式要求的客户json字符串
@@ -240,11 +234,11 @@ public class AddcustomerServiceImp implements AddcustomerService {
 	public  String addcustomertoList(String customerId,String listId, String access_token){
 		String domain = getPropertyInfo(DOMIAN_NAME);
 		String url = domain + "/v1/listMembers" + "?access_token=" + access_token;
-		JSONObject obj = new JSONObject();
+		JSONObject data = new JSONObject();
 		JSONObject obj2 = new JSONObject();
-		obj.put("customerId", customerId);
-		obj.put("listId", listId);
-		obj2.put("data", obj);
+		data.put("customerId", customerId);
+		data.put("listId", listId);
+		obj2.put("data", data);
 		String returnCode = SendUtils.post(url, obj2.toString());
 		return returnCode;
 	}
@@ -254,12 +248,29 @@ public class AddcustomerServiceImp implements AddcustomerService {
 	 * @return
 	 */
 	private String getImage(){
+		String imageurl ="";
 		List<DeImage> arrs = imagedao.selectAllImage();
 		int size = arrs.size();
-		int index = (int) (Math.random() * size);
-		DeImage image = arrs.get(index);
-		return image.getImageurl();
-		
+		if(size >0){
+			int index = (int) (Math.random() * size);
+			DeImage image = arrs.get(index);
+			imageurl =  image.getImageurl();
+		}
+		return imageurl;
+	
+	}
+	
+	/**
+	 * 获取配置数据
+	 * @param kind
+	 * @return
+	 */
+	public String getPropertyInfo(String kind){
+		List<String> list = tblPropertiesInfoDao.selectPropertyInfoByKind(kind);
+		if(list!=null && list.size()>0){
+			return list.get(0);
+		}
+		return "";
 	}
 
 }
