@@ -76,10 +76,12 @@ public class CustomerController {
 	 * 自动创建客户,客户的创建时间调用方法返回符合要求的时间
 	 */
 	@RequestMapping("/createCustomer")
-	public void createCustomer(){
+	@ResponseBody
+	public String createCustomer(){
 		JSONObject customer = addcustomerService.getcustomer();
 		System.out.println("customer.toString() "+customer.toString());
-		addcustomerService.addcustomer(customer.toString());
+		String id = addcustomerService.addcustomer(customer.toString());
+		return id;
 		
 		
 	}
