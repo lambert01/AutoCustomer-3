@@ -37,13 +37,19 @@ public class AddcustomerServiceImp implements AddcustomerService {
 	@Resource
 	private DeImageMapper imagedao;
 	
-	private static final String ADDRESS_SET ="address_set";
-	private static final String URL = "http://api.convertwork.cn/";
+	private static final String ADDRESS_SET ="address_set"; //地址配置
+	private static final String DOMIAN_NAME ="domian_name"; //域名,可配置测试域名或生产域名
+	private static final String APPID ="appid";  
+	private static final String SERCET ="sercet";  
     
 	@Override
 	public String addcustomer(String customer) {
-		String accessToken = getAccessToken("cl02dd15a2228ee92", "ce2f7581f4203b257ed5687c2e2106c3978a93be");
-		String url = "http://api.convertwork.cn/v1/customerandidentities?access_token="+accessToken;
+		String domain = getPropertyInfo(DOMIAN_NAME);
+		String appid = getPropertyInfo(APPID);
+		String sercet = getPropertyInfo(SERCET);
+		//appid.String accessToken = getAccessToken("cl02dd15a2228ee92", "ce2f7581f4203b257ed5687c2e2106c3978a93be");
+		String accessToken = getAccessToken(appid,sercet);
+		String url = domain+"/v1/customerandidentities?access_token="+accessToken;
 		String retunrstr = SendUtils.post(url, customer);
 		JSONObject returnobj = JSONObject.fromObject(retunrstr);
 		System.out.println("创建客户返回的json是"+returnobj);
@@ -53,7 +59,8 @@ public class AddcustomerServiceImp implements AddcustomerService {
 	}
 	
 	private String getAccessToken(String appid,String sercet) {
-		String url ="http://api.convertwork.cn/security/accesstoken";
+		String domain = getPropertyInfo(DOMIAN_NAME);
+		String url =domain+"/security/accesstoken";
 		String retunrstr = SendUtils.sendGet(url,"grant_type=client_credentials&appid="+appid+"&secret="+sercet+"");
 		// 发送get请求,通过appid和sercet获取accesstoken.
 		// retunrstr ="{\"error_code\":0,\"access_token\":\"123\"}";
@@ -133,7 +140,8 @@ public class AddcustomerServiceImp implements AddcustomerService {
 	 * @return 
 	 */
 	public  String createTag(String access_token){
-		String url = URL + "v1/tags?access_token="+access_token;
+		String domain = getPropertyInfo(DOMIAN_NAME);
+		String url = domain + "/v1/tags?access_token="+access_token;
 		JSONObject obj = new JSONObject();
 		obj.put("dimension", "coder");
 		obj.put("name", "程序员");
@@ -149,7 +157,8 @@ public class AddcustomerServiceImp implements AddcustomerService {
 	 */
 	@SuppressWarnings("unchecked")
 	public  String addCustomerTag(String customerId, String access_token){
-		String url = URL + "v1/tagservice/addCustomerTag?access_token=" + access_token;
+		String domain = getPropertyInfo(DOMIAN_NAME);
+		String url = domain + "/v1/tagservice/addCustomerTag?access_token=" + access_token;
 		JSONObject obj = new JSONObject();
 		JSONArray arr = new JSONArray();
 		obj.put("customerId", customerId);
@@ -193,7 +202,8 @@ public class AddcustomerServiceImp implements AddcustomerService {
 	 * @return
 	 */
 	public  String createCustomerEvent(String customerId,String access_token){
-		String url = URL + "v1/customerevents?access_token=" + access_token;
+		String domain = getPropertyInfo(DOMIAN_NAME);
+		String url = domain + "/v1/customerevents?access_token=" + access_token;
 		JSONObject obj = new JSONObject();
 		obj.put("customerId", customerId);
 		obj.put("date", percentageService.getRanCreateTime());
@@ -211,7 +221,8 @@ public class AddcustomerServiceImp implements AddcustomerService {
 	 * @return
 	 */
 	public  String createList(String access_token,String name){
-		String url = URL + "v1/lists?access_token=" + access_token;
+		String domain = getPropertyInfo(DOMIAN_NAME);
+		String url = domain + "/v1/lists?access_token=" + access_token;
 		JSONObject obj = new JSONObject();
 		obj.put("name", name);
 		String returnCode = SendUtils.post(url, obj.toString());
@@ -227,7 +238,8 @@ public class AddcustomerServiceImp implements AddcustomerService {
 	 * @return
 	 */
 	public  String addcustomertoList(String customerId,String listId, String access_token){
-		String url = URL + "v1/listMembers" + "?access_token=" + access_token;
+		String domain = getPropertyInfo(DOMIAN_NAME);
+		String url = domain + "/v1/listMembers" + "?access_token=" + access_token;
 		JSONObject obj = new JSONObject();
 		JSONObject obj2 = new JSONObject();
 		obj.put("customerId", customerId);
