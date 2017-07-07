@@ -82,7 +82,5 @@ public class CustomerController {
 		System.out.println("customer.toString() "+customer.toString());
 		String id = addcustomerService.addcustomer(customer.toString());
 		return id;
-		
-		
 	}
 }
