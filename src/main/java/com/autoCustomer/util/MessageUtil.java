@@ -32,9 +32,11 @@ public class MessageUtil {
 		return sb.toString();
 	}
 
-	/**
-	 * 返回中文姓名
-	 */
+    /**
+     * 根据性别返回合适的中文姓名
+     * @param sex
+     * @return
+     */
 	public static String getChineseName(int sex) {
 		int index = getNum(0, firstName.length() - 1);
 		String first = firstName.substring(index, index + 1);
@@ -69,13 +71,21 @@ public class MessageUtil {
 		String mobile = first + second + thrid;
 		return mobile;
 	}
-
+    
+	/**
+	 * 随机返回性别,1是男性,2是女性
+	 * @return
+	 */
 	public static int getGender(){
 		Random r=new Random();
 		int a=r.nextInt()>0?1:2;
 		return a;
 	}
 	
+	/**
+	 * 随机翻译一个唯一的身份id
+	 * @return
+	 */
 	public static String getOpenId(){
 		UUID uuid = UUID.randomUUID();
 		String openId = uuid.toString().replaceAll("-", "");
