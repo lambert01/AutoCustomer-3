@@ -1,6 +1,5 @@
 package com.autoCustomer.service.impl;
 
-import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -12,15 +11,12 @@ import javax.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import com.autoCustomer.dao.TblPropertiesInfoMapper;
-import com.autoCustomer.demo.CustomerDemo;
 import com.autoCustomer.service.AddcustomerService;
 import com.autoCustomer.util.ImageUtil;
 import com.autoCustomer.util.LocalUtil2;
 import com.autoCustomer.util.MessageUtil;
 import com.autoCustomer.util.SendUtils;
 import com.autoCustomer.util.TagUtil;
-import com.autoCustomer.util.TimeUtil;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -42,6 +38,7 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		String url = "http://api.convertwork.cn/v1/customerandidentities?access_token="+accessToken;
 		String retunrstr = SendUtils.post(url, customer);
 		JSONObject returnobj = JSONObject.fromObject(retunrstr);
+		System.out.println("创建客户返回的json是"+returnobj);
 		String id = returnobj.get("id").toString();
 		return id;
 
@@ -91,7 +88,6 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		String county =obj.getString("countys");
 
 		cust.put("email", MessageUtil.getEmail(6, 9));
-		cust.put("dateCreated", TimeUtil.getStringTime());
 		ImageUtil img = new ImageUtil();
 		cust.put("img", img.getHttpLink());
 		cust.put("name", MessageUtil.getChineseName(sex));
@@ -122,24 +118,6 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		j.put("customerIdentities", arr);
 		j.put("customer", cust);
 		return j;
-	}
-
-	/**
-	 * 将客户信息推送到dmhub中,同时返回客户的id
-	 * @param access_token
-	 * @param openid
-	 * @param unionid
-	 * @return
-	 * @throws UnsupportedEncodingException 
-	 */
-	public  String sendCustomer(String access_token){
-		String customer = getcustomer().toString();
-		System.out.println(customer);
-		String url = URL+"v1/customerandidentities?access_token="+access_token;
-		String retunrstr = SendUtils.post(url, customer);
-		JsonObject returnData = new JsonParser().parse(retunrstr).getAsJsonObject();
-		JsonElement id = returnData.get("id");
-		return id.toString();
 	}
 
 	/**
