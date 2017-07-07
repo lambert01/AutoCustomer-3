@@ -1,9 +1,13 @@
 package com.autoCustomer.service.impl;
 
 import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.TimeZone;
 
 import javax.annotation.Resource;
 
@@ -78,6 +82,16 @@ public class DePercentageServiceImpl implements DePercentageService{
 			}
 			System.out.println(createTime);
 		}
+		 SimpleDateFormat df1 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+		 SimpleDateFormat df2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		 df1.setTimeZone(TimeZone.getTimeZone("UTC"));
+		 Date date = null;
+		 try {
+			  date = df2.parse(createTime);
+		} catch (ParseException e) {
+			date = new Date();
+		}
+		 createTime = df1.format(date);
 		return createTime;
 	}
 	
