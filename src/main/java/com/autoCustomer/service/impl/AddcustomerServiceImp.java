@@ -14,6 +14,7 @@ import com.autoCustomer.dao.DeImageMapper;
 import com.autoCustomer.dao.TblPropertiesInfoMapper;
 import com.autoCustomer.entity.DeImage;
 import com.autoCustomer.service.AddcustomerService;
+import com.autoCustomer.service.DePercentageService;
 import com.autoCustomer.util.LocalUtil2;
 import com.autoCustomer.util.MessageUtil;
 import com.autoCustomer.util.SendUtils;
@@ -29,6 +30,9 @@ public class AddcustomerServiceImp implements AddcustomerService {
 	
 	@Resource
 	private TblPropertiesInfoMapper tblPropertiesInfoDao;
+	
+	@Resource
+	private DePercentageService percentageService;
 	
 	@Resource
 	private DeImageMapper imagedao;
@@ -92,6 +96,7 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		String county =obj.getString("countys");
 
 		cust.put("email", MessageUtil.getEmail(6, 9));
+		cust.put("dateJoin", percentageService.getRanCreateTime());
 		cust.put("img", getImage());
 		cust.put("name", MessageUtil.getChineseName(sex));
 		cust.put("country", "中国");
@@ -191,7 +196,7 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		String url = URL + "v1/customerevents?access_token=" + access_token;
 		JSONObject obj = new JSONObject();
 		obj.put("customerId", customerId);
-		obj.put("date", "");
+		obj.put("date", percentageService.getRanCreateTime());
 		obj.put("event", "submit_form");
 		obj.put("targetId", "111");
 		obj.put("targetName", "阿斯达");
