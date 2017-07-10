@@ -146,7 +146,8 @@ public class CustomerDemo {
 		JSONArray arr = new JSONArray();
 		obj.put("customerId", customerId);
 		
-		Map<String, Object> map = TagUtil.getTags();
+		TagUtil tag = new TagUtil();
+		Map<String, Object> map = tag.getTags();
 		Map<String, Object> tagmap = (Map<String, Object>) map.get("map1");
 		Map<String, Object> tagmap2 = (Map<String, Object>) map.get("map2");
 	     for(Entry<String, Object> entry:tagmap.entrySet()){  
