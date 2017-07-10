@@ -1,13 +1,11 @@
 package com.autoCustomer.service.impl;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
 import javax.annotation.Resource;
-import javax.swing.text.html.HTML.Tag;
 import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
