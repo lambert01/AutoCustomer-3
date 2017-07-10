@@ -1,11 +1,13 @@
 package com.autoCustomer.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
 import javax.annotation.Resource;
+import javax.swing.text.html.HTML.Tag;
 import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
@@ -53,14 +55,25 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		String retunrstr = SendUtils.post(url, customer);
 		JSONObject returnobj = JSONObject.fromObject(retunrstr);
 		System.out.println("创建客户返回的json是"+returnobj);
-		String id = returnobj.getString("id");
+		String customeid = returnobj.getString("id");
+	//	addCustomerTag(customeid,accessToken);
 		String dateJoin = returnobj.getString("dateJoin");
-		String event = createCustomerEvent(id, accessToken,dateJoin);
+		String event = createCustomerEvent(customeid, accessToken,dateJoin);
 		System.out.println("event is "+event);
-		return id;
+		String listid = createList(accessToken, "静态组群1");
+		createTag(accessToken);
+		addcustomertoList( customeid, listid, accessToken);
+		addCustomerTag(customeid, accessToken);
+		return customeid;
 
 	}
 	
+	/**
+	 * 获得accessToken
+	 * @param appid
+	 * @param sercet
+	 * @return
+	 */
 	private String getAccessToken(String appid,String sercet) {
 		String domain = getPropertyInfo(DOMIAN_NAME);
 		String url =domain+"/security/accesstoken";
@@ -71,7 +84,7 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		System.out.println("调用accessToken   "+returnData);
 		String codes = returnData.get("error_code").toString();
 		String access_token = "";
-		if ("0".equals(codes)) {
+		if ("0".equals(codes)){
 			access_token = returnData.get("access_token").toString().replaceAll("\"", "");
 		}
 		return access_token;
@@ -130,6 +143,8 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		j.put("customer", cust);
 		return j;
 	}
+	
+ 
 
 	/**
 	 * 创建标签,标签也有所属的组群,返回创建的标签id
@@ -139,8 +154,9 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		String domain = getPropertyInfo(DOMIAN_NAME);
 		String url = domain + "/v1/tags?access_token="+access_token;
 		JSONObject obj = new JSONObject();
-		obj.put("dimension", "coder");
-		obj.put("name", "程序员");
+		obj.put("dimension", "basic");
+		//obj.put("name", "土豪");
+		obj.put("name", "精英");
 		String returnstr = SendUtils.post(url, obj.toString());
 		JSONObject returnObj = JSONObject.fromObject(returnstr);
 		String tagId = returnObj.getString("id");
@@ -151,7 +167,7 @@ public class AddcustomerServiceImp implements AddcustomerService {
 	 * 给客户打标签,是通过客户id来关联客户与标签的
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
+ 	@SuppressWarnings("unchecked")
 	public  String addCustomerTag(String customerId, String access_token){
 		String domain = getPropertyInfo(DOMIAN_NAME);
 		String url = domain + "/v1/tagservice/addCustomerTag?access_token=" + access_token;
@@ -159,7 +175,8 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		JSONArray arr = new JSONArray();
 		obj.put("customerId", customerId);
 		
-		Map<String, Object> map = TagUtil.getTags();
+		TagUtil tag = new TagUtil();
+		Map<String, Object> map = tag.getTags();
 		Map<String, Object> tagmap = (Map<String, Object>) map.get("map1");
 		Map<String, Object> tagmap2 = (Map<String, Object>) map.get("map2");
 	     for(Entry<String, Object> entry:tagmap.entrySet()){  
@@ -187,6 +204,35 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		obj.put("tags", arr);
 		
 		String returncodes = SendUtils.post(url, obj.toString());
+		return returncodes;
+		}
+	 
+	/**
+	 * 新的将客户与标签绑定
+	 * @param customerId
+	 * @param access_token
+	 * @return
+	 */
+	public  String addCustomernewTag(String customerId, String access_token){
+		String domain = getPropertyInfo(DOMIAN_NAME);
+		String url = domain + "/v1/tagservice/addCustomerTag?access_token=" + access_token;
+		JSONObject obj = new JSONObject();
+		obj.put("customerId", customerId);
+		JSONArray arr = new JSONArray();
+		JSONObject j = new JSONObject();
+			j.put("dimension", "basic");
+			j.put("name", "精英");
+			JSONObject j1 = new JSONObject();
+			j1.put("dimension", "basic");
+			j1.put("name", "土豪");
+			arr.add(j);
+			arr.add(j1);
+			obj.put("tags", arr);
+		
+		System.out.println("将客户与标签绑定的json是 "+obj.toString());
+		
+		String returncodes = SendUtils.post(url, obj.toString());
+		System.out.println("客户绑定标签返回结果的json是"+returncodes);
 		return returncodes;
 		}
 
