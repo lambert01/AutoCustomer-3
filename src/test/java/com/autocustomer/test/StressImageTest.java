@@ -20,7 +20,7 @@ public class StressImageTest {
         BufferedReader br = null;  //用于包装InputStreamReader,提高处理性能。因为BufferedReader有缓冲的，而InputStreamReader没有。
         PrintStream p = null;
         try {
-        FileOutputStream fs = new FileOutputStream(new File("D:\\image.txt"));
+        FileOutputStream fs = new FileOutputStream(new File("D:\\imagesql.txt"));
         p = new PrintStream(fs);
 
 
