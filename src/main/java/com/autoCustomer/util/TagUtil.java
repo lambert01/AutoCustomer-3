@@ -67,10 +67,9 @@ public class TagUtil {
 	/***
 	 * 返回标签
 	 */
-	public  Map<String, Object> getTags(){
+	public  Map<String, Object> getTags(Map<String,String> allTagsmap){
 		Map<String, Object> returnmap = new LinkedHashMap<String, Object>();
 		Map<String, Object> returnmap2 = new LinkedHashMap<String, Object>();
-		Map<String,String> allTagsmap = getAllTagsByfile();
 		int foreachcount = getNum();
 		HashSet<String> set = new HashSet<String>();
 		for (int j = 0; j < foreachcount; j++) {
