@@ -1,5 +1,6 @@
 package com.autoCustomer.service.impl;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -11,8 +12,10 @@ import javax.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import com.autoCustomer.dao.DeImageMapper;
+import com.autoCustomer.dao.DeTagMapper;
 import com.autoCustomer.dao.TblPropertiesInfoMapper;
 import com.autoCustomer.entity.DeImage;
+import com.autoCustomer.entity.DeTag;
 import com.autoCustomer.service.AddcustomerService;
 import com.autoCustomer.service.DePercentageService;
 import com.autoCustomer.util.LocalUtil2;
@@ -37,6 +40,9 @@ public class AddcustomerServiceImp implements AddcustomerService {
 	@Resource
 	private DeImageMapper imagedao;
 	
+	@Resource
+	private DeTagMapper tagdao;
+	
 	private static final String ADDRESS_SET ="address_set"; //地址配置
 	private static final String DOMIAN_NAME ="domian_name"; //域名,可配置测试域名或生产域名
 	private static final String APPID ="appid";  
@@ -54,7 +60,7 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		JSONObject returnobj = JSONObject.fromObject(retunrstr);
 		System.out.println("创建客户返回的json是"+returnobj);
 		String customeid = returnobj.getString("id");
-	//	addCustomerTag(customeid,accessToken);
+		addCustomerTag(customeid,accessToken);
 		String dateJoin = returnobj.getString("dateJoin");
 		String event = createCustomerEvent(customeid, accessToken,dateJoin);
 		System.out.println("event is "+event);
@@ -172,9 +178,16 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		JSONObject obj = new JSONObject();
 		JSONArray arr = new JSONArray();
 		obj.put("customerId", customerId);
+		List<DeTag> tags = tagdao.selectAllTag();
+		Map<String, String> tagdealmap = new HashMap<String, String>();
+		for (DeTag deTag : tags) {
+			String dimension =deTag.getDimension();
+			String name = deTag.getTagname();
+			tagdealmap.put(name, dimension);
+		}
 		
 		TagUtil tag = new TagUtil();
-		Map<String, Object> map = tag.getTags();
+		Map<String, Object> map = tag.getTags(tagdealmap);
 		Map<String, Object> tagmap = (Map<String, Object>) map.get("map1");
 		Map<String, Object> tagmap2 = (Map<String, Object>) map.get("map2");
 	     for(Entry<String, Object> entry:tagmap.entrySet()){  
