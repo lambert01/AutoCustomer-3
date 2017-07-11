@@ -1,6 +1,10 @@
- consumptive_habit7:中频消费者
- consumptive_habit7:低频消费者
- consumptive_habit7:高频消费者
+标签备注:有的标签属性是冲突的,如青年,老年
+这样的在demesion后面加上相同的数字,表示互斥
+
+可以使用工具类StressTagTest生成sql,也可以直接在表中插入数据
+
+如果用工具类,数据格式如下:
+
  consumptive_habit6:奢华
  consumptive_habit6:节俭
  consumptive_habit5:喜欢优惠
@@ -35,4 +39,3 @@
  basic1:老年
  basic1:中年
  basic1:青年 
- coder:程序员
