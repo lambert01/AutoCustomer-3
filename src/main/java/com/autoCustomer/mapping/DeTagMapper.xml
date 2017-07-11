@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.autoCustomer.dao.DeTagMapper" >
+  <resultMap id="BaseResultMap" type="com.autoCustomer.entity.DeTag" >
+    <id column="tagId" property="tagid" jdbcType="INTEGER" />
+    <result column="dimension" property="dimension" jdbcType="VARCHAR" />
+    <result column="tagname" property="tagname" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    tagId, dimension, tagname
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from de_tag
+    where tagId = #{tagid,jdbcType=INTEGER}
+  </select>
+  
+    <select id="selectAllTag" resultMap="BaseResultMap" >
+    select 
+    <include refid="Base_Column_List" />
+    from de_tag
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from de_tag
+    where tagId = #{tagid,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.autoCustomer.entity.DeTag" >
+    insert into de_tag (tagId, dimension, tagname
+      )
+    values (#{tagid,jdbcType=INTEGER}, #{dimension,jdbcType=VARCHAR}, #{tagname,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.autoCustomer.entity.DeTag" >
+    insert into de_tag
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="tagid != null" >
+        tagId,
+      </if>
+      <if test="dimension != null" >
+        dimension,
+      </if>
+      <if test="tagname != null" >
+        tagname,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="tagid != null" >
+        #{tagid,jdbcType=INTEGER},
+      </if>
+      <if test="dimension != null" >
+        #{dimension,jdbcType=VARCHAR},
+      </if>
+      <if test="tagname != null" >
+        #{tagname,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.autoCustomer.entity.DeTag" >
+    update de_tag
+    <set >
+      <if test="dimension != null" >
+        dimension = #{dimension,jdbcType=VARCHAR},
+      </if>
+      <if test="tagname != null" >
+        tagname = #{tagname,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where tagId = #{tagid,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.autoCustomer.entity.DeTag" >
+    update de_tag
+    set dimension = #{dimension,jdbcType=VARCHAR},
+      tagname = #{tagname,jdbcType=VARCHAR}
+    where tagId = #{tagid,jdbcType=INTEGER}
+  </update>
+</mapper>
