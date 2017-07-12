@@ -89,8 +89,8 @@ public class LocalUtil2 {
 		List<String> arrs = getLocalSetsByfile(addressSet);
 		int size = arrs.size();
 		int index = (int)(Math.random()*size);
-		String str = arrs.get(index);
-		return str;
+		String address = arrs.get(index);
+		return address;
 	}
 
 }
