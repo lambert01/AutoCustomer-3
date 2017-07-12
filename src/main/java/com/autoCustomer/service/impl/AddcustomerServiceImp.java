@@ -49,26 +49,28 @@ public class AddcustomerServiceImp implements AddcustomerService {
 	private static final String SERCET ="sercet";  
     
 	@Override
-	public String addcustomer(String customer) {
+	public String addcustomer() {
 		String domain = getPropertyInfo(DOMIAN_NAME);
 		String appid = getPropertyInfo(APPID);
 		String sercet = getPropertyInfo(SERCET);
 		//appid.String accessToken = getAccessToken("cl02dd15a2228ee92", "ce2f7581f4203b257ed5687c2e2106c3978a93be");
 		String accessToken = getAccessToken(appid,sercet);
 		String url = domain+"/v1/customerandidentities?access_token="+accessToken;
-		String retunrstr = SendUtils.post(url, customer);
-		JSONObject returnobj = JSONObject.fromObject(retunrstr);
-		System.out.println("创建客户返回的json是"+returnobj);
-		String customeid = returnobj.getString("id");
-		addCustomerTag(customeid,accessToken);
-		String dateJoin = returnobj.getString("dateJoin");
-		String event = createCustomerEvent(customeid, accessToken,dateJoin);
-		System.out.println("event is "+event);
-		String listid = createList(accessToken, "静态组群1");
-		createTag(accessToken);
-		addcustomertoList( customeid, listid, accessToken);
-		addCustomerTag(customeid, accessToken);
-		return customeid;
+		String customer = getcustomer().toString();
+		System.out.println("customer is "+customer);
+	//	String retunrstr = SendUtils.post(url, customer);
+		//JSONObject returnobj = JSONObject.fromObject(retunrstr);
+		//System.out.println("创建客户返回的json是"+returnobj);
+		//String customeid = returnobj.getString("id");
+	//	addCustomerTag(customeid,accessToken);
+	//	String dateJoin = returnobj.getString("dateJoin");
+	//	String event = createCustomerEvent(customeid, accessToken,dateJoin);
+		//System.out.println("event is "+event);
+		//String listid = createList(accessToken, "静态组群1");
+		//createTag(accessToken);
+		//addcustomertoList( customeid, listid, accessToken);
+		//addCustomerTag(customeid, accessToken);
+		return "";
 
 	}
 	
@@ -263,7 +265,7 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		obj.put("date",dateTime);
 		obj.put("event", "submit_form");
 		obj.put("targetId", "111");
-		obj.put("targetName", "阿斯达");
+		obj.put("targetName", "微信事件");
 		String returnCode = SendUtils.post(url, obj.toString());
 		return returnCode;
 	}
@@ -281,7 +283,7 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		obj.put("name", name);
 		String returnCode = SendUtils.post(url, obj.toString());
 		JSONObject returnObj = JSONObject.fromObject(returnCode);
-		String listid = returnObj.getString("id");
+		String listid = returnObj.getString("id");//群组id
 		return listid;
 	}
 
