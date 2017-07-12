@@ -1,6 +1,8 @@
 package com.autoCustomer.controller;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -68,7 +70,7 @@ public class CustomerController {
 			json.put("errMsg", "入参为空");
 			return json.toString();
 		}
-		String message = addcustomerService.addcustomer(data);
+		String message = addcustomerService.addcustomer();
 		return message;
 	}
 	
@@ -80,7 +82,10 @@ public class CustomerController {
 	public String createCustomer(){
 		JSONObject customer = addcustomerService.getcustomer();
 		System.out.println("customer.toString() "+customer.toString());
-		String id = addcustomerService.addcustomer(customer.toString());
-		return id;
+		for (int i = 0; i < 1; i++) { 
+			addcustomerService.addcustomer();	
+		}
+		
+		return "";
 	}
 }
