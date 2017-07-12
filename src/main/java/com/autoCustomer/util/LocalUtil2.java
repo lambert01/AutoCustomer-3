@@ -19,10 +19,8 @@ public class LocalUtil2 {
 	private static List<String> getLocalSetsByfile(String addressSet){
 		List<String> arrs = new ArrayList<String>();
 				JSONObject obj = JSONObject.fromObject(addressSet);
-				//String[] baoyouqus = obj.get("包邮区").toString().split(",");
 				String[] baoyouqus = {"江苏","浙江","上海"};
 				List<String> listbaoyouqus = Arrays.asList(baoyouqus);
-				//String[] yanhais = obj.get("沿海").toString().split(",");
 				String[] yanhais = {"辽宁","河北","北京","天津","山东","福建","广东","海南","广西","香港","澳门"};
 				List<String> listyanhais = Arrays.asList(yanhais);
 				String[] bilis = obj.get("proportion").toString().split(":");
