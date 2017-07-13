@@ -226,7 +226,7 @@ public class AddcustomerServiceImp implements AddcustomerService {
 	 * @param access_token
 	 * @return
 	 */
-	public  String addCustomernewTag(String customerId, String access_token){
+/*	public  String addCustomerTag(String customerId, String access_token){
 		String domain = getPropertyInfo(DOMIAN_NAME);
 		String url = domain + "/v1/tagservice/addCustomerTag?access_token=" + access_token;
 		JSONObject obj = new JSONObject();
@@ -242,12 +242,10 @@ public class AddcustomerServiceImp implements AddcustomerService {
 			arr.add(j1);
 			obj.put("tags", arr);
 		
-		System.out.println("将客户与标签绑定的json是 "+obj.toString());
 		
 		String returncodes = SendUtils.post(url, obj.toString());
-		System.out.println("客户绑定标签返回结果的json是"+returncodes);
 		return returncodes;
-		}
+		}*/
 
 
     /**
