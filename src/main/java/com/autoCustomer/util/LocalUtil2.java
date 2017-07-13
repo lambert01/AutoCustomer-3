@@ -80,7 +80,7 @@ public class LocalUtil2 {
 	}
 
 	/**
-	 * 返回包邮区的概率50%,返回沿海非包邮地区的概率30%,返回内地地区的概率20%
+	 * 返回包邮区的概率50%,返回沿海非包邮地区的概率30%,返回内地地区的概率20%,概率可根据配置更改
 	 * @return
 	 */
 	public static String getProvinceAndCity(String addressSet){
