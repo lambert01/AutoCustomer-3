@@ -170,7 +170,7 @@ public class AddcustomerServiceImp implements AddcustomerService {
 	}
 
 	/**
-	 * 给客户打标签,是通过客户id来关联客户与标签的
+	 * 将客户与标签绑定
 	 * @return
 	 */
  	@SuppressWarnings("unchecked")
@@ -219,33 +219,6 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		String returncodes = SendUtils.post(url, obj.toString());
 		return returncodes;
 		}
-	 
-	/**
-	 * 新的将客户与标签绑定
-	 * @param customerId
-	 * @param access_token
-	 * @return
-	 */
-/*	public  String addCustomerTag(String customerId, String access_token){
-		String domain = getPropertyInfo(DOMIAN_NAME);
-		String url = domain + "/v1/tagservice/addCustomerTag?access_token=" + access_token;
-		JSONObject obj = new JSONObject();
-		obj.put("customerId", customerId);
-		JSONArray arr = new JSONArray();
-		JSONObject j = new JSONObject();
-			j.put("dimension", "basic");
-			j.put("name", "精英");
-			JSONObject j1 = new JSONObject();
-			j1.put("dimension", "basic");
-			j1.put("name", "土豪");
-			arr.add(j);
-			arr.add(j1);
-			obj.put("tags", arr);
-		
-		
-		String returncodes = SendUtils.post(url, obj.toString());
-		return returncodes;
-		}*/
 
 
     /**
