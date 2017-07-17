@@ -3,6 +3,7 @@ package com.autoCustomer.controller;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -42,12 +43,17 @@ public class CustomerController {
 		response.setHeader("Content-Type", "application/xml; charset=UTF-8");  
 		String createTime = percentageService.getRanCreateTime();
 		System.out.println("createTime:"+createTime);
-		String currentStage = percentageService.getCurrentStage();
-		System.out.println("currentStage:"+currentStage);
+		for (int i = 0; i < 10; i++) {
+			Map<String, Object> currentStages = percentageService.getCurrentStage();
+			String meaage = currentStages.get("message").toString();
+			System.out.println("客户状态是 "+meaage);
+		}
+		
+		//System.out.println("currentStage:"+currentStage);
 		String activeDate = percentageService.getActiveData();
 		System.out.println("activeDate:"+activeDate);
 		json.put("createTime", createTime);
-		json.put("currentStage",currentStage);
+	//	json.put("currentStage",currentStage);
 		json.put("activeDate", activeDate);
 		return json.toString();
 	}
