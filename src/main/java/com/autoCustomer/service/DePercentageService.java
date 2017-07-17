@@ -1,5 +1,7 @@
 package com.autoCustomer.service;
 
+import java.util.Map;
+
 public interface DePercentageService {
 
 	//获取线下活动数据
@@ -9,5 +11,5 @@ public interface DePercentageService {
 	String getRanCreateTime();
 	
 	//获取当前阶段数据
-	String getCurrentStage();
+	 Map<String,Object> getCurrentStage();
 }
