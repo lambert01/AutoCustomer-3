@@ -1,5 +1,6 @@
 package com.autoCustomer.service.impl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,9 +13,11 @@ import javax.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import com.autoCustomer.dao.DeImageMapper;
+import com.autoCustomer.dao.DeStageEventMapper;
 import com.autoCustomer.dao.DeTagMapper;
 import com.autoCustomer.dao.TblPropertiesInfoMapper;
 import com.autoCustomer.entity.DeImage;
+import com.autoCustomer.entity.DeStageEvent;
 import com.autoCustomer.entity.DeTag;
 import com.autoCustomer.service.AddcustomerService;
 import com.autoCustomer.service.DePercentageService;
@@ -43,6 +46,9 @@ public class AddcustomerServiceImp implements AddcustomerService {
 	@Resource
 	private DeTagMapper tagdao;
 	
+	@Resource
+	private DeStageEventMapper stagedao;//获得与客户状态对应的事件
+	
 	private static final String ADDRESS_SET ="address_set"; //地址配置
 	private static final String DOMIAN_NAME ="domian_name"; //域名,可配置测试域名或生产域名
 	private static final String APPID ="appid";  
@@ -56,15 +62,21 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		//appid.String accessToken = getAccessToken("cl02dd15a2228ee92", "ce2f7581f4203b257ed5687c2e2106c3978a93be");
 		String accessToken = getAccessToken(appid,sercet);
 		String url = domain+"/v1/customerandidentities?access_token="+accessToken;
-		String customer = getcustomer().toString();
+		JSONObject customer = getcustomer();
+		Map<String, Object> stagemap = percentageService.getCurrentStage();
+		String stage = stagemap.get("message").toString();
+		Integer stageid = (Integer)stagemap.get("id"); //客户状态id,通过状态id找到符合的事件
+		List<DeStageEvent>  stageevents = stagedao.selectEventsByStage(stageid); //所有符合客户状态的事件
+		customer.put("stage", stage);
 		System.out.println("customer is "+customer);
-	//	String retunrstr = SendUtils.post(url, customer);
-		//JSONObject returnobj = JSONObject.fromObject(retunrstr);
-		//System.out.println("创建客户返回的json是"+returnobj);
-		//String customeid = returnobj.getString("id");
+		String retunrstr = SendUtils.post(url, customer.toString());
+		JSONObject returnobj = JSONObject.fromObject(retunrstr);
+		String name = returnobj.get("name").toString();
+		System.out.println("创建客户返回的json是"+name);
+		String customeid = returnobj.getString("id");
 	//	addCustomerTag(customeid,accessToken);
-	//	String dateJoin = returnobj.getString("dateJoin");
-	//	String event = createCustomerEvent(customeid, accessToken,dateJoin);
+		String dateJoin = returnobj.getString("dateJoin");
+		String event = createCustomerEvent(customeid, accessToken,dateJoin,stageevents);
 		//System.out.println("event is "+event);
 		//String listid = createList(accessToken, "静态组群1");
 		//createTag(accessToken);
@@ -137,6 +149,7 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		cust.put("county", county);
 		cust.put("mobile", moblie);
 		cust.put("gender", sex);
+		cust.put("source", percentageService.getActiveData());
 		JSONArray arr = new JSONArray();
 		for(int i = 0; i < 1; i++){
 			j1.put("identityType", "wechat");
@@ -222,22 +235,56 @@ public class AddcustomerServiceImp implements AddcustomerService {
 
 
     /**
-     * 给客户绑定事件
+     * 给客户绑定事件,有的状态的对应事件有多个,在其中选择一个就行了
+     * 表中ismust状态为1的表示对应状态的事件有多个,任选一个
      * @param customerId
      * @param access_token
      * @param dateTime
      * @return
      */
-	public  String createCustomerEvent(String customerId,String access_token,String dateTime){
+	public String createCustomerEvent(String customerId, String access_token, String dateTime,List<DeStageEvent> events) {
 		String domain = getPropertyInfo(DOMIAN_NAME);
 		String url = domain + "/v1/customerevents?access_token=" + access_token;
-		JSONObject obj = new JSONObject();
-		obj.put("customerId", customerId);
-		obj.put("date",dateTime);
-		obj.put("event", "submit_form");
-		obj.put("targetId", "111");
-		obj.put("targetName", "微信事件");
-		String returnCode = SendUtils.post(url, obj.toString());
+		String returnCode = "";
+		Integer laststageid = 0;
+		List<DeStageEvent> listevents = new ArrayList<DeStageEvent>();
+
+		for (DeStageEvent deStageEvent : events) {
+			Integer stageid = deStageEvent.getStageid(); // 客户状态id
+			Integer ismust = deStageEvent.getIsmust(); // 是否有多个可选状态
+			if (ismust == 1) {
+				if (laststageid == 0 || laststageid == stageid) {
+					listevents.add(deStageEvent);
+				}
+				laststageid = stageid;
+				// 查询该stageid有几个对应的事件
+				int ueczise = stagedao.selectUnnectagesize(stageid);
+				if (ueczise == listevents.size()) {
+					int size = listevents.size();
+					int index = (int) (Math.random() * size);
+					DeStageEvent event = listevents.get(index);
+					JSONObject obj = new JSONObject();
+					obj.put("customerId", customerId);
+					obj.put("date", dateTime);
+					obj.put("event", event.getEvent());
+					obj.put("targetId", event.getTargetid());
+					obj.put("targetName", event.getTargetname());
+					returnCode = SendUtils.post(url, obj.toString());
+					System.out.println("将客户绑定事件的json  "+obj.toString());
+					listevents.clear();
+				}
+			} else {
+				laststageid = 0;
+				JSONObject obj = new JSONObject();
+				obj.put("customerId", customerId);
+				obj.put("date", dateTime);
+				obj.put("event", deStageEvent.getEvent());
+				obj.put("targetId", deStageEvent.getTargetid());
+				obj.put("targetName", deStageEvent.getTargetname());
+				returnCode = SendUtils.post(url, obj.toString());
+				System.out.println("将客户绑定事件的json  "+obj.toString());
+			}
+		}
 		return returnCode;
 	}
 
