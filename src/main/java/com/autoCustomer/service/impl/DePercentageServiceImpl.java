@@ -4,6 +4,7 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -26,7 +27,8 @@ public class DePercentageServiceImpl implements DePercentageService{
 	
 	
 	
-	public String getCurrentStage() {
+	public Map<String, Object> getCurrentStage() {
+		Map<String, Object> returnMap = new HashMap<String, Object>();
 		List<Map<String, Object>> list = dePercentageMapper.selectByType(Constant.CURRENT_STAGE);
 		double num = getNum(Constant.DIGIT2);
 		String message = "";
@@ -37,10 +39,13 @@ public class DePercentageServiceImpl implements DePercentageService{
 			double endNum = Double.valueOf(recursion.split(":")[1]);
 			if(num > startNum && num <= endNum){
 				message = (String)list.get(i).get("message");
+				Integer id = Integer.parseInt (list.get(i).get("id").toString());
+				returnMap.put("message", message);
+				returnMap.put("id", id);
 				break;
 			}
 		}
-		return message;
+		return returnMap;
 	}
 	
 	
