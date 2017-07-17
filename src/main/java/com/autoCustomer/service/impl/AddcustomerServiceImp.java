@@ -70,8 +70,8 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		JSONObject customer = getcustomer();
 		Map<String, Object> stagemap = percentageService.getCurrentStage();
 		String stage = stagemap.get("message").toString();
-		//Integer stageid = (Integer)stagemap.get("id"); //客户状态id,通过状态id找到符合的事件
-		Integer stageid = 29; //客户状态id,通过状态id找到符合的事件
+		Integer stageid = (Integer)stagemap.get("id"); //客户状态id,通过状态id找到符合的事件
+		//Integer stageid = 29; //客户状态id,通过状态id找到符合的事件
 		List<DeStageEvent>  stageevents = stagedao.selectEventsByStage(stageid); //所有符合客户状态的事件
 		customer.put("stage", stage);
 		System.out.println("customer is "+customer);
