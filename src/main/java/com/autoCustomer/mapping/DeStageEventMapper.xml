@@ -108,7 +108,7 @@
     select 
     <include refid="Base_Column_List" />
     from de_stage_event
-    where stageId &lt;= #{stageid,jdbcType=INTEGER}
+    where stageId &lt;= #{stageid,jdbcType=INTEGER} order by stageId 
   </select>
   
    <select id="selectUnnectagesize" resultType="java.lang.Integer" parameterType="java.lang.Integer" >
