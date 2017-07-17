@@ -13,7 +13,7 @@
  	</resultMap>
   
   	<select id="selectByType" resultType="Map" parameterType="java.lang.String">
-  		select start_date,end_date,percentage,spread,message from de_percentage
+  		select start_date,end_date,percentage,spread,message,id from de_percentage
   		 where type=#{type} order by percentage
   	</select>
   
