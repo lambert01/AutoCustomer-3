@@ -1,9 +1,14 @@
 package com.autoCustomer.service.impl;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
@@ -65,7 +70,8 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		JSONObject customer = getcustomer();
 		Map<String, Object> stagemap = percentageService.getCurrentStage();
 		String stage = stagemap.get("message").toString();
-		Integer stageid = (Integer)stagemap.get("id"); //客户状态id,通过状态id找到符合的事件
+		//Integer stageid = (Integer)stagemap.get("id"); //客户状态id,通过状态id找到符合的事件
+		Integer stageid = 29; //客户状态id,通过状态id找到符合的事件
 		List<DeStageEvent>  stageevents = stagedao.selectEventsByStage(stageid); //所有符合客户状态的事件
 		customer.put("stage", stage);
 		System.out.println("customer is "+customer);
@@ -248,8 +254,9 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		String returnCode = "";
 		Integer laststageid = 0;
 		List<DeStageEvent> listevents = new ArrayList<DeStageEvent>();
-
+          String differentTime = dateTime;
 		for (DeStageEvent deStageEvent : events) {
+			differentTime = paserUtcTime(differentTime);
 			Integer stageid = deStageEvent.getStageid(); // 客户状态id
 			Integer ismust = deStageEvent.getIsmust(); // 是否有多个可选状态
 			if (ismust == 1) {
@@ -265,7 +272,7 @@ public class AddcustomerServiceImp implements AddcustomerService {
 					DeStageEvent event = listevents.get(index);
 					JSONObject obj = new JSONObject();
 					obj.put("customerId", customerId);
-					obj.put("date", dateTime);
+					obj.put("date", differentTime);
 					obj.put("event", event.getEvent());
 					obj.put("targetId", event.getTargetid());
 					obj.put("targetName", event.getTargetname());
@@ -277,7 +284,7 @@ public class AddcustomerServiceImp implements AddcustomerService {
 				laststageid = 0;
 				JSONObject obj = new JSONObject();
 				obj.put("customerId", customerId);
-				obj.put("date", dateTime);
+				obj.put("date", differentTime);
 				obj.put("event", deStageEvent.getEvent());
 				obj.put("targetId", deStageEvent.getTargetid());
 				obj.put("targetName", deStageEvent.getTargetname());
@@ -351,6 +358,29 @@ public class AddcustomerServiceImp implements AddcustomerService {
 			return list.get(0);
 		}
 		return "";
+	}
+	
+	/**
+	 * 把utc事件转换为date,并随机添加几小时
+	 * @param time
+	 * @return
+	 */
+	public String paserUtcTime(String time){
+		Date date = null;
+		 SimpleDateFormat df1 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+			 try {
+				date = df1.parse(time);
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
+		 int hours = (int)(Math.random()*10)+5;
+		 System.out.println("hours is "+hours);
+		 Calendar ca=Calendar.getInstance();
+		 ca.setTime(date);
+		 ca.add(Calendar.HOUR_OF_DAY, hours);
+		String returndate = df1.format(ca.getTime());
+		return returndate;
+		
 	}
 
 }
