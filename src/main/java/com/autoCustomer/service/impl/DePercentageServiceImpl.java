@@ -34,7 +34,6 @@ public class DePercentageServiceImpl implements DePercentageService{
 		String message = "";
 		for(int i=0;i<list.size();i++){
 			String recursion = getRecursionData(i,list);
-			System.out.println("recursion:"+recursion);
 			double startNum = Double.valueOf(recursion.split(":")[0]);
 			double endNum = Double.valueOf(recursion.split(":")[1]);
 			if(num > startNum && num <= endNum){
@@ -55,7 +54,6 @@ public class DePercentageServiceImpl implements DePercentageService{
 		String message = "";
 		for(int i=0;i<list.size();i++){
 			String recursion = getRecursionData(i,list);
-			System.out.println("recursion:"+recursion);
 			double startNum = Double.valueOf(recursion.split(":")[0]);
 			double endNum = Double.valueOf(recursion.split(":")[1]);
 			if(num > startNum && num <= endNum){
@@ -73,10 +71,8 @@ public class DePercentageServiceImpl implements DePercentageService{
 		List<Map<String, Object>> monthList = dePercentageMapper.selectByType("0");
 		double d = Double.valueOf(df.format(b));
 		//double d = 0.607;
-		System.out.println("getMonthList:"+d);
 		for(int i=0;i<monthList.size();i++){
 			String recursion = getRecursionData(i,monthList);
-			System.out.println(recursion);
 			double start = Double.parseDouble(recursion.split(":")[0]);
 			double end = Double.parseDouble(recursion.split(":")[1]);
 			if(d > start && d<= end){
@@ -85,7 +81,6 @@ public class DePercentageServiceImpl implements DePercentageService{
 				createTime = Constant.YEAR+"-"+getRandomMonth(state_date,end_date);
 				break;
 			}
-			System.out.println(createTime);
 		}
 		 SimpleDateFormat df1 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 		 SimpleDateFormat df2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -115,7 +110,6 @@ public class DePercentageServiceImpl implements DePercentageService{
 		String end_time = "";
 		double num = getNum(Constant.DIGIT2);
 		//double num = 0.25;
-		System.out.println("getRandomMonth:"+num);
 		if("04".equals(state_date) || "4".equals(state_date) ){
 			monthList = dePercentageMapper.selectByType(getString(state_date));
 			//double num = 0.6;
@@ -168,7 +162,6 @@ public class DePercentageServiceImpl implements DePercentageService{
 		String end_date = "";
 		String time = "";
 		double num = getNum(Constant.DIGIT2);
-		System.out.println("getTime:"+num);
 		if(null != spread && !"".equals(spread) && spread.equals(Constant.MAJORITY_DATE)){
 			monthList = dePercentageMapper.selectByType(Constant.MAJORITY);
 			for(int i = 0;i<monthList.size();i++){
