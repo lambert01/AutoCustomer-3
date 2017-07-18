@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import com.autoCustomer.dao.DeImageMapper;
 import com.autoCustomer.dao.DeStageEventMapper;
+import com.autoCustomer.dao.DeStageOrderMapper;
 import com.autoCustomer.dao.DeTagMapper;
 import com.autoCustomer.dao.TblPropertiesInfoMapper;
 import com.autoCustomer.entity.DeImage;
@@ -53,6 +54,9 @@ public class AddcustomerServiceImp implements AddcustomerService {
 	@Resource
 	private DeStageEventMapper eventdao; //事件dao
 	
+	@Resource
+	private DeStageOrderMapper stageorderdao;//查看客户状态是否该有订单
+	
 	private static final String ADDRESS_SET ="address_set"; //地址配置
 	private static final String DOMIAN_NAME ="domian_name"; //域名,可配置测试域名或生产域名
 	private static final String APPID ="appid";  
@@ -69,8 +73,8 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		JSONObject customer = getcustomer();
 		Map<String, Object> stagemap = percentageService.getCurrentStage();
 		String stage = stagemap.get("message").toString();
-		Integer stageid = (Integer)stagemap.get("id"); //客户状态id,通过状态id找到符合的事件
-		//Integer stageid = 29; //客户状态id,通过状态id找到符合的事件
+		//Integer stageid = (Integer)stagemap.get("id"); //客户状态id,通过状态id找到符合的事件
+		Integer stageid = 30;
 		List<DeStageEvent>  stageevents = eventdao.selectEventsByStage(stageid); //所有符合客户状态的事件
 		customer.put("stage", stage);
 		String retunrstr = SendUtils.post(url, customer.toString());
@@ -78,9 +82,15 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		String name = returnobj.get("name").toString();
 		System.out.println("创建客户返回的是"+returnobj.toString());
 		String customeid = returnobj.getString("id");
-	//	addCustomerTag(customeid,accessToken);
 		String dateJoin = returnobj.getString("dateJoin");
-		String event = createCustomerEvent(customeid, accessToken,dateJoin,stageevents);
+		createCustomerEvent(customeid, accessToken,dateJoin,stageevents);
+		Integer hasOrder = stageorderdao.selectByStageId(stageid);//为1需要配置订单
+		if(hasOrder ==1){
+			
+			
+		}
+		
+		//	addCustomerTag(customeid,accessToken);
 		//System.out.println("event is "+event);
 		//String listid = createList(accessToken, "静态组群1");
 		//createTag(accessToken);
@@ -332,7 +342,7 @@ public class AddcustomerServiceImp implements AddcustomerService {
 	 * @param access_token
 	 * @return
 	 */
-	public  String addcustomerDeals(String customerId,String listId, String access_token){
+	public  String addcustomerDeals(String customerId, String access_token){
 		String domain = getPropertyInfo(DOMIAN_NAME);
 		String url = domain + "/v1/deals" + "?access_token=" + access_token;
 		JSONObject order = new JSONObject();
@@ -341,34 +351,18 @@ public class AddcustomerServiceImp implements AddcustomerService {
 			 JSONObject product = new JSONObject();
 			 product.put("productName", "");
 			 product.put("productId", "");
-			 product.put("skuId", "");
-			 product.put("category", "");
 			 product.put("qty", "");
 			 product.put("priceUnit", "");
-			 product.put("priceSubTotal", "");
 			 lines.add(product);
 		}
-		 order.put("customerId", "");
+		 order.put("customerId", customerId);
 		 order.put("orderNo", "");
 		 order.put("amountTotal", "");
 		 order.put("amountPaid", "");
 		 order.put("amountDiscount", "");
 		 order.put("counponCode", "");
-		 order.put("groupId", "");
-		 order.put("paymentTerm", "");
 		 order.put("paymentNo", "");
-		 order.put("type", "");
 		 order.put("dateOrder", "");
-		 order.put("store", "");
-		 order.put("salesChannel", "");
-		 order.put("shippingMethod", "");
-		 order.put("contactName", "");
-		 order.put("contactTel", "");
-		 order.put("shippingProvince", "");
-		 order.put("shippingCity", "");
-		 order.put("shippingCounty", "");
-		 order.put("shippingStreet", "");
-		 order.put("shippingAddress", "");
 		 order.put("lines", lines);
 		 
 		String returnCode = SendUtils.post(url, order.toString());
