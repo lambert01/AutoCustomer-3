@@ -11,7 +11,8 @@ public class DeStageEvent {
 
     private Integer stageid;
 
-    private Integer ismust;
+
+    private Integer isrelated;
 
     public Integer getEventid() {
         return eventid;
@@ -53,11 +54,12 @@ public class DeStageEvent {
         this.stageid = stageid;
     }
 
-    public Integer getIsmust() {
-        return ismust;
+
+    public Integer getIsrelated() {
+        return isrelated;
     }
 
-    public void setIsmust(Integer ismust) {
-        this.ismust = ismust;
+    public void setIsrelated(Integer isrelated) {
+        this.isrelated = isrelated;
     }
 }
