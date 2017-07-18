@@ -11,18 +11,53 @@ import net.sf.json.JSONObject;
  * Created by house on 17-5-15.
  */
 public class OpenApiTest {
-	public static void main(String[] args) {
-		for (int i = 0; i < 100; i++) {
-			int index = (int) (Math.random() * 2);
-			System.out.println(index);
-		}
+	public static void main(String[] args) {/*JSONObject order = new JSONObject();
+	 JSONArray lines = new JSONArray();
+	 for (int i = 0; i < 1; i++) {
+		 JSONObject product = new JSONObject();
+		 product.put("productName", "");
+		 product.put("productId", "");
+		 product.put("skuId", "");
+		 product.put("category", "");
+		 product.put("qty", "");
+		 product.put("priceUnit", "");
+		 product.put("priceSubTotal", "");
+		 lines.add(product);
 		
 	}
+	 order.put("customerId", "");
+	 order.put("orderNo", "");
+	 order.put("amountTotal", "");
+	 order.put("amountPaid", "");
+	 order.put("amountDiscount", "");
+	 order.put("counponCode", "");
+	 order.put("groupId", "");
+	 order.put("paymentTerm", "");
+	 order.put("paymentNo", "");
+	 order.put("type", "");
+	 order.put("dateOrder", "");
+	 order.put("store", "");
+	 order.put("salesChannel", "");
+	 order.put("shippingMethod", "");
+	 order.put("contactName", "");
+	 order.put("contactTel", "");
+	 order.put("shippingProvince", "");
+	 order.put("shippingCity", "");
+	 order.put("shippingCounty", "");
+	 order.put("shippingStreet", "");
+	 order.put("shippingAddress", "");
+	 order.put("lines", lines);
+	 System.out.println(order.toString());
+	 
+	 */
+		addcustomer();
+		}
 	
   
 	public static String addcustomer() {
 	 
 	 String accessToken = getAccessToken("cl02dd15a2228ee92", "ce2f7581f4203b257ed5687c2e2106c3978a93be");
+	 System.out.println("---------------------");
 		String url = "http://api.convertwork.cn"+"/v1/customerandidentities?access_token="+accessToken;
 	//	String customer = getcustomer().toString();
 		System.out.println("accessToken is "+accessToken);
