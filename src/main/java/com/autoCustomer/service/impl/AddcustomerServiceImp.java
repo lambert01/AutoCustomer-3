@@ -2,12 +2,12 @@ package com.autoCustomer.service.impl;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
@@ -51,7 +51,7 @@ public class AddcustomerServiceImp implements AddcustomerService {
 	private DeTagMapper tagdao;
 	
 	@Resource
-	private DeStageEventMapper stagedao;//获得与客户状态对应的事件
+	private DeStageEventMapper eventdao; //事件dao
 	
 	private static final String ADDRESS_SET ="address_set"; //地址配置
 	private static final String DOMIAN_NAME ="domian_name"; //域名,可配置测试域名或生产域名
@@ -71,12 +71,12 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		String stage = stagemap.get("message").toString();
 		Integer stageid = (Integer)stagemap.get("id"); //客户状态id,通过状态id找到符合的事件
 		//Integer stageid = 29; //客户状态id,通过状态id找到符合的事件
-		List<DeStageEvent>  stageevents = stagedao.selectEventsByStage(stageid); //所有符合客户状态的事件
+		List<DeStageEvent>  stageevents = eventdao.selectEventsByStage(stageid); //所有符合客户状态的事件
 		customer.put("stage", stage);
 		String retunrstr = SendUtils.post(url, customer.toString());
 		JSONObject returnobj = JSONObject.fromObject(retunrstr);
 		String name = returnobj.get("name").toString();
-		System.out.println("创建客户返回的name是"+name);
+		System.out.println("创建客户返回的是"+returnobj.toString());
 		String customeid = returnobj.getString("id");
 	//	addCustomerTag(customeid,accessToken);
 		String dateJoin = returnobj.getString("dateJoin");
@@ -86,7 +86,7 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		//createTag(accessToken);
 		//addcustomertoList( customeid, listid, accessToken);
 		//addCustomerTag(customeid, accessToken);
-		return "";
+		return name;
 
 	}
 	
@@ -136,7 +136,9 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		cust.put("img", getImage());
 		cust.put("name", MessageUtil.getChineseName(sex));
 		cust.put("country", "中国");
-		if("北京".equals(province)||"天津".equals(province)||"重庆".equals(province) ||"上海".equals(province)||"澳门".equals(province)||"香港".equals(province)){
+		if("北京".equals(province)||"天津".equals(province)||
+				"重庆".equals(province) ||"上海".equals(province)||
+				"澳门".equals(province)||"香港".equals(province)){
 			cust.put("province", province);
 			cust.put("city", province);
 			cust.put("county", city);
@@ -238,47 +240,46 @@ public class AddcustomerServiceImp implements AddcustomerService {
 
 
     /**
-     * 给客户绑定事件,有的状态的对应事件有多个,在其中选择一个就行了
-     * 表中ismust状态为1的表示对应状态的事件有多个,任选一个
+     * 给客户绑定事件
      * @param customerId
      * @param access_token
      * @param dateTime
      */
 	public String createCustomerEvent(String customerId, String access_token, String dateTime,List<DeStageEvent> events) {
+		List<DeStageEvent> unrelatedevents = eventdao.selectUnRelatedStageEvent();
 		String domain = getPropertyInfo(DOMIAN_NAME);
 		String url = domain + "/v1/customerevents?access_token=" + access_token;
 		String returnCode = "";
-		Integer laststageid = 0;
-		List<DeStageEvent> listevents = new ArrayList<DeStageEvent>();
-		//如果客户的某一个状态可以有多个对应的事件,把该状态的所有事件放入集合中,随机返回一个
           String differentTime = dateTime;
+         int eventsize =  unrelatedevents.size();
+        int index = (int)( Math.random()*eventsize);
+        DeStageEvent event = unrelatedevents.get(index);
+        Integer related = event.getIsrelated();
+        if(related != null && related != 0){
+        	differentTime = paserUtcTime(differentTime);
+        	DeStageEvent relatedevent = eventdao.selectByPrimaryKey(related);
+    		JSONObject obj = new JSONObject();
+			obj.put("customerId", customerId);
+			obj.put("date", differentTime);
+			obj.put("event", relatedevent.getEvent());
+			obj.put("targetId", relatedevent.getTargetid());
+			obj.put("targetName", relatedevent.getTargetname());
+			returnCode = SendUtils.post(url, obj.toString());
+			System.out.println("将客户绑定事件的json  "+obj.toString());
+        }
+        
+    	differentTime = paserUtcTime(differentTime);
+		JSONObject eventobj = new JSONObject();
+		eventobj.put("customerId", customerId);
+		eventobj.put("date", differentTime);
+		eventobj.put("event", event.getEvent());
+		eventobj.put("targetId", event.getTargetid());
+		eventobj.put("targetName", event.getTargetname());
+		returnCode = SendUtils.post(url, eventobj.toString());
+		System.out.println("将客户绑定事件的json  "+eventobj.toString());
+          
 		for (DeStageEvent deStageEvent : events) {
 			differentTime = paserUtcTime(differentTime); //事件的发生时间不同
-			Integer stageid = deStageEvent.getStageid(); // 客户状态id
-			Integer ismust = deStageEvent.getIsmust(); // 是否有多个可选状态
-			if (ismust == 1) {
-				if (laststageid == 0 || laststageid == stageid) {
-					listevents.add(deStageEvent);
-				}
-				laststageid = stageid;
-				// 查询该stageid有几个对应的事件
-				int unneczise = stagedao.selectUnnectagesize(stageid);
-				if (unneczise == listevents.size()) {
-					int size = listevents.size();
-					int index = (int) (Math.random() * size);
-					DeStageEvent event = listevents.get(index);
-					JSONObject obj = new JSONObject();
-					obj.put("customerId", customerId);
-					obj.put("date", differentTime);
-					obj.put("event", event.getEvent());
-					obj.put("targetId", event.getTargetid());
-					obj.put("targetName", event.getTargetname());
-					returnCode = SendUtils.post(url, obj.toString());
-					System.out.println("将客户绑定事件的json  "+obj.toString());
-					listevents.clear();
-				}
-			} else {
-				laststageid = 0;
 				JSONObject obj = new JSONObject();
 				obj.put("customerId", customerId);
 				obj.put("date", differentTime);
@@ -288,7 +289,6 @@ public class AddcustomerServiceImp implements AddcustomerService {
 				returnCode = SendUtils.post(url, obj.toString());
 				System.out.println("将客户绑定事件的json  "+obj.toString());
 			}
-		}
 		return returnCode;
 	}
 
@@ -347,7 +347,6 @@ public class AddcustomerServiceImp implements AddcustomerService {
 			 product.put("priceUnit", "");
 			 product.put("priceSubTotal", "");
 			 lines.add(product);
-			
 		}
 		 order.put("customerId", "");
 		 order.put("orderNo", "");
@@ -372,7 +371,6 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		 order.put("shippingAddress", "");
 		 order.put("lines", lines);
 		 
-		 
 		String returnCode = SendUtils.post(url, order.toString());
 		return returnCode;
 	}
@@ -391,7 +389,6 @@ public class AddcustomerServiceImp implements AddcustomerService {
 			imageurl =  image.getImageurl();
 		}
 		return imageurl;
-	
 	}
 	
 	/**
@@ -407,21 +404,21 @@ public class AddcustomerServiceImp implements AddcustomerService {
 	}
 	
 	/**
-	 * 把utc事件转换为date,并随机添加几小时
+	 *返回不同的时间
 	 * @param time
 	 */
 	public String paserUtcTime(String time){
 		Date date = null;
 		 SimpleDateFormat df1 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+		 df1.setTimeZone(TimeZone.getTimeZone("GMT"));
 			 try {
 				date = df1.parse(time);
 			} catch (ParseException e) {
 				e.printStackTrace();
 			}
-		 int hours = (int)(Math.random()*10)+5;
 		 Calendar ca=Calendar.getInstance();
 		 ca.setTime(date);
-		 ca.add(Calendar.HOUR_OF_DAY, hours);
+		 ca.add(Calendar.HOUR_OF_DAY,3);
 		String returndate = df1.format(ca.getTime());
 		return returndate;
 		
