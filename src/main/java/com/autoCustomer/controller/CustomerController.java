@@ -1,8 +1,6 @@
 package com.autoCustomer.controller;
 
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -86,8 +84,7 @@ public class CustomerController {
 	@RequestMapping("/createCustomer")
 	@ResponseBody
 	public String createCustomer(){
-		JSONObject customer = addcustomerService.getcustomer();
-		System.out.println("customer.toString() "+customer.toString());
+	
 		for (int i = 0; i < 1; i++) { 
 			addcustomerService.addcustomer();	
 		}
