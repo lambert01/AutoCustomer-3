@@ -79,4 +79,11 @@
       hasOrder = #{hasorder,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
+  
+    <select id="selectByStageId" resultType="java.lang.Integer" parameterType="java.lang.Integer" >
+    select 
+    hasOrder
+    from de_stage_order
+    where stageid = #{stageid,jdbcType=INTEGER}
+  </select>
 </mapper>
