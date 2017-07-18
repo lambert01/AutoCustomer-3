@@ -131,9 +131,9 @@ public class AddcustomerServiceImp implements AddcustomerService {
 	 * @param unionid
 	 */
 	public JSONObject getcustomer() {
-		JSONObject j = new JSONObject();
+		JSONObject data = new JSONObject();
 
-		JSONObject j1 = new JSONObject();
+		JSONObject custidentitie = new JSONObject();
 		JSONObject cust = new JSONObject();
 		String moblie = MessageUtil.getMobile();
 		int sex = MessageUtil.getGender();
@@ -166,17 +166,17 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		cust.put("mobile", moblie);
 		cust.put("gender", sex);
 		cust.put("source", percentageService.getActiveData());
-		JSONArray arr = new JSONArray();
+		JSONArray identitiesarr = new JSONArray();
 		for (int i = 0; i < 1; i++) {
-			j1.put("identityType", "wechat");
-			j1.put("identityValue", MessageUtil.getOpenId());
-			j1.put("identityName", "微信");
-			arr.add(j1);
+			custidentitie.put("identityType", "wechat");
+			custidentitie.put("identityValue", MessageUtil.getOpenId());
+			custidentitie.put("identityName", "微信");
+			identitiesarr.add(custidentitie);
 		}
 
-		j.put("customerIdentities", arr);
-		j.put("customer", cust);
-		return j;
+		data.put("customerIdentities", identitiesarr);
+		data.put("customer", cust);
+		return data;
 	}
 
 	/**
@@ -258,7 +258,6 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		List<DeStageEvent> unrelatedevents = eventdao.selectUnRelatedStageEvent();
 		String domain = getPropertyInfo(DOMIAN_NAME);
 		String url = domain + "/v1/customerevents?access_token=" + access_token;
-		String returnCode = "";
 		String differentTime = dateTime;
 		int eventsize = unrelatedevents.size();
 		int index = (int) (Math.random() * eventsize);
@@ -273,7 +272,7 @@ public class AddcustomerServiceImp implements AddcustomerService {
 			obj.put("event", relatedevent.getEvent());
 			obj.put("targetId", relatedevent.getTargetid());
 			obj.put("targetName", relatedevent.getTargetname());
-			returnCode = SendUtils.post(url, obj.toString());
+			  SendUtils.post(url, obj.toString());
 			System.out.println("将客户绑定事件的json  " + obj.toString());
 		}
 
@@ -284,7 +283,7 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		eventobj.put("event", event.getEvent());
 		eventobj.put("targetId", event.getTargetid());
 		eventobj.put("targetName", event.getTargetname());
-		returnCode = SendUtils.post(url, eventobj.toString());
+		 SendUtils.post(url, eventobj.toString());
 		System.out.println("将客户绑定事件的json  " + eventobj.toString());
 
 		for (DeStageEvent deStageEvent : events) {
@@ -295,7 +294,7 @@ public class AddcustomerServiceImp implements AddcustomerService {
 			obj.put("event", deStageEvent.getEvent());
 			obj.put("targetId", deStageEvent.getTargetid());
 			obj.put("targetName", deStageEvent.getTargetname());
-			returnCode = SendUtils.post(url, obj.toString());
+			 SendUtils.post(url, obj.toString());
 			System.out.println("将客户绑定事件的json  " + obj.toString());
 		}
 		return differentTime;
