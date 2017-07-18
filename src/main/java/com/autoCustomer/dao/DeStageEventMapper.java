@@ -17,8 +17,9 @@ public interface DeStageEventMapper {
 
     int updateByPrimaryKey(DeStageEvent record);
     
-    //查找所有符合客户当前以及之前状态对应的事件
+    //查询所有符合客户当前以及之前状态对应的事件
     List<DeStageEvent> selectEventsByStage(Integer stageid);
     
-    int selectUnnectagesize(Integer stageid);
+    //查询与状态无关的事件
+    List<DeStageEvent> selectUnRelatedStageEvent();
 }
