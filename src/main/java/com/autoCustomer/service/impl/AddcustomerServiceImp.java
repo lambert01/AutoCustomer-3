@@ -7,8 +7,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TimeZone;
 import java.util.Map.Entry;
+import java.util.TimeZone;
 import java.util.regex.Pattern;
 
 import javax.annotation.Resource;
@@ -17,11 +17,13 @@ import javax.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import com.autoCustomer.dao.DeImageMapper;
+import com.autoCustomer.dao.DeProductsMapper;
 import com.autoCustomer.dao.DeStageEventMapper;
 import com.autoCustomer.dao.DeStageOrderMapper;
 import com.autoCustomer.dao.DeTagMapper;
 import com.autoCustomer.dao.TblPropertiesInfoMapper;
 import com.autoCustomer.entity.DeImage;
+import com.autoCustomer.entity.DeProducts;
 import com.autoCustomer.entity.DeStageEvent;
 import com.autoCustomer.entity.DeTag;
 import com.autoCustomer.service.AddcustomerService;
@@ -57,6 +59,9 @@ public class AddcustomerServiceImp implements AddcustomerService {
 	@Resource
 	private DeStageOrderMapper stageorderdao;//查看客户状态是否该有订单
 	
+	@Resource
+	private DeProductsMapper productdao;
+	
 	private static final String ADDRESS_SET ="address_set"; //地址配置
 	private static final String DOMIAN_NAME ="domian_name"; //域名,可配置测试域名或生产域名
 	private static final String APPID ="appid";  
@@ -80,23 +85,20 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		String retunrstr = SendUtils.post(url, customer.toString());
 		JSONObject returnobj = JSONObject.fromObject(retunrstr);
 		String name = returnobj.get("name").toString();
-		System.out.println("创建客户返回的是"+returnobj.toString());
+		System.out.println("创建客户返回的是"+name);
 		String customeid = returnobj.getString("id");
 		String dateJoin = returnobj.getString("dateJoin");
-		createCustomerEvent(customeid, accessToken,dateJoin,stageevents);
+		String ordertime = createCustomerEvent(customeid, accessToken,dateJoin,stageevents);
+		ordertime = paserUtcTime(ordertime);
 		Integer hasOrder = stageorderdao.selectByStageId(stageid);//为1需要配置订单
 		if(hasOrder ==1){
-			
+			List<DeProducts>  products = productdao.selectProduct();
+			String returndeal = addcustomerDeals(customeid, accessToken, products,ordertime);
+			System.out.println("创建订单返回的 "+returndeal);
 			
 		}
 		
-		//	addCustomerTag(customeid,accessToken);
-		//System.out.println("event is "+event);
-		//String listid = createList(accessToken, "静态组群1");
-		//createTag(accessToken);
-		//addcustomertoList( customeid, listid, accessToken);
-		//addCustomerTag(customeid, accessToken);
-		return name;
+		return "";
 
 	}
 	
@@ -251,6 +253,8 @@ public class AddcustomerServiceImp implements AddcustomerService {
 
     /**
      * 给客户绑定事件
+     * 返回绑定的事件最后的一个事件
+     * 有可能绑定订单,订单事件要在最后的
      * @param customerId
      * @param access_token
      * @param dateTime
@@ -299,7 +303,7 @@ public class AddcustomerServiceImp implements AddcustomerService {
 				returnCode = SendUtils.post(url, obj.toString());
 				System.out.println("将客户绑定事件的json  "+obj.toString());
 			}
-		return returnCode;
+		return differentTime;
 	}
 
 	/**
@@ -342,28 +346,36 @@ public class AddcustomerServiceImp implements AddcustomerService {
 	 * @param access_token
 	 * @return
 	 */
-	public  String addcustomerDeals(String customerId, String access_token){
+	public  String addcustomerDeals(String customerId, String access_token,List<DeProducts> products,String ordertime){
 		String domain = getPropertyInfo(DOMIAN_NAME);
 		String url = domain + "/v1/deals" + "?access_token=" + access_token;
 		JSONObject order = new JSONObject();
 		 JSONArray lines = new JSONArray();
-		 for (int i = 0; i < 1; i++) {
-			 JSONObject product = new JSONObject();
-			 product.put("productName", "");
-			 product.put("productId", "");
-			 product.put("qty", "");
-			 product.put("priceUnit", "");
-			 lines.add(product);
+		 Double totalPrice = 0d;
+		 Double amountDiscounts = 0d;
+		 for (DeProducts deProducts : products) {
+
+			 JSONObject productobj = new JSONObject();
+			 Integer qty = deProducts.getProductquantity();
+			 Double price = deProducts.getProductprice();
+			 Double amountDiscount = deProducts.getAmountdiscount();
+			 productobj.put("productName", deProducts.getProductname());
+			 productobj.put("productId", deProducts.getProductid());
+			 productobj.put("qty", qty);
+			 productobj.put("priceUnit", price);
+			 amountDiscounts += qty*amountDiscount;
+			 totalPrice+=qty*price;
+			 lines.add(productobj);
 		}
+		 
 		 order.put("customerId", customerId);
-		 order.put("orderNo", "");
-		 order.put("amountTotal", "");
-		 order.put("amountPaid", "");
-		 order.put("amountDiscount", "");
-		 order.put("counponCode", "");
-		 order.put("paymentNo", "");
-		 order.put("dateOrder", "");
+		 order.put("orderNo", MessageUtil.getOpenId());
+		 order.put("amountTotal", totalPrice);
+		 order.put("amountDiscount", amountDiscounts);
+		 order.put("amountPaid", totalPrice-amountDiscounts);
+		 order.put("dateOrder", ordertime);
 		 order.put("lines", lines);
+		 System.out.println("订单格式 "+order.toString());
 		 
 		String returnCode = SendUtils.post(url, order.toString());
 		return returnCode;
