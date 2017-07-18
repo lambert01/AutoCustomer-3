@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.autoCustomer.dao.DeStageOrderMapper" >
+  <resultMap id="BaseResultMap" type="com.autoCustomer.entity.DeStageOrder" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="stageId" property="stageid" jdbcType="INTEGER" />
+    <result column="stageName" property="stagename" jdbcType="VARCHAR" />
+    <result column="hasOrder" property="hasorder" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, stageId, stageName, hasOrder
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from de_stage_order
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from de_stage_order
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.autoCustomer.entity.DeStageOrder" >
+    insert into de_stage_order (id, stageId, stageName, 
+      hasOrder)
+    values (#{id,jdbcType=INTEGER}, #{stageid,jdbcType=INTEGER}, #{stagename,jdbcType=VARCHAR}, 
+      #{hasorder,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.autoCustomer.entity.DeStageOrder" >
+    insert into de_stage_order
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="stageid != null" >
+        stageId,
+      </if>
+      <if test="stagename != null" >
+        stageName,
+      </if>
+      <if test="hasorder != null" >
+        hasOrder,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="stageid != null" >
+        #{stageid,jdbcType=INTEGER},
+      </if>
+      <if test="stagename != null" >
+        #{stagename,jdbcType=VARCHAR},
+      </if>
+      <if test="hasorder != null" >
+        #{hasorder,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.autoCustomer.entity.DeStageOrder" >
+    update de_stage_order
+    <set >
+      <if test="stageid != null" >
+        stageId = #{stageid,jdbcType=INTEGER},
+      </if>
+      <if test="stagename != null" >
+        stageName = #{stagename,jdbcType=VARCHAR},
+      </if>
+      <if test="hasorder != null" >
+        hasOrder = #{hasorder,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.autoCustomer.entity.DeStageOrder" >
+    update de_stage_order
+    set stageId = #{stageid,jdbcType=INTEGER},
+      stageName = #{stagename,jdbcType=VARCHAR},
+      hasOrder = #{hasorder,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>
