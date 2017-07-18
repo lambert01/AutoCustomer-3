@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.autoCustomer.dao.DeProductsMapper" >
+  <resultMap id="BaseResultMap" type="com.autoCustomer.entity.DeProducts" >
+    <id column="productId" property="productid" jdbcType="INTEGER" />
+    <result column="productName" property="productname" jdbcType="VARCHAR" />
+    <result column="productPrice" property="productprice" jdbcType="DOUBLE" />
+    <result column="productQuantity" property="productquantity" jdbcType="INTEGER" />
+    <result column="amountDiscount" property="amountdiscount" jdbcType="DOUBLE" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    productId, productName, productPrice, productQuantity, amountDiscount
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from de_products
+    where productId = #{productid,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from de_products
+    where productId = #{productid,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.autoCustomer.entity.DeProducts" >
+    insert into de_products (productId, productName, productPrice, 
+      productQuantity, amountDiscount)
+    values (#{productid,jdbcType=INTEGER}, #{productname,jdbcType=VARCHAR}, #{productprice,jdbcType=DOUBLE}, 
+      #{productquantity,jdbcType=INTEGER}, #{amountdiscount,jdbcType=DOUBLE})
+  </insert>
+  <insert id="insertSelective" parameterType="com.autoCustomer.entity.DeProducts" >
+    insert into de_products
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="productid != null" >
+        productId,
+      </if>
+      <if test="productname != null" >
+        productName,
+      </if>
+      <if test="productprice != null" >
+        productPrice,
+      </if>
+      <if test="productquantity != null" >
+        productQuantity,
+      </if>
+      <if test="amountdiscount != null" >
+        amountDiscount,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="productid != null" >
+        #{productid,jdbcType=INTEGER},
+      </if>
+      <if test="productname != null" >
+        #{productname,jdbcType=VARCHAR},
+      </if>
+      <if test="productprice != null" >
+        #{productprice,jdbcType=DOUBLE},
+      </if>
+      <if test="productquantity != null" >
+        #{productquantity,jdbcType=INTEGER},
+      </if>
+      <if test="amountdiscount != null" >
+        #{amountdiscount,jdbcType=DOUBLE},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.autoCustomer.entity.DeProducts" >
+    update de_products
+    <set >
+      <if test="productname != null" >
+        productName = #{productname,jdbcType=VARCHAR},
+      </if>
+      <if test="productprice != null" >
+        productPrice = #{productprice,jdbcType=DOUBLE},
+      </if>
+      <if test="productquantity != null" >
+        productQuantity = #{productquantity,jdbcType=INTEGER},
+      </if>
+      <if test="amountdiscount != null" >
+        amountDiscount = #{amountdiscount,jdbcType=DOUBLE},
+      </if>
+    </set>
+    where productId = #{productid,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.autoCustomer.entity.DeProducts" >
+    update de_products
+    set productName = #{productname,jdbcType=VARCHAR},
+      productPrice = #{productprice,jdbcType=DOUBLE},
+      productQuantity = #{productquantity,jdbcType=INTEGER},
+      amountDiscount = #{amountdiscount,jdbcType=DOUBLE}
+    where productId = #{productid,jdbcType=INTEGER}
+  </update>
+  
+    <select id="selectProduct" resultMap="BaseResultMap" >
+    select 
+    <include refid="Base_Column_List" />
+    from de_products
+  </select>
+</mapper>
