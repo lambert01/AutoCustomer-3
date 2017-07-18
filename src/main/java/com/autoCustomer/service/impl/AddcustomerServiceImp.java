@@ -8,7 +8,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TimeZone;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
@@ -74,11 +73,10 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		//Integer stageid = 29; //客户状态id,通过状态id找到符合的事件
 		List<DeStageEvent>  stageevents = stagedao.selectEventsByStage(stageid); //所有符合客户状态的事件
 		customer.put("stage", stage);
-		System.out.println("customer is "+customer);
 		String retunrstr = SendUtils.post(url, customer.toString());
 		JSONObject returnobj = JSONObject.fromObject(retunrstr);
 		String name = returnobj.get("name").toString();
-		System.out.println("创建客户返回的json是"+name);
+		System.out.println("创建客户返回的name是"+name);
 		String customeid = returnobj.getString("id");
 	//	addCustomerTag(customeid,accessToken);
 		String dateJoin = returnobj.getString("dateJoin");
@@ -96,7 +94,6 @@ public class AddcustomerServiceImp implements AddcustomerService {
 	 * 获得accessToken
 	 * @param appid
 	 * @param sercet
-	 * @return
 	 */
 	private String getAccessToken(String appid,String sercet) {
 		String domain = getPropertyInfo(DOMIAN_NAME);
@@ -120,7 +117,6 @@ public class AddcustomerServiceImp implements AddcustomerService {
 	 * @param openid
 	 * @param unionid
 	 */
-	@Override
 	public  JSONObject getcustomer(){
 		JSONObject j = new JSONObject();
 
@@ -171,10 +167,11 @@ public class AddcustomerServiceImp implements AddcustomerService {
 	
  
 
-	/**
-	 * 创建标签,标签也有所属的组群,返回创建的标签id
-	 * @return 
-	 */
+    /**
+     * 创建标签,标签也有所属的组群,返回创建的标签id
+     * @param access_token
+     * @return
+     */
 	public  String createTag(String access_token){
 		String domain = getPropertyInfo(DOMIAN_NAME);
 		String url = domain + "/v1/tags?access_token="+access_token;
@@ -246,7 +243,6 @@ public class AddcustomerServiceImp implements AddcustomerService {
      * @param customerId
      * @param access_token
      * @param dateTime
-     * @return
      */
 	public String createCustomerEvent(String customerId, String access_token, String dateTime,List<DeStageEvent> events) {
 		String domain = getPropertyInfo(DOMIAN_NAME);
@@ -254,9 +250,10 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		String returnCode = "";
 		Integer laststageid = 0;
 		List<DeStageEvent> listevents = new ArrayList<DeStageEvent>();
+		//如果客户的某一个状态可以有多个对应的事件,把该状态的所有事件放入集合中,随机返回一个
           String differentTime = dateTime;
 		for (DeStageEvent deStageEvent : events) {
-			differentTime = paserUtcTime(differentTime);
+			differentTime = paserUtcTime(differentTime); //事件的发生时间不同
 			Integer stageid = deStageEvent.getStageid(); // 客户状态id
 			Integer ismust = deStageEvent.getIsmust(); // 是否有多个可选状态
 			if (ismust == 1) {
@@ -265,8 +262,8 @@ public class AddcustomerServiceImp implements AddcustomerService {
 				}
 				laststageid = stageid;
 				// 查询该stageid有几个对应的事件
-				int ueczise = stagedao.selectUnnectagesize(stageid);
-				if (ueczise == listevents.size()) {
+				int unneczise = stagedao.selectUnnectagesize(stageid);
+				if (unneczise == listevents.size()) {
 					int size = listevents.size();
 					int index = (int) (Math.random() * size);
 					DeStageEvent event = listevents.get(index);
@@ -299,7 +296,6 @@ public class AddcustomerServiceImp implements AddcustomerService {
 	 * 创建客户组群
 	 * @param URL
 	 * @param json
-	 * @return
 	 */
 	public  String createList(String access_token,String name){
 		String domain = getPropertyInfo(DOMIAN_NAME);
@@ -316,7 +312,6 @@ public class AddcustomerServiceImp implements AddcustomerService {
 	 * 将客户放入某个组群中
 	 * @param URL
 	 * @param json
-	 * @return
 	 */
 	public  String addcustomertoList(String customerId,String listId, String access_token){
 		String domain = getPropertyInfo(DOMIAN_NAME);
@@ -327,6 +322,58 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		data.put("listId", listId);
 		obj2.put("data", data);
 		String returnCode = SendUtils.post(url, obj2.toString());
+		return returnCode;
+	}
+	
+	/**
+	 * 给符合条件的客户创建订单
+	 * @param customerId
+	 * @param listId
+	 * @param access_token
+	 * @return
+	 */
+	public  String addcustomerDeals(String customerId,String listId, String access_token){
+		String domain = getPropertyInfo(DOMIAN_NAME);
+		String url = domain + "/v1/deals" + "?access_token=" + access_token;
+		JSONObject order = new JSONObject();
+		 JSONArray lines = new JSONArray();
+		 for (int i = 0; i < 1; i++) {
+			 JSONObject product = new JSONObject();
+			 product.put("productName", "");
+			 product.put("productId", "");
+			 product.put("skuId", "");
+			 product.put("category", "");
+			 product.put("qty", "");
+			 product.put("priceUnit", "");
+			 product.put("priceSubTotal", "");
+			 lines.add(product);
+			
+		}
+		 order.put("customerId", "");
+		 order.put("orderNo", "");
+		 order.put("amountTotal", "");
+		 order.put("amountPaid", "");
+		 order.put("amountDiscount", "");
+		 order.put("counponCode", "");
+		 order.put("groupId", "");
+		 order.put("paymentTerm", "");
+		 order.put("paymentNo", "");
+		 order.put("type", "");
+		 order.put("dateOrder", "");
+		 order.put("store", "");
+		 order.put("salesChannel", "");
+		 order.put("shippingMethod", "");
+		 order.put("contactName", "");
+		 order.put("contactTel", "");
+		 order.put("shippingProvince", "");
+		 order.put("shippingCity", "");
+		 order.put("shippingCounty", "");
+		 order.put("shippingStreet", "");
+		 order.put("shippingAddress", "");
+		 order.put("lines", lines);
+		 
+		 
+		String returnCode = SendUtils.post(url, order.toString());
 		return returnCode;
 	}
 	
@@ -350,7 +397,6 @@ public class AddcustomerServiceImp implements AddcustomerService {
 	/**
 	 * 获取配置数据
 	 * @param kind
-	 * @return
 	 */
 	public String getPropertyInfo(String kind){
 		List<String> list = tblPropertiesInfoDao.selectPropertyInfoByKind(kind);
@@ -363,7 +409,6 @@ public class AddcustomerServiceImp implements AddcustomerService {
 	/**
 	 * 把utc事件转换为date,并随机添加几小时
 	 * @param time
-	 * @return
 	 */
 	public String paserUtcTime(String time){
 		Date date = null;
@@ -374,7 +419,6 @@ public class AddcustomerServiceImp implements AddcustomerService {
 				e.printStackTrace();
 			}
 		 int hours = (int)(Math.random()*10)+5;
-		 System.out.println("hours is "+hours);
 		 Calendar ca=Calendar.getInstance();
 		 ca.setTime(date);
 		 ca.add(Calendar.HOUR_OF_DAY, hours);
