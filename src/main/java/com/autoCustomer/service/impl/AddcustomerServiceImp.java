@@ -118,11 +118,12 @@ public class AddcustomerServiceImp implements AddcustomerService {
 				accountLevel = accountleveldao.selectMaxLevel(amountTotal);
 			}
 		}
-		String citylevel = cityleveldao.selectLevelBycity(city);
-		if(citylevel == null || "".equals(citylevel)){
-			citylevel = "三四线城市";
+		cityLevel = cityleveldao.selectLevelBycity(city);
+		if(cityLevel == null || "".equals(cityLevel)){
+			cityLevel = "三四线城市";
 		}
-		
+		String tagreturn = addCustomerTag(customeid, accessToken, cityLevel, accountLevel);
+		System.out.println("创建标签返回的结果是"+tagreturn);
 
 		return "";
 
@@ -345,7 +346,7 @@ public class AddcustomerServiceImp implements AddcustomerService {
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public String addCustomerTag(String customerId, String access_token,String city,String level){
+	public String addCustomerTag(String customerId, String access_token,String citylevel,String accountlevel){
 		String domain = getPropertyInfo(DOMIAN_NAME);
 		String url = domain + "/v1/tagservice/addCustomerTag?access_token=" + access_token;
 		JSONObject obj = new JSONObject();
@@ -385,16 +386,19 @@ public class AddcustomerServiceImp implements AddcustomerService {
 			obj1.put("name", value);
 			arr.add(obj1);
 		}
-		JSONObject cityandlevel = new JSONObject();
-		cityandlevel.put("dimension", "bacis");
-		cityandlevel.put("name", city);
-		if(level != null && !"".equals(level)){
-			cityandlevel.put("dimension", "bacis");
-			cityandlevel.put("name", city);	
+		JSONObject cityandleveljson = new JSONObject();
+		JSONObject accountleveljson = new JSONObject();
+		cityandleveljson.put("dimension", "bacis");
+		cityandleveljson.put("name", citylevel);
+		//金领,白领标签只有在订单生成后才有该标签
+		if(accountlevel != null && !"".equals(accountlevel)){
+			accountleveljson.put("dimension", "bacis");
+			accountleveljson.put("name", accountlevel);	
 		}
-		arr.add(cityandlevel);
+		arr.add(accountleveljson);
+		arr.add(cityandleveljson);
 		obj.put("tags", arr);
-
+       System.out.println("创建标签的json是 "+obj.toString());
 		String returncodes = SendUtils.post(url, obj.toString());
 		return returncodes;
 	}
