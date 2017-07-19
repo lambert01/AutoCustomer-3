@@ -24,10 +24,12 @@ import com.autoCustomer.dao.DeStageEventMapper;
 import com.autoCustomer.dao.DeStageOrderMapper;
 import com.autoCustomer.dao.DeTagMapper;
 import com.autoCustomer.dao.TblPropertiesInfoMapper;
+import com.autoCustomer.dao.deAcccountLevelMapper;
 import com.autoCustomer.entity.DeImage;
 import com.autoCustomer.entity.DeProducts;
 import com.autoCustomer.entity.DeStageEvent;
 import com.autoCustomer.entity.DeTag;
+import com.autoCustomer.entity.TblPropertiesInfo;
 import com.autoCustomer.service.AddcustomerService;
 import com.autoCustomer.service.DePercentageService;
 import com.autoCustomer.util.LocalUtil2;
@@ -64,6 +66,9 @@ public class AddcustomerServiceImp implements AddcustomerService {
 
 	@Resource
 	private DeProductsMapper productdao;
+	
+	@Resource
+	private deAcccountLevelMapper accountleveldao; //订单金额对应的级别dao
 
 	private static final String ADDRESS_SET = "address_set"; // 地址配置
 	private static final String DOMIAN_NAME = "domian_name"; // 域名,可配置测试域名或生产域名
@@ -72,7 +77,7 @@ public class AddcustomerServiceImp implements AddcustomerService {
 
 	@Override
 	public String addcustomer() {
-		String domain = getPropertyInfo(DOMIAN_NAME);
+	 	String domain = getPropertyInfo(DOMIAN_NAME);
 		String appid = getPropertyInfo(APPID);
 		String sercet = getPropertyInfo(SERCET);
 		// appid.String accessToken = getAccessToken("cl02dd15a2228ee92",
@@ -99,6 +104,12 @@ public class AddcustomerServiceImp implements AddcustomerService {
 			List<DeProducts> products = getproducts();
 			String returndeal = addcustomerDeals(customeid, accessToken, products, ordertime);
 			System.out.println("创建订单返回的 " + returndeal);
+			JSONObject  returndealobj = JSONObject.fromObject(returndeal);
+			Double amountTotal = Double.parseDouble(returndealobj.get("amountTotal").toString());
+			String level = accountleveldao.selectLevelByAccount(amountTotal);
+			if(level == null || "".equals(level)){
+				level = accountleveldao.selectMaxLevel(amountTotal);
+			}
 		}
 
 		return "";
@@ -236,7 +247,8 @@ public class AddcustomerServiceImp implements AddcustomerService {
 
 
 	/**
-	 * 给符合条件的客户创建订单
+	 * 给符合条件的客户创建订单,
+	 * 返回订单的总金额,通过订单金额判断是金领,白领,还是蓝领
 	 * @param customerId
 	 * @param listId
 	 * @param access_token
@@ -421,7 +433,8 @@ public class AddcustomerServiceImp implements AddcustomerService {
 	 * @param kind
 	 */
 	public String getPropertyInfo(String kind) {
-		List<String> list = tblPropertiesInfoDao.selectPropertyInfoByKind(kind);
+		List<String>  list = tblPropertiesInfoDao.selectPropertyInfoByKind(kind);
+		 
 		if (list != null && list.size() > 0) {
 			return list.get(0);
 		}
