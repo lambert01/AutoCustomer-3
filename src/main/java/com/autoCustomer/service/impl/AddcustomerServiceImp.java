@@ -180,77 +180,13 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		return data;
 	}
 
-	/**
-	 * 创建标签,标签也有所属的组群,返回创建的标签id
-	 * @param access_token
-	 * @return
-	 */
-	public String createTag(String access_token) {
-		String domain = getPropertyInfo(DOMIAN_NAME);
-		String url = domain + "/v1/tags?access_token=" + access_token;
-		JSONObject obj = new JSONObject();
-		obj.put("dimension", "basic");
-		// obj.put("name", "土豪");
-		obj.put("name", "精英");
-		String returnstr = SendUtils.post(url, obj.toString());
-		JSONObject returnObj = JSONObject.fromObject(returnstr);
-		String tagId = returnObj.getString("id");
-		return tagId;
-	}
+ 
 
-	/**
-	 * 将客户与标签绑定
-	 * @return
-	 */
-	@SuppressWarnings("unchecked")
-	public String addCustomerTag(String customerId, String access_token) {
-		String domain = getPropertyInfo(DOMIAN_NAME);
-		String url = domain + "/v1/tagservice/addCustomerTag?access_token=" + access_token;
-		JSONObject obj = new JSONObject();
-		JSONArray arr = new JSONArray();
-		obj.put("customerId", customerId);
-		List<DeTag> tags = tagdao.selectAllTag();
-		Map<String, String> tagdealmap = new HashMap<String, String>();
-		for (DeTag deTag : tags) {
-			String dimension = deTag.getDimension();
-			String name = deTag.getTagname();
-			tagdealmap.put(name, dimension);
-		}
 
-		TagUtil tag = new TagUtil();
-		Map<String, Object> map = tag.getTags(tagdealmap);
-		Map<String, Object> tagmap = (Map<String, Object>) map.get("map1");
-		Map<String, Object> tagmap2 = (Map<String, Object>) map.get("map2");
-		for (Entry<String, Object> entry : tagmap.entrySet()) {
-			JSONObject obj1 = new JSONObject();
-			String key = entry.getKey();
-			String value = (String) entry.getValue();
-			obj1.put("dimension", value);
-			obj1.put("name", key);
-			arr.add(obj1);
-		}
-		for (Entry<String, Object> entry : tagmap2.entrySet()) {
-			JSONObject obj1 = new JSONObject();
-			String key = entry.getKey();
-			String lastword = key.substring(key.length() - 1);
-			Pattern pattern = Pattern.compile("[0-9]*");
-			boolean isMath = pattern.matcher(lastword).matches();
-			if (isMath) {
-				key = key.substring(0, key.length() - 1);
-			}
-			String value = (String) entry.getValue();
-			obj1.put("dimension", key);
-			obj1.put("name", value);
-			arr.add(obj1);
-		}
-		obj.put("tags", arr);
-
-		String returncodes = SendUtils.post(url, obj.toString());
-		return returncodes;
-	}
 
 	/**
 	 * 给客户绑定事件 返回绑定的事件最后的一个事件 有可能绑定订单,订单事件要在最后的
+	 * 返回最后一个事件创建的事件,如果有订单,订单的创建时间要在这个时间之后
 	 * @param customerId
 	 * @param access_token
 	 * @param dateTime
@@ -301,38 +237,7 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		return differentTime;
 	}
 
-	/**
-	 * 创建客户组群
-	 * @param URL
-	 * @param json
-	 */
-	public String createList(String access_token, String name) {
-		String domain = getPropertyInfo(DOMIAN_NAME);
-		String url = domain + "/v1/lists?access_token=" + access_token;
-		JSONObject obj = new JSONObject();
-		obj.put("name", name);
-		String returnCode = SendUtils.post(url, obj.toString());
-		JSONObject returnObj = JSONObject.fromObject(returnCode);
-		String listid = returnObj.getString("id");// 群组id
-		return listid;
-	}
 
-	/**
-	 * 将客户放入某个组群中
-	 * @param URL
-	 * @param json
-	 */
-	public String addcustomertoList(String customerId, String listId, String access_token) {
-		String domain = getPropertyInfo(DOMIAN_NAME);
-		String url = domain + "/v1/listMembers" + "?access_token=" + access_token;
-		JSONObject data = new JSONObject();
-		JSONObject obj2 = new JSONObject();
-		data.put("customerId", customerId);
-		data.put("listId", listId);
-		obj2.put("data", data);
-		String returnCode = SendUtils.post(url, obj2.toString());
-		return returnCode;
-	}
 
 	/**
 	 * 给符合条件的客户创建订单
@@ -414,7 +319,90 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		}
         return reList;
     }
+    
+	/**
+	 * 将客户与标签绑定
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public String addCustomerTag(String customerId, String access_token,String city,String totalpay){
+		String domain = getPropertyInfo(DOMIAN_NAME);
+		String url = domain + "/v1/tagservice/addCustomerTag?access_token=" + access_token;
+		JSONObject obj = new JSONObject();
+		JSONArray arr = new JSONArray();
+		obj.put("customerId", customerId);
+		List<DeTag> tags = tagdao.selectAllTag();
+		Map<String, String> tagdealmap = new HashMap<String, String>();
+		for (DeTag deTag : tags) {
+			String dimension = deTag.getDimension();
+			String name = deTag.getTagname();
+			tagdealmap.put(name, dimension);
+		}
 
+		TagUtil tag = new TagUtil();
+		Map<String, Object> map = tag.getTags(tagdealmap);
+		Map<String, Object> tagmap = (Map<String, Object>) map.get("map1");
+		Map<String, Object> tagmap2 = (Map<String, Object>) map.get("map2");
+		for (Entry<String, Object> entry : tagmap.entrySet()) {
+			JSONObject obj1 = new JSONObject();
+			String key = entry.getKey();
+			String value = (String) entry.getValue();
+			obj1.put("dimension", value);
+			obj1.put("name", key);
+			arr.add(obj1);
+		}
+		for (Entry<String, Object> entry : tagmap2.entrySet()) {
+			JSONObject obj1 = new JSONObject();
+			String key = entry.getKey();
+			String lastword = key.substring(key.length() - 1);
+			Pattern pattern = Pattern.compile("[0-9]*");
+			boolean isMath = pattern.matcher(lastword).matches();
+			if (isMath) {
+				key = key.substring(0, key.length() - 1);
+			}
+			String value = (String) entry.getValue();
+			obj1.put("dimension", key);
+			obj1.put("name", value);
+			arr.add(obj1);
+		}
+		obj.put("tags", arr);
+
+		String returncodes = SendUtils.post(url, obj.toString());
+		return returncodes;
+	}
+
+	/**
+	 * 创建客户组群
+	 * @param URL
+	 * @param json
+	 */
+	public String createList(String access_token, String name) {
+		String domain = getPropertyInfo(DOMIAN_NAME);
+		String url = domain + "/v1/lists?access_token=" + access_token;
+		JSONObject obj = new JSONObject();
+		obj.put("name", name);
+		String returnCode = SendUtils.post(url, obj.toString());
+		JSONObject returnObj = JSONObject.fromObject(returnCode);
+		String listid = returnObj.getString("id");// 群组id
+		return listid;
+	}
+
+	/**
+	 * 将客户放入某个组群中
+	 * @param URL
+	 * @param json
+	 */
+	public String addcustomertoList(String customerId, String listId, String access_token) {
+		String domain = getPropertyInfo(DOMIAN_NAME);
+		String url = domain + "/v1/listMembers" + "?access_token=" + access_token;
+		JSONObject data = new JSONObject();
+		JSONObject obj2 = new JSONObject();
+		data.put("customerId", customerId);
+		data.put("listId", listId);
+		obj2.put("data", data);
+		String returnCode = SendUtils.post(url, obj2.toString());
+		return returnCode;
+	}
 
 	/**
 	 * 随机返回一个图片的路径
