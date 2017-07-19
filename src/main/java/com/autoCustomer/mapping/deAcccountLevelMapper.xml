@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.autoCustomer.dao.deAcccountLevelMapper" >
+  <resultMap id="BaseResultMap" type="com.autoCustomer.entity.deAcccountLevel" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="accountMin" property="accountmin" jdbcType="DOUBLE" />
+    <result column="accountMax" property="accountmax" jdbcType="DOUBLE" />
+    <result column="level" property="level" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, accountMin, accountMax, level
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from de_acccount_level
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from de_acccount_level
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.autoCustomer.entity.deAcccountLevel" >
+    insert into de_acccount_level (id, accountMin, accountMax, 
+      level)
+    values (#{id,jdbcType=INTEGER}, #{accountmin,jdbcType=DOUBLE}, #{accountmax,jdbcType=DOUBLE}, 
+      #{level,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.autoCustomer.entity.deAcccountLevel" >
+    insert into de_acccount_level
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="accountmin != null" >
+        accountMin,
+      </if>
+      <if test="accountmax != null" >
+        accountMax,
+      </if>
+      <if test="level != null" >
+        level,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="accountmin != null" >
+        #{accountmin,jdbcType=DOUBLE},
+      </if>
+      <if test="accountmax != null" >
+        #{accountmax,jdbcType=DOUBLE},
+      </if>
+      <if test="level != null" >
+        #{level,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.autoCustomer.entity.deAcccountLevel" >
+    update de_acccount_level
+    <set >
+      <if test="accountmin != null" >
+        accountMin = #{accountmin,jdbcType=DOUBLE},
+      </if>
+      <if test="accountmax != null" >
+        accountMax = #{accountmax,jdbcType=DOUBLE},
+      </if>
+      <if test="level != null" >
+        level = #{level,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.autoCustomer.entity.deAcccountLevel" >
+    update de_acccount_level
+    set accountMin = #{accountmin,jdbcType=DOUBLE},
+      accountMax = #{accountmax,jdbcType=DOUBLE},
+      level = #{level,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  
+  
+    <select id="selectLevelByAccount" resultType="java.lang.String" parameterType="java.lang.Double" >
+    select level
+    from de_acccount_level
+    where accountMin &lt;=#{account,jdbcType=DOUBLE} AND accountMax  &gt;=#{account,jdbcType=DOUBLE}
+  </select>
+  
+     <select id="selectMaxLevel" resultType="java.lang.String" parameterType="java.lang.Double" >
+    select level
+    from de_acccount_level
+    where  accountMax  &lt;=#{account,jdbcType=DOUBLE} order by accountMax desc limit 1
+  </select>
+</mapper>
