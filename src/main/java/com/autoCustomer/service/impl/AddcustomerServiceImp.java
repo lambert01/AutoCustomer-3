@@ -180,9 +180,6 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		return data;
 	}
 
- 
-
-
 
 	/**
 	 * 给客户绑定事件 返回绑定的事件最后的一个事件 有可能绑定订单,订单事件要在最后的
@@ -236,7 +233,6 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		}
 		return differentTime;
 	}
-
 
 
 	/**
@@ -294,7 +290,7 @@ public class AddcustomerServiceImp implements AddcustomerService {
         if (products.size() >= selected) {
             for (int i = 0; i < selected; i++) {
                 // 随机数的范围为0-list.size()-1;
-                int target = random.nextInt(products.size()-1);
+                int target = random.nextInt(products.size());
                 reList.add(products.get(target));
                 products.remove(target);
             }
@@ -302,7 +298,7 @@ public class AddcustomerServiceImp implements AddcustomerService {
             selected = products.size();
             for (int i = 0; i < selected; i++) {
                 // 随机数的范围为0-list.size()-1;
-                int target = random.nextInt(products.size()-1);
+                int target = random.nextInt(products.size());
                 reList.add(products.get(target));
                 products.remove(target);
             }
