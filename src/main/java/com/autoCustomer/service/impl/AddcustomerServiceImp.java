@@ -2,12 +2,14 @@ package com.autoCustomer.service.impl;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Random;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
 
@@ -80,8 +82,8 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		JSONObject customer = getcustomer();
 		Map<String, Object> stagemap = percentageService.getCurrentStage();
 		String stage = stagemap.get("message").toString();
-		Integer stageid = (Integer)stagemap.get("id"); //客户状态id,通过状态id找到符合的事件
-		//Integer stageid = 30;
+		//Integer stageid = (Integer)stagemap.get("id"); //客户状态id,通过状态id找到符合的事件
+		Integer stageid = 30;
 		List<DeStageEvent> stageevents = eventdao.selectEventsByStage(stageid); // 所有符合客户状态的事件
 		customer.put("stage", stage);
 		String retunrstr = SendUtils.post(url, customer.toString());
@@ -92,12 +94,11 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		String dateJoin = returnobj.getString("dateJoin");
 		String ordertime = createCustomerEvent(customeid, accessToken, dateJoin, stageevents);
 		ordertime = paserUtcTime(ordertime);
-		Integer hasOrder = stageorderdao.selectByStageId(stageid);// 为1需要配置订单
+		Integer hasOrder = stageorderdao.selectByStageId(stageid);// 是否需要配置订单
 		if (hasOrder == 1) {
-			List<DeProducts> products = productdao.selectProduct();
+			List<DeProducts> products = getproducts();
 			String returndeal = addcustomerDeals(customeid, accessToken, products, ordertime);
 			System.out.println("创建订单返回的 " + returndeal);
-
 		}
 
 		return "";
@@ -373,6 +374,47 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		String returnCode = SendUtils.post(url, order.toString());
 		return returnCode;
 	}
+	
+   /**
+    * 返回随机数量的不同的商品信息,每个商品的出售数量也随机
+    * @return
+    */
+    public  List<DeProducts> getproducts() {
+    	List<DeProducts> products = productdao.selectProduct();
+    	int selected = (int) ((Math.random()*5)+1);//返回随机数量的商品
+        List<DeProducts> reList = new ArrayList<DeProducts>();
+ 
+        Random random = new Random();
+        // 先抽取，备选数量的个数
+        if (products.size() >= selected) {
+            for (int i = 0; i < selected; i++) {
+                // 随机数的范围为0-list.size()-1;
+                int target = random.nextInt(products.size()-1);
+                reList.add(products.get(target));
+                products.remove(target);
+            }
+        } else {
+            selected = products.size();
+            for (int i = 0; i < selected; i++) {
+                // 随机数的范围为0-list.size()-1;
+                int target = random.nextInt(products.size()-1);
+                reList.add(products.get(target));
+                products.remove(target);
+            }
+        }
+        for (DeProducts deProducts : reList) { 
+        	//在循环准备返回的product,里面的商品数量也返回随机的小于存量的
+        	Integer quantity = deProducts.getProductquantity();//商品数量
+        	int quantitysize = (int)(Math.random()*quantity);
+        	if(quantitysize ==0){
+        		quantitysize = 1;
+        	}
+        	deProducts.setProductquantity(quantitysize);
+			
+		}
+        return reList;
+    }
+
 
 	/**
 	 * 随机返回一个图片的路径
