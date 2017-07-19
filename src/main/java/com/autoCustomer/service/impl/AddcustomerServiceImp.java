@@ -25,11 +25,11 @@ import com.autoCustomer.dao.DeStageOrderMapper;
 import com.autoCustomer.dao.DeTagMapper;
 import com.autoCustomer.dao.TblPropertiesInfoMapper;
 import com.autoCustomer.dao.deAcccountLevelMapper;
+import com.autoCustomer.dao.deCityLevelMapper;
 import com.autoCustomer.entity.DeImage;
 import com.autoCustomer.entity.DeProducts;
 import com.autoCustomer.entity.DeStageEvent;
 import com.autoCustomer.entity.DeTag;
-import com.autoCustomer.entity.TblPropertiesInfo;
 import com.autoCustomer.service.AddcustomerService;
 import com.autoCustomer.service.DePercentageService;
 import com.autoCustomer.util.LocalUtil2;
@@ -69,6 +69,9 @@ public class AddcustomerServiceImp implements AddcustomerService {
 	
 	@Resource
 	private deAcccountLevelMapper accountleveldao; //订单金额对应的级别dao
+	
+	@Resource
+	private deCityLevelMapper cityleveldao; //城市对应的级别
 
 	private static final String ADDRESS_SET = "address_set"; // 地址配置
 	private static final String DOMIAN_NAME = "domian_name"; // 域名,可配置测试域名或生产域名
@@ -97,20 +100,29 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		System.out.println("创建客户返回的是" + name);
 		String customeid = returnobj.getString("id");
 		String dateJoin = returnobj.getString("dateJoin");
+		String city = returnobj.getString("city");
 		String ordertime = createCustomerEvent(customeid, accessToken, dateJoin, stageevents);
 		ordertime = paserUtcTime(ordertime);
 		Integer hasOrder = stageorderdao.selectByStageId(stageid);// 是否需要配置订单
+		//开始配置标签
+		String accountLevel = "";
+		String cityLevel="";
 		if (hasOrder == 1) {
 			List<DeProducts> products = getproducts();
 			String returndeal = addcustomerDeals(customeid, accessToken, products, ordertime);
 			System.out.println("创建订单返回的 " + returndeal);
 			JSONObject  returndealobj = JSONObject.fromObject(returndeal);
 			Double amountTotal = Double.parseDouble(returndealobj.get("amountTotal").toString());
-			String level = accountleveldao.selectLevelByAccount(amountTotal);
-			if(level == null || "".equals(level)){
-				level = accountleveldao.selectMaxLevel(amountTotal);
+			accountLevel = accountleveldao.selectLevelByAccount(amountTotal);
+			if(accountLevel == null || "".equals(accountLevel)){
+				accountLevel = accountleveldao.selectMaxLevel(amountTotal);
 			}
 		}
+		String citylevel = cityleveldao.selectLevelBycity(city);
+		if(citylevel == null || "".equals(citylevel)){
+			citylevel = "三四线城市";
+		}
+		
 
 		return "";
 
@@ -333,7 +345,7 @@ public class AddcustomerServiceImp implements AddcustomerService {
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public String addCustomerTag(String customerId, String access_token,String city,String totalpay){
+	public String addCustomerTag(String customerId, String access_token,String city,String level){
 		String domain = getPropertyInfo(DOMIAN_NAME);
 		String url = domain + "/v1/tagservice/addCustomerTag?access_token=" + access_token;
 		JSONObject obj = new JSONObject();
@@ -373,6 +385,14 @@ public class AddcustomerServiceImp implements AddcustomerService {
 			obj1.put("name", value);
 			arr.add(obj1);
 		}
+		JSONObject cityandlevel = new JSONObject();
+		cityandlevel.put("dimension", "bacis");
+		cityandlevel.put("name", city);
+		if(level != null && !"".equals(level)){
+			cityandlevel.put("dimension", "bacis");
+			cityandlevel.put("name", city);	
+		}
+		arr.add(cityandlevel);
 		obj.put("tags", arr);
 
 		String returncodes = SendUtils.post(url, obj.toString());
