@@ -5,13 +5,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Random;
 import java.util.TimeZone;
-import java.util.regex.Pattern;
 
 import javax.annotation.Resource;
 import javax.transaction.Transactional;
@@ -19,13 +16,13 @@ import javax.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import com.autoCustomer.dao.DeAcccountLevelMapper;
+import com.autoCustomer.dao.DeCityLevelMapper;
 import com.autoCustomer.dao.DeImageMapper;
 import com.autoCustomer.dao.DeProductsMapper;
 import com.autoCustomer.dao.DeStageEventMapper;
 import com.autoCustomer.dao.DeStageOrderMapper;
 import com.autoCustomer.dao.DeTagMapper;
 import com.autoCustomer.dao.TblPropertiesInfoMapper;
-import com.autoCustomer.dao.DeCityLevelMapper;
 import com.autoCustomer.entity.DeImage;
 import com.autoCustomer.entity.DeProducts;
 import com.autoCustomer.entity.DeStageEvent;
@@ -35,7 +32,6 @@ import com.autoCustomer.service.DePercentageService;
 import com.autoCustomer.util.LocalUtil2;
 import com.autoCustomer.util.MessageUtil;
 import com.autoCustomer.util.SendUtils;
-import com.autoCustomer.util.TagUtil;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -89,9 +85,13 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		String url = domain + "/v1/customerandidentities?access_token=" + accessToken;
 		JSONObject customer = getcustomer();
 		Map<String, Object> stagemap = percentageService.getCurrentStage();
-		String stage = stagemap.get("message").toString();
-		//Integer stageid = (Integer)stagemap.get("id"); //客户状态id,通过状态id找到符合的事件
-		Integer stageid = 30;
+		String stage ="";
+		try {
+			stage = stagemap.get("message").toString();
+		} catch (Exception e) {
+			stage ="未知";
+		}
+		Integer stageid = (Integer)stagemap.get("id"); //客户状态id,通过状态id找到符合的事件
 		List<DeStageEvent> stageevents = eventdao.selectEventsByStage(stageid); // 所有符合客户状态的事件
 		customer.put("stage", stage);
 		String retunrstr = SendUtils.post(url, customer.toString());
@@ -348,48 +348,65 @@ public class AddcustomerServiceImp implements AddcustomerService {
 	 * 将客户与标签绑定
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
 	public String addCustomerTag(String customerId, String access_token,String citylevel,String accountlevel){
 		String domain = getPropertyInfo(DOMIAN_NAME);
 		String url = domain + "/v1/tagservice/addCustomerTag?access_token=" + access_token;
 		JSONObject obj = new JSONObject();
-		JSONArray arr = new JSONArray();
+		JSONArray tagsarr = new JSONArray();
 		obj.put("customerId", customerId);
 		List<DeTag> tags = tagdao.selectAllTag();
-		Map<String, String> tagdealmap = new HashMap<String, String>();
+		List<JSONObject> unrelationtags = new ArrayList<JSONObject>();
+		List<JSONObject> relationtags = new ArrayList<JSONObject>();
+		Integer differtrelation = 0;
 		for (DeTag deTag : tags) {
+			JSONObject tagjson = new JSONObject();
 			String dimension = deTag.getDimension();
 			String name = deTag.getTagname();
-			tagdealmap.put(name, dimension);
+			Integer relation = deTag.getRelation();//标签的互斥关系,有相同数字的标签不能出现在同一个用户身上
+			if(relation == null){
+				tagjson.put("dimension", dimension);
+				tagjson.put("name", name);
+				unrelationtags.add(tagjson);
+			}else{
+				//有些标签不能同事出现在同一个人身上,如青年标签,老年标签,这个标签有相同的relation
+				if(differtrelation == 0 || differtrelation == relation){
+					tagjson.put("dimension", dimension);
+					tagjson.put("name", name);
+					relationtags.add(tagjson);
+					differtrelation = relation;	
+					int size = tagdao.selectCountSize(relation);
+					int jsonsize = relationtags.size();
+					if(jsonsize == size){
+						int index = (int)(Math.random() * jsonsize);
+						JSONObject relationjson = relationtags.get(index);
+						int didadd = (int)(Math.random()*10);
+						if(didadd >= 5){
+							if(!relationjson.isEmpty()){
+								tagsarr.add(relationjson);
+							}
+						}
+						
+						relationtags.clear();
+						differtrelation = 0;
+					}
+				}
+			}
 		}
 
-		TagUtil tag = new TagUtil();
-		Map<String, Object> map = tag.getTags(tagdealmap);
-		Map<String, Object> tagmap = (Map<String, Object>) map.get("map1");
-		Map<String, Object> tagmap2 = (Map<String, Object>) map.get("map2");
-		for (Entry<String, Object> entry : tagmap.entrySet()) {
-			JSONObject obj1 = new JSONObject();
-			String key = entry.getKey();
-			String value = (String) entry.getValue();
-			obj1.put("dimension", value);
-			obj1.put("name", key);
-			arr.add(obj1);
+		//开始添加非互斥标签
+		int unrelationsize = unrelationtags.size();
+		int index = (int)(Math.random() * unrelationsize);
+		if(index >5){
+			index = 5;
 		}
-		for (Entry<String, Object> entry : tagmap2.entrySet()) {
-			JSONObject obj1 = new JSONObject();
-			String key = entry.getKey();
-			String lastword = key.substring(key.length() - 1);
-			Pattern pattern = Pattern.compile("[0-9]*");
-			boolean isMath = pattern.matcher(lastword).matches();
-			if (isMath) {
-				key = key.substring(0, key.length() - 1);
+		for (int i = 0; i < index; i++) {
+			JSONObject unrelationtag = unrelationtags.get(i);
+			if(!unrelationtag.isEmpty()){
+				tagsarr.add(unrelationtag);
 			}
-			String value = (String) entry.getValue();
-			obj1.put("dimension", key);
-			obj1.put("name", value);
-			arr.add(obj1);
+			
+			
 		}
-		
 		
 		JSONObject cityandleveljson = new JSONObject();
 		JSONObject accountleveljson = new JSONObject();
@@ -399,15 +416,15 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		if(accountlevel != null && !"".equals(accountlevel)){
 			accountleveljson.put("dimension", "bacis");
 			accountleveljson.put("name", accountlevel);	
+			tagsarr.add(accountleveljson);
 		}
-		arr.add(accountleveljson);
-		arr.add(cityandleveljson);
-		obj.put("tags", arr);
+		tagsarr.add(cityandleveljson);
+		obj.put("tags", tagsarr);
        System.out.println("创建标签的json是 "+obj.toString());
 		String returncodes = SendUtils.post(url, obj.toString());
 		return returncodes;
 	}
-
+ 
 	/**
 	 * 创建客户组群
 	 * @param URL
