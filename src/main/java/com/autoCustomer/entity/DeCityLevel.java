@@ -1,6 +1,6 @@
 package com.autoCustomer.entity;
 
-public class deCityLevel {
+public class DeCityLevel {
     private Integer id;
 
     private String city;
