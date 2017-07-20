@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.autoCustomer.dao.deCityLevelMapper" >
-  <resultMap id="BaseResultMap" type="com.autoCustomer.entity.deCityLevel" >
+<mapper namespace="com.autoCustomer.dao.DeCityLevelMapper" >
+  <resultMap id="BaseResultMap" type="com.autoCustomer.entity.DeCityLevel" >
     <id column="id" property="id" jdbcType="INTEGER" />
     <result column="city" property="city" jdbcType="VARCHAR" />
     <result column="level" property="level" jdbcType="VARCHAR" />
@@ -19,13 +19,13 @@
     delete from de_city_level
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.autoCustomer.entity.deCityLevel" >
+  <insert id="insert" parameterType="com.autoCustomer.entity.DeCityLevel" >
     insert into de_city_level (id, city, level
       )
     values (#{id,jdbcType=INTEGER}, #{city,jdbcType=VARCHAR}, #{level,jdbcType=VARCHAR}
       )
   </insert>
-  <insert id="insertSelective" parameterType="com.autoCustomer.entity.deCityLevel" >
+  <insert id="insertSelective" parameterType="com.autoCustomer.entity.DeCityLevel" >
     insert into de_city_level
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -50,7 +50,7 @@
       </if>
     </trim>
   </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.autoCustomer.entity.deCityLevel" >
+  <update id="updateByPrimaryKeySelective" parameterType="com.autoCustomer.entity.DeCityLevel" >
     update de_city_level
     <set >
       <if test="city != null" >
@@ -62,7 +62,7 @@
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.autoCustomer.entity.deCityLevel" >
+  <update id="updateByPrimaryKey" parameterType="com.autoCustomer.entity.DeCityLevel" >
     update de_city_level
     set city = #{city,jdbcType=VARCHAR},
       level = #{level,jdbcType=VARCHAR}
