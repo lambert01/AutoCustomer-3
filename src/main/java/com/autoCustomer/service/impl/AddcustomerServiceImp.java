@@ -18,14 +18,14 @@ import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
 
+import com.autoCustomer.dao.DeAcccountLevelMapper;
 import com.autoCustomer.dao.DeImageMapper;
 import com.autoCustomer.dao.DeProductsMapper;
 import com.autoCustomer.dao.DeStageEventMapper;
 import com.autoCustomer.dao.DeStageOrderMapper;
 import com.autoCustomer.dao.DeTagMapper;
 import com.autoCustomer.dao.TblPropertiesInfoMapper;
-import com.autoCustomer.dao.deAcccountLevelMapper;
-import com.autoCustomer.dao.deCityLevelMapper;
+import com.autoCustomer.dao.DeCityLevelMapper;
 import com.autoCustomer.entity.DeImage;
 import com.autoCustomer.entity.DeProducts;
 import com.autoCustomer.entity.DeStageEvent;
@@ -68,10 +68,10 @@ public class AddcustomerServiceImp implements AddcustomerService {
 	private DeProductsMapper productdao;
 	
 	@Resource
-	private deAcccountLevelMapper accountleveldao; //订单金额对应的级别dao
+	private DeAcccountLevelMapper accountleveldao; //订单金额对应的级别dao
 	
 	@Resource
-	private deCityLevelMapper cityleveldao; //城市对应的级别
+	private DeCityLevelMapper cityleveldao; //城市对应的级别
 
 	private static final String ADDRESS_SET = "address_set"; // 地址配置
 	private static final String DOMIAN_NAME = "domian_name"; // 域名,可配置测试域名或生产域名
@@ -80,11 +80,11 @@ public class AddcustomerServiceImp implements AddcustomerService {
 
 	@Override
 	public String addcustomer() {
+		JSONObject returnjson = new JSONObject();
 	 	String domain = getPropertyInfo(DOMIAN_NAME);
 		String appid = getPropertyInfo(APPID);
 		String sercet = getPropertyInfo(SERCET);
-		// appid.String accessToken = getAccessToken("cl02dd15a2228ee92",
-		// "ce2f7581f4203b257ed5687c2e2106c3978a93be");
+		// appid.String accessToken = getAccessToken("cl02dd15a2228ee92","ce2f7581f4203b257ed5687c2e2106c3978a93be");
 		String accessToken = getAccessToken(appid, sercet);
 		String url = domain + "/v1/customerandidentities?access_token=" + accessToken;
 		JSONObject customer = getcustomer();
@@ -96,6 +96,7 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		customer.put("stage", stage);
 		String retunrstr = SendUtils.post(url, customer.toString());
 		JSONObject returnobj = JSONObject.fromObject(retunrstr);
+		returnjson.put("创建客户返回的是", retunrstr);
 		String name = returnobj.get("name").toString();
 		System.out.println("创建客户返回的是" + name);
 		String customeid = returnobj.getString("id");
@@ -111,6 +112,7 @@ public class AddcustomerServiceImp implements AddcustomerService {
 			List<DeProducts> products = getproducts();
 			String returndeal = addcustomerDeals(customeid, accessToken, products, ordertime);
 			System.out.println("创建订单返回的 " + returndeal);
+			returnjson.put("创建订单返回的", returndeal);
 			JSONObject  returndealobj = JSONObject.fromObject(returndeal);
 			Double amountTotal = Double.parseDouble(returndealobj.get("amountTotal").toString());
 			accountLevel = accountleveldao.selectLevelByAccount(amountTotal);
@@ -124,8 +126,9 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		}
 		String tagreturn = addCustomerTag(customeid, accessToken, cityLevel, accountLevel);
 		System.out.println("创建标签返回的结果是"+tagreturn);
+		returnjson.put("创建标签返回的", tagreturn);
 
-		return "";
+		return returnjson.toString();
 
 	}
 
@@ -386,6 +389,8 @@ public class AddcustomerServiceImp implements AddcustomerService {
 			obj1.put("name", value);
 			arr.add(obj1);
 		}
+		
+		
 		JSONObject cityandleveljson = new JSONObject();
 		JSONObject accountleveljson = new JSONObject();
 		cityandleveljson.put("dimension", "bacis");
@@ -428,11 +433,11 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		String domain = getPropertyInfo(DOMIAN_NAME);
 		String url = domain + "/v1/listMembers" + "?access_token=" + access_token;
 		JSONObject data = new JSONObject();
-		JSONObject obj2 = new JSONObject();
+		JSONObject list = new JSONObject();
 		data.put("customerId", customerId);
 		data.put("listId", listId);
-		obj2.put("data", data);
-		String returnCode = SendUtils.post(url, obj2.toString());
+		list.put("data", data);
+		String returnCode = SendUtils.post(url, list.toString());
 		return returnCode;
 	}
 
@@ -458,7 +463,6 @@ public class AddcustomerServiceImp implements AddcustomerService {
 	 */
 	public String getPropertyInfo(String kind) {
 		List<String>  list = tblPropertiesInfoDao.selectPropertyInfoByKind(kind);
-		 
 		if (list != null && list.size() > 0) {
 			return list.get(0);
 		}
