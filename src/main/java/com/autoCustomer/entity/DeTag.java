@@ -7,6 +7,8 @@ public class DeTag {
 
     private String tagname;
 
+    private Integer relation;
+
     public Integer getTagid() {
         return tagid;
     }
@@ -29,5 +31,13 @@ public class DeTag {
 
     public void setTagname(String tagname) {
         this.tagname = tagname == null ? null : tagname.trim();
+    }
+
+    public Integer getRelation() {
+        return relation;
+    }
+
+    public void setRelation(Integer relation) {
+        this.relation = relation;
     }
 }
