@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.autoCustomer.service.AddcustomerService;
-import com.autoCustomer.service.CustomerService;
 import com.autoCustomer.service.DePercentageService;
 
 import net.sf.json.JSONObject;
@@ -20,10 +19,7 @@ import net.sf.json.JSONObject;
 @Controller
 @RequestMapping("/demo")
 public class CustomerController {
-	
-	
-	@Autowired
-	private CustomerService customerService;
+
 	
 	@Autowired
 	private DePercentageService percentageService;
