@@ -98,7 +98,7 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		JSONObject returnobj = JSONObject.fromObject(retunrstr);
 		returnjson.put("创建客户返回的是", retunrstr);
 		String name = returnobj.get("name").toString();
-		System.out.println("创建客户返回的是" + name);
+		System.out.println("创建客户返回的是" + name +"  "+stage);
 		String customeid = returnobj.getString("id");
 		String dateJoin = returnobj.getString("dateJoin");
 		String city = returnobj.getString("city");
