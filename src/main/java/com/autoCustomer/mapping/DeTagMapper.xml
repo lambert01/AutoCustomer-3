@@ -5,9 +5,10 @@
     <id column="tagId" property="tagid" jdbcType="INTEGER" />
     <result column="dimension" property="dimension" jdbcType="VARCHAR" />
     <result column="tagname" property="tagname" jdbcType="VARCHAR" />
+    <result column="relation" property="relation" jdbcType="INTEGER" />
   </resultMap>
   <sql id="Base_Column_List" >
-    tagId, dimension, tagname
+    tagId, dimension, tagname, relation
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
@@ -15,22 +16,15 @@
     from de_tag
     where tagId = #{tagid,jdbcType=INTEGER}
   </select>
-  
-    <select id="selectAllTag" resultMap="BaseResultMap" >
-    select 
-    <include refid="Base_Column_List" />
-    from de_tag
-  </select>
-  
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
     delete from de_tag
     where tagId = #{tagid,jdbcType=INTEGER}
   </delete>
   <insert id="insert" parameterType="com.autoCustomer.entity.DeTag" >
-    insert into de_tag (tagId, dimension, tagname
-      )
-    values (#{tagid,jdbcType=INTEGER}, #{dimension,jdbcType=VARCHAR}, #{tagname,jdbcType=VARCHAR}
-      )
+    insert into de_tag (tagId, dimension, tagname, 
+      relation)
+    values (#{tagid,jdbcType=INTEGER}, #{dimension,jdbcType=VARCHAR}, #{tagname,jdbcType=VARCHAR}, 
+      #{relation,jdbcType=INTEGER})
   </insert>
   <insert id="insertSelective" parameterType="com.autoCustomer.entity.DeTag" >
     insert into de_tag
@@ -44,6 +38,9 @@
       <if test="tagname != null" >
         tagname,
       </if>
+      <if test="relation != null" >
+        relation,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="tagid != null" >
@@ -54,6 +51,9 @@
       </if>
       <if test="tagname != null" >
         #{tagname,jdbcType=VARCHAR},
+      </if>
+      <if test="relation != null" >
+        #{relation,jdbcType=INTEGER},
       </if>
     </trim>
   </insert>
@@ -66,13 +66,17 @@
       <if test="tagname != null" >
         tagname = #{tagname,jdbcType=VARCHAR},
       </if>
+      <if test="relation != null" >
+        relation = #{relation,jdbcType=INTEGER},
+      </if>
     </set>
     where tagId = #{tagid,jdbcType=INTEGER}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.autoCustomer.entity.DeTag" >
     update de_tag
     set dimension = #{dimension,jdbcType=VARCHAR},
-      tagname = #{tagname,jdbcType=VARCHAR}
+      tagname = #{tagname,jdbcType=VARCHAR},
+      relation = #{relation,jdbcType=INTEGER}
     where tagId = #{tagid,jdbcType=INTEGER}
   </update>
 </mapper>
