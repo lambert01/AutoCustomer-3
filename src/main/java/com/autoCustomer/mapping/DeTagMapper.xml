@@ -79,4 +79,15 @@
       relation = #{relation,jdbcType=INTEGER}
     where tagId = #{tagid,jdbcType=INTEGER}
   </update>
+  
+    <select id="selectAllTag" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from de_tag order by relation
+  </select>
+  
+      <select id="selectCountSize" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+    select count(*)
+    from de_tag where relation = #{relation,jdbcType=INTEGER}
+  </select>
 </mapper>
