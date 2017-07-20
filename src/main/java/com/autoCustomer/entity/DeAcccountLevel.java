@@ -1,6 +1,6 @@
 package com.autoCustomer.entity;
 
-public class deAcccountLevel {
+public class DeAcccountLevel {
     private Integer id;
 
     private Double accountmin;
