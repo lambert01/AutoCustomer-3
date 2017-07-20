@@ -105,6 +105,10 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		String ordertime = createCustomerEvent(customeid,accessToken,dateJoin,stageevents);
 		ordertime = paserUtcTime(ordertime);
 		Integer hasOrder = stageorderdao.selectByStageId(stageid);// 是否需要配置订单
+		if(hasOrder == null){
+			hasOrder = 0;
+		}
+ 
 		// 开始配置标签
 		String accountLevel = "";
 		String cityLevel = "";
