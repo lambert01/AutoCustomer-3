@@ -1,6 +1,6 @@
 package com.autoCustomer.service;
 
 public interface AddcustomerService {
-	public String addcustomer();
+	public String addcustomer(String username);
 
 }
