@@ -96,9 +96,10 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		customer.put("stage", stage);
 		String retunrstr = SendUtils.post(url, customer.toString());
 		JSONObject returnobj = JSONObject.fromObject(retunrstr);
-		returnjson.put("创建客户返回的是", retunrstr);
 		String name = returnobj.get("name").toString();
 		System.out.println("创建客户返回的是" + name +"  "+stage);
+		returnjson.put("姓名", name);
+		returnjson.put("状态", stage);
 		String customeid = returnobj.getString("id");
 		String dateJoin = returnobj.getString("dateJoin");
 		String city = returnobj.getString("city");
@@ -116,7 +117,6 @@ public class AddcustomerServiceImp implements AddcustomerService {
 			List<DeProducts> products = getproducts();
 			String returndeal = addcustomerDeals(customeid,accessToken,products,ordertime);
 			System.out.println("创建订单返回的 " + returndeal);
-			returnjson.put("创建订单返回的", returndeal);
 			JSONObject returndealobj = JSONObject.fromObject(returndeal);
 			Double amountTotal = Double.parseDouble(returndealobj.get("amountTotal").toString());
 			accountLevel = accountleveldao.selectLevelByAccount(amountTotal);
@@ -130,7 +130,6 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		}
 		String tagreturn = addCustomerTag(customeid,accessToken,cityLevel,accountLevel);
 		System.out.println("创建标签返回的结果是" + tagreturn);
-		returnjson.put("创建标签返回的", tagreturn);
 
 		return returnjson.toString();
 
