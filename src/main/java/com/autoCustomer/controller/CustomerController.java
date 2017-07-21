@@ -63,7 +63,7 @@ public class CustomerController {
 	@ResponseBody
 	public String createCustomer(@PathVariable("username")String username,@PathVariable("size")int size){
 		JSONArray arr = new JSONArray();
-		if(size < 0){
+		if(size <= 0){
 			size = 1;
 		}
 		for (int i = 0; i < size; i++) { 
