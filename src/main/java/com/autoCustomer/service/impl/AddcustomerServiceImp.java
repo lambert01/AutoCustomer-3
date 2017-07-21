@@ -71,15 +71,15 @@ public class AddcustomerServiceImp implements AddcustomerService {
 
 	private static final String ADDRESS_SET = "address_set"; // 地址配置
 	private static final String DOMIAN_NAME = "domian_name"; // 域名,可配置测试域名或生产域名
-	private static final String APPID = "appid";
-	private static final String SERCET = "sercet";
+	private static final String APPID = "appid_";
+	private static final String SERCET = "sercet_";
 
 	@Override
-	public String addcustomer(){
+	public String addcustomer(String username){
 		JSONObject returnjson = new JSONObject();
 		String domain = getPropertyInfo(DOMIAN_NAME);
-		String appid = getPropertyInfo(APPID);
-		String sercet = getPropertyInfo(SERCET);
+		String appid = getPropertyInfo(APPID+username);
+		String sercet = getPropertyInfo(SERCET+username);
 		// appid.String accessToken =  getAccessToken("cl02dd15a2228ee92","ce2f7581f4203b257ed5687c2e2106c3978a93be");
 		String accessToken = getAccessToken(appid, sercet);
 		String url = domain + "/v1/customerandidentities?access_token=" + accessToken;
