@@ -59,15 +59,15 @@ public class CustomerController {
      * @param size
      * @return
      */
-	@RequestMapping(value="/createCustomer/{size}",produces = "text/json;charset=UTF-8")
+	@RequestMapping(value="/createCustomer/{username}/{size}",produces = "text/json;charset=UTF-8")
 	@ResponseBody
-	public String createCustomer(@PathVariable("size")int size){
+	public String createCustomer(@PathVariable("username")String username,@PathVariable("size")int size){
 		JSONArray arr = new JSONArray();
 		if(size < 0){
 			size = 1;
 		}
 		for (int i = 0; i < size; i++) { 
-			String mes = addcustomerService.addcustomer();
+			String mes = addcustomerService.addcustomer(username);
 			arr.add(mes);
 		}
 		String retnemmes = arr.toString();
