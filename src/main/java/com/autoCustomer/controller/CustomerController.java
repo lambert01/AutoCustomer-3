@@ -56,9 +56,11 @@ public class CustomerController {
 	
  
 	
-	/**
-	 * 自动创建客户,客户的创建时间调用方法返回符合要求的时间
-	 */
+    /**
+     * 自动创建客户
+     * @param size
+     * @return
+     */
 	@RequestMapping(value="/createCustomer/{size}",produces = "text/json;charset=UTF-8")
 	@ResponseBody
 	public String createCustomer(@PathVariable("size")int size){
