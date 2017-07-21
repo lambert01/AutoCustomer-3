@@ -1,12 +1,15 @@
 package com.autoCustomer.controller;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -14,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.autoCustomer.service.AddcustomerService;
 import com.autoCustomer.service.DePercentageService;
 
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 @Controller
@@ -55,14 +59,19 @@ public class CustomerController {
 	/**
 	 * 自动创建客户,客户的创建时间调用方法返回符合要求的时间
 	 */
-	@RequestMapping("/createCustomer")
+	@RequestMapping(value="/createCustomer/{size}",produces = "text/json;charset=UTF-8")
 	@ResponseBody
-	public String createCustomer(){
-		String mes  ="";
-		for (int i = 0; i < 1; i++) { 
-			 mes = addcustomerService.addcustomer();	
+	public String createCustomer(@PathVariable("size")int size){
+		JSONArray arr = new JSONArray();
+		if(size < 0){
+			size = 1;
 		}
+		for (int i = 0; i < size; i++) { 
+			String mes = addcustomerService.addcustomer();
+			arr.add(mes);
+		}
+		String retnemmes = arr.toString();
 		
-		return mes;
+		return retnemmes;
 	}
 }
