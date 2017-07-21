@@ -43,31 +43,31 @@ import net.sf.json.JSONObject;
 public class AddcustomerServiceImp implements AddcustomerService {
 
 	@Resource
-	private TblPropertiesInfoMapper tblPropertiesInfoDao;
+	private TblPropertiesInfoMapper tblPropertiesInfoDao; //配置dao
 
 	@Resource
-	private DePercentageService percentageService; // 获得符合要求的utc时间
+	private DePercentageService percentageService; 
 
 	@Resource
-	private DeImageMapper imagedao;
+	private DeImageMapper imagedao;  //图片dao
 
 	@Resource
-	private DeTagMapper tagdao;
+	private DeTagMapper tagdao; //标签dao
 
 	@Resource
 	private DeStageEventMapper eventdao; // 事件dao
 
 	@Resource
-	private DeStageOrderMapper stageorderdao;// 查看客户状态是否该有订单
+	private DeStageOrderMapper stageorderdao;// 查看客户状态是否该有订单dao
 
 	@Resource
-	private DeProductsMapper productdao;
+	private DeProductsMapper productdao; //产品dao
 
 	@Resource
 	private DeAcccountLevelMapper accountleveldao; // 订单金额对应的级别dao
 
 	@Resource
-	private DeCityLevelMapper cityleveldao; // 城市对应的级别
+	private DeCityLevelMapper cityleveldao; // 城市对应的级别dao
 
 	private static final String ADDRESS_SET = "address_set"; // 地址配置
 	private static final String DOMIAN_NAME = "domian_name"; // 域名,可配置测试域名或生产域名
