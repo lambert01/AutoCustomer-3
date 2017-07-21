@@ -97,13 +97,16 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		String retunrstr = SendUtils.post(url, customer.toString());
 		JSONObject returnobj = JSONObject.fromObject(retunrstr);
 		String name = returnobj.get("name").toString();
-		System.out.println("创建客户返回的是" + name +"  "+stage);
-		returnjson.put("姓名", name);
-		returnjson.put("状态", stage);
+		System.out.println("创建客户返回的是" + returnobj);
+
 		String customeid = returnobj.getString("id");
 		String dateJoin = returnobj.getString("dateJoin");
+		returnjson.put("姓名", name);
+		returnjson.put("状态", stage);
+		returnjson.put("创建时间", dateJoin);
+		returnjson.put("来源", returnobj.getString("source"));
 		String city = returnobj.getString("city");
-		String ordertime = createCustomerEvent(customeid,accessToken,dateJoin,stageevents);
+		String ordertime = createCustomerEvent(customeid,accessToken,dateJoin,stageevents,returnjson);
 		ordertime = paserUtcTime(ordertime);
 		Integer hasOrder = stageorderdao.selectByStageId(stageid);// 是否需要配置订单
 		if(hasOrder == null){
@@ -117,6 +120,8 @@ public class AddcustomerServiceImp implements AddcustomerService {
 			List<DeProducts> products = getproducts();
 			String returndeal = addcustomerDeals(customeid,accessToken,products,ordertime);
 			System.out.println("创建订单返回的 " + returndeal);
+			
+			returnjson.put("订单", JSONObject.fromObject(returndeal));
 			JSONObject returndealobj = JSONObject.fromObject(returndeal);
 			Double amountTotal = Double.parseDouble(returndealobj.get("amountTotal").toString());
 			accountLevel = accountleveldao.selectLevelByAccount(amountTotal);
@@ -130,6 +135,15 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		}
 		String tagreturn = addCustomerTag(customeid,accessToken,cityLevel,accountLevel);
 		System.out.println("创建标签返回的结果是" + tagreturn);
+		JSONArray tagarr = JSONArray.fromObject(tagreturn);
+		List<String> listtag = new ArrayList<String>();
+		for (Object tag : tagarr) {
+			JSONObject jsontag = JSONObject.fromObject(tag);
+			String tagname = jsontag.getString("name");
+			listtag.add(tagname);
+			
+		}
+		returnjson.put("标签", listtag);
 
 		return returnjson.toString();
 
@@ -217,10 +231,11 @@ public class AddcustomerServiceImp implements AddcustomerService {
 	 * @param access_token
 	 * @param dateTime
 	 */
-	public String createCustomerEvent(String customerId,String access_token,String dateTime,List<DeStageEvent> events){
+	public String createCustomerEvent(String customerId,String access_token,String dateTime,List<DeStageEvent> events,JSONObject returnjson){
 		List<DeStageEvent> unrelatedevents = eventdao.selectUnRelatedStageEvent();
 		String domain = getPropertyInfo(DOMIAN_NAME);
 		String url = domain + "/v1/customerevents?access_token=" + access_token;
+		JSONArray enventarr = new JSONArray();
 		String differentTime = dateTime;
 		int eventsize = unrelatedevents.size();
 		int index = (int) (Math.random() * eventsize);
@@ -235,7 +250,8 @@ public class AddcustomerServiceImp implements AddcustomerService {
 			obj.put("event", relatedevent.getEvent());
 			obj.put("targetId", relatedevent.getTargetid());
 			obj.put("targetName", relatedevent.getTargetname());
-			SendUtils.post(url, obj.toString());
+			String returnstr = SendUtils.post(url, obj.toString());
+			enventarr.add(JSONObject.fromObject(returnstr));
 			System.out.println("将客户绑定事件的json" + obj.toString());
 		}
 
@@ -246,7 +262,8 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		eventobj.put("event", event.getEvent());
 		eventobj.put("targetId", event.getTargetid());
 		eventobj.put("targetName", event.getTargetname());
-		SendUtils.post(url, eventobj.toString());
+		String returnstr = SendUtils.post(url, eventobj.toString());
+		enventarr.add(JSONObject.fromObject(returnstr));
 		System.out.println("将客户绑定事件的json" + eventobj.toString());
 
 		for (DeStageEvent deStageEvent : events){
@@ -257,9 +274,11 @@ public class AddcustomerServiceImp implements AddcustomerService {
 			obj.put("event", deStageEvent.getEvent());
 			obj.put("targetId", deStageEvent.getTargetid());
 			obj.put("targetName", deStageEvent.getTargetname());
-			SendUtils.post(url, obj.toString());
+			String returnstr1 = SendUtils.post(url, obj.toString());
+			enventarr.add(JSONObject.fromObject(returnstr1));
 			System.out.println("将客户绑定事件的json" + obj.toString());
 		}
+		returnjson.put("事件", enventarr);
 		return differentTime;
 	}
 
