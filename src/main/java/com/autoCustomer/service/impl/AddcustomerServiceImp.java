@@ -145,6 +145,7 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		}
 		returnjson.put("标签", listtag);
 
+		System.out.println("创建客户结束");
 		return returnjson.toString();
 
 	}
