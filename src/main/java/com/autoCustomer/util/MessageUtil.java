@@ -105,7 +105,6 @@ public class MessageUtil {
 		}
 		//将字符串转换为数字并输出
 		String num=str.toString();
-		System.out.println(num);
 		return num;
 	}
 	
