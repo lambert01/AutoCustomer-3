@@ -79,9 +79,21 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		JSONObject returnjson = new JSONObject();
 		String domain = getPropertyInfo(DOMIAN_NAME);
 		String appid = getPropertyInfo(APPID+username);
+		if(appid == null || "".equals(appid)){
+			returnjson.put("error","没有对应的appid");
+			return returnjson.toString();
+		}
 		String sercet = getPropertyInfo(SERCET+username);
+		if(sercet == null || "".equals(sercet)){
+			returnjson.put("error","没有对应的sercet");
+			return returnjson.toString();
+		}
 		// appid.String accessToken =  getAccessToken("cl02dd15a2228ee92","ce2f7581f4203b257ed5687c2e2106c3978a93be");
 		String accessToken = getAccessToken(appid, sercet);
+		if("".equals(accessToken)){
+			returnjson.put("error","没有对应的token");
+			return returnjson.toString();
+		}
 		String url = domain + "/v1/customerandidentities?access_token=" + accessToken;
 		JSONObject customer = getcustomer();
 		Map<String,Object> stagemap = percentageService.getCurrentStage();
