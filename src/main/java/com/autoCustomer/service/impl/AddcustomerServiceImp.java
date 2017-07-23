@@ -135,10 +135,10 @@ public class AddcustomerServiceImp implements AddcustomerService {
 			
 			returnjson.put("订单", JSONObject.fromObject(returndeal));
 			JSONObject returndealobj = JSONObject.fromObject(returndeal);
-			Double amountTotal = Double.parseDouble(returndealobj.get("amountTotal").toString());
-			accountLevel = accountleveldao.selectLevelByAccount(amountTotal);
+			Double amountPaid = Double.parseDouble(returndealobj.get("amountPaid").toString());
+			accountLevel = accountleveldao.selectLevelByAccount(amountPaid);
 			if(accountLevel == null || "".equals(accountLevel)){
-				accountLevel = accountleveldao.selectMaxLevel(amountTotal);
+				accountLevel = accountleveldao.selectMaxLevel(amountPaid);
 			}
 		}
 		cityLevel = cityleveldao.selectLevelBycity(city);
