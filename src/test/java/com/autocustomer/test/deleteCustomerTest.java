@@ -2,21 +2,11 @@ package com.autocustomer.test;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 
 import com.autoCustomer.util.SendUtils;
 import com.google.gson.JsonObject;
@@ -62,7 +52,6 @@ public class deleteCustomerTest {
 			  try {
 				  doDelete(deleteurl,"access_token="+accesstoken);
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 //System.out.println("删除返回的结果"+str);
@@ -122,7 +111,6 @@ public class deleteCustomerTest {
 		try {
 			deletecustomer();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
