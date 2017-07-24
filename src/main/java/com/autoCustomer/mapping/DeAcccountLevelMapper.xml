@@ -84,7 +84,7 @@
     <select id="selectLevelByAccount" resultType="java.lang.String" parameterType="java.lang.Double" >
     select level
     from de_acccount_level
-    where accountMin &lt;=#{account,jdbcType=DOUBLE} AND accountMax  &gt;=#{account,jdbcType=DOUBLE}
+    where accountMin &lt;=#{account,jdbcType=DOUBLE} AND accountMax  &gt;#{account,jdbcType=DOUBLE}
   </select>
   
      <select id="selectMaxLevel" resultType="java.lang.String" parameterType="java.lang.Double" >
