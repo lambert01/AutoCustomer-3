@@ -1,12 +1,8 @@
 package com.autocustomer.test;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.List;
 
 import com.autoCustomer.util.SendUtils;
 import com.google.gson.JsonObject;
@@ -39,7 +35,7 @@ public class deleteCustomerTest {
 	static void deletecustomer() throws IOException{
 		String accesstoken = getaccessToken();
 		String queryurl ="http://api.convertwork.cn/v1/customers";
-		String json = SendUtils.sendGet(queryurl,"access_token="+accesstoken+"&rows=759");
+		String json = SendUtils.sendGet(queryurl,"access_token="+accesstoken+"&rows=1000");
 		JSONObject customerjson = JSONObject.fromObject(json);
 		JSONArray arr = customerjson.getJSONArray("rows");
 		System.out.println(arr.size());
@@ -77,34 +73,6 @@ public class deleteCustomerTest {
         }  
     } 
     
-    private static String deleteurl(List<String> list,String url1) throws IOException {  
-        
-        URL url = new URL(url1);  
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();  
-        connection.setRequestMethod("DELETE");  
-        connection.setDoInput(true);  
-        connection.setDoOutput(true);  
-        connection.setRequestProperty("name", "robben");  
-        connection.setRequestProperty("content-type", "text/html");  
-        OutputStreamWriter out = new OutputStreamWriter(connection.getOutputStream(), "8859_1");  
-        // 将要传递的集合转换成JSON格式  
-        JSONArray jsonArray = JSONArray.fromObject(list);  
-        // 组织要传递的参数  
-        out.write("" + jsonArray);  
-        out.flush();  
-        out.close();  
-        // 获取返回的数据  
-        BufferedReader in = new BufferedReader(new InputStreamReader(  
-                connection.getInputStream()));  
-        String line = null;  
-        StringBuffer content = new StringBuffer();  
-        while ((line = in.readLine()) != null) {  
-            // line 为返回值，这就可以判断是否成功  
-            content.append(line);  
-        }  
-        in.close();  
-        return content.toString();  
-    }  
   
 	public static void main(String[] args) {
 		try {
