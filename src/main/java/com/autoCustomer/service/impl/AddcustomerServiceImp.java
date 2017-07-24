@@ -20,10 +20,10 @@ import com.autoCustomer.dao.DeCityLevelMapper;
 import com.autoCustomer.dao.DeEventTagMapper;
 import com.autoCustomer.dao.DeImageMapper;
 import com.autoCustomer.dao.DeProductsMapper;
+import com.autoCustomer.dao.DePropertiesInfoMapper;
 import com.autoCustomer.dao.DeStageEventMapper;
 import com.autoCustomer.dao.DeStageOrderMapper;
 import com.autoCustomer.dao.DeTagMapper;
-import com.autoCustomer.dao.TblPropertiesInfoMapper;
 import com.autoCustomer.entity.DeEventTag;
 import com.autoCustomer.entity.DeImage;
 import com.autoCustomer.entity.DeProducts;
@@ -45,7 +45,7 @@ import net.sf.json.JSONObject;
 public class AddcustomerServiceImp implements AddcustomerService {
 
 	@Resource
-	private TblPropertiesInfoMapper tblPropertiesInfoDao; //配置dao
+	private DePropertiesInfoMapper dePropertiesInfoDao; //配置dao
 
 	@Resource
 	private DePercentageService percentageService; 
@@ -547,7 +547,7 @@ public class AddcustomerServiceImp implements AddcustomerService {
 	 * @param kind
 	 */
 	public String getPropertyInfo(String kind){
-		List<String> list = tblPropertiesInfoDao.selectPropertyInfoByKind(kind);
+		List<String> list = dePropertiesInfoDao.selectPropertyInfoByKind(kind);
 		if(list != null && list.size() > 0){
 			return list.get(0);
 		}
