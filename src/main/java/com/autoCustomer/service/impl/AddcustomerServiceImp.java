@@ -19,6 +19,7 @@ import com.autoCustomer.dao.DeAcccountLevelMapper;
 import com.autoCustomer.dao.DeCityLevelMapper;
 import com.autoCustomer.dao.DeEventTagMapper;
 import com.autoCustomer.dao.DeImageMapper;
+import com.autoCustomer.dao.DeOrderCountMapper;
 import com.autoCustomer.dao.DeProductsMapper;
 import com.autoCustomer.dao.DeStageEventMapper;
 import com.autoCustomer.dao.DeStageOrderMapper;
@@ -73,6 +74,9 @@ public class AddcustomerServiceImp implements AddcustomerService {
 	
 	@Resource
 	private DeEventTagMapper eventtagdao;//内容标签dao
+	
+	@Resource
+	private DeOrderCountMapper ordercountdao;
 
 	private static final String ADDRESS_SET = "address_set"; // 地址配置
 	private static final String DOMIAN_NAME = "domian_name"; // 域名,可配置测试域名或生产域名
@@ -108,8 +112,8 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		}catch (Exception e){
 			stage = "未知";
 		}
-		Integer stageid = (Integer) stagemap.get("id"); // 客户状态id,通过状态id找到符合对应状态的事件
-		//Integer stageid = 29;
+		//Integer stageid = (Integer) stagemap.get("id"); // 客户状态id,通过状态id找到符合对应状态的事件
+		Integer stageid = 30;
 		List<DeStageEvent> stageevents = eventdao.selectEventsByStage(stageid); // 所有符合客户状态的事件
 		customer.put("stage", stage);
 		String retunrstr = SendUtils.post(url, customer.toString());
@@ -135,17 +139,32 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		String accountLevel = "";
 		String cityLevel = "";
 		if(hasOrder == 1){
-			List<DeProducts> products = getproducts();
-			String returndeal = addcustomerDeals(customeid,accessToken,products,ordertime);
-			System.out.println("创建订单返回的 " + returndeal);
-			
-			returnjson.put("订单", JSONObject.fromObject(returndeal));
-			JSONObject returndealobj = JSONObject.fromObject(returndeal);
-			Double amountPaid = Double.parseDouble(returndealobj.get("amountPaid").toString());
-			accountLevel = accountleveldao.selectLevelByAccount(amountPaid);
-			if(accountLevel == null || "".equals(accountLevel)){
-				accountLevel = accountleveldao.selectMaxLevel(amountPaid);
+			Double allamountPaid = 0d;
+			int ordecount = ordercountdao.selectAllOrderCount();
+			int realordecount = (int)(Math.random()*ordecount);
+			if(realordecount == 0){
+				realordecount = 1;
 			}
+			
+			for (int i = 0; i < realordecount; i++){
+				List<DeProducts> products = getproducts();
+				String returndeal = addcustomerDeals(customeid,accessToken,products,ordertime);
+				System.out.println("创建订单返回的 " + returndeal);
+				
+				returnjson.put("订单", JSONObject.fromObject(returndeal));
+				JSONObject returndealobj = JSONObject.fromObject(returndeal);
+				
+				Double amountPaid = Double.parseDouble(returndealobj.get("amountPaid").toString());
+				allamountPaid += amountPaid; //有多个订单,计算多个订单的总价
+			}
+			
+			accountLevel = accountleveldao.selectLevelByAccount(allamountPaid);
+			if(accountLevel == null || "".equals(accountLevel)){
+				accountLevel = accountleveldao.selectMaxLevel(allamountPaid);
+			}
+			
+			
+		
 		}
 		cityLevel = cityleveldao.selectLevelBycity(city);
 		if(cityLevel == null || "".equals(cityLevel)){
