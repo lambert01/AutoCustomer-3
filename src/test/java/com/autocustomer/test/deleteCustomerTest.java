@@ -18,10 +18,9 @@ import net.sf.json.JSONObject;
 public class deleteCustomerTest {
 	static String getaccessToken(){
 
-		String domain ="http://api.convertwork.cn";
-		String url =domain+"/security/accesstoken";
-		String appid ="cl009c15d31412af3";
-		String sercet ="bd348212d1e03e92916c14e6910dcef4a9e55343";
+		String url ="http://api.convertwork.cn/security/accesstoken";
+		String appid ="cl029015d6ef5320a";
+		String sercet ="ddb6172910bd7c59f2c083a11fcd72752d363995";
 		String retunrstr = SendUtils.sendGet(url,"grant_type=client_credentials&appid="+appid+"&secret="+sercet+"");
 		// 发送get请求,通过appid和sercet获取accesstoken.
 		// retunrstr ="{\"error_code\":0,\"access_token\":\"123\"}";
