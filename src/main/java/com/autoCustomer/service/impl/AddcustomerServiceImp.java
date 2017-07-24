@@ -303,12 +303,8 @@ public class AddcustomerServiceImp implements AddcustomerService {
 			
 			int eventtagssize = eventtags.size();
 			int eventindex = (int)(Math.random()*eventtagssize);
-			List<Integer> eventindexs = new ArrayList<Integer>();
-			if(!eventindexs.contains(eventindex)){
 				DeEventTag eventtag = eventtags.get(eventindex);
 				obj.put("tag",eventtag.getTag());
-				eventindexs.add(eventindex);
-			}
 			
 		
 			String returnstr1 = SendUtils.post(url, obj.toString());
