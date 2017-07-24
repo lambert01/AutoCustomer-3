@@ -407,12 +407,9 @@ public class AddcustomerServiceImp implements AddcustomerService {
 					if(jsonsize == size){
 						int index = (int)(Math.random() * jsonsize);
 						JSONObject relationjson = relationtags.get(index);
-						int didadd = (int)(Math.random() * 10);
-						if(didadd >= 5){
 							if(!relationjson.isEmpty()){
 								tagsarr.add(relationjson);
 							}
-						}
 						relationtags.clear();
 						differtrelation = 0;
 					}
