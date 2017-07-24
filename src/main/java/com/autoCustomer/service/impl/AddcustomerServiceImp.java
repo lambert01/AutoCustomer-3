@@ -17,12 +17,14 @@ import org.springframework.stereotype.Service;
 
 import com.autoCustomer.dao.DeAcccountLevelMapper;
 import com.autoCustomer.dao.DeCityLevelMapper;
+import com.autoCustomer.dao.DeEventTagMapper;
 import com.autoCustomer.dao.DeImageMapper;
 import com.autoCustomer.dao.DeProductsMapper;
 import com.autoCustomer.dao.DeStageEventMapper;
 import com.autoCustomer.dao.DeStageOrderMapper;
 import com.autoCustomer.dao.DeTagMapper;
 import com.autoCustomer.dao.TblPropertiesInfoMapper;
+import com.autoCustomer.entity.DeEventTag;
 import com.autoCustomer.entity.DeImage;
 import com.autoCustomer.entity.DeProducts;
 import com.autoCustomer.entity.DeStageEvent;
@@ -68,6 +70,9 @@ public class AddcustomerServiceImp implements AddcustomerService {
 
 	@Resource
 	private DeCityLevelMapper cityleveldao; // 城市对应的级别dao
+	
+	@Resource
+	private DeEventTagMapper eventtagdao;//内容标签dao
 
 	private static final String ADDRESS_SET = "address_set"; // 地址配置
 	private static final String DOMIAN_NAME = "domian_name"; // 域名,可配置测试域名或生产域名
@@ -104,6 +109,7 @@ public class AddcustomerServiceImp implements AddcustomerService {
 			stage = "未知";
 		}
 		Integer stageid = (Integer) stagemap.get("id"); // 客户状态id,通过状态id找到符合对应状态的事件
+		//Integer stageid = 29;
 		List<DeStageEvent> stageevents = eventdao.selectEventsByStage(stageid); // 所有符合客户状态的事件
 		customer.put("stage", stage);
 		String retunrstr = SendUtils.post(url, customer.toString());
@@ -247,6 +253,11 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		List<DeStageEvent> unrelatedevents = eventdao.selectUnRelatedStageEvent();
 		String domain = getPropertyInfo(DOMIAN_NAME);
 		String url = domain + "/v1/customerevents?access_token=" + access_token;
+		
+		List<DeEventTag> eventtags = eventtagdao.selectAllEventTag(); //查询内容标签
+		 
+		
+		
 		JSONArray enventarr = new JSONArray();
 		String differentTime = dateTime;
 		int eventsize = unrelatedevents.size();
@@ -277,8 +288,11 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		String returnstr = SendUtils.post(url, eventobj.toString());
 		enventarr.add(JSONObject.fromObject(returnstr));
 		System.out.println("将客户绑定事件的json" + eventobj.toString());
+		
+	
 
 		for (DeStageEvent deStageEvent : events){
+
 			differentTime = paserUtcTime(differentTime); // 事件的发生时间不同
 			JSONObject obj = new JSONObject();
 			obj.put("customerId", customerId);
@@ -286,6 +300,17 @@ public class AddcustomerServiceImp implements AddcustomerService {
 			obj.put("event", deStageEvent.getEvent());
 			obj.put("targetId", deStageEvent.getTargetid());
 			obj.put("targetName", deStageEvent.getTargetname());
+			
+			int eventtagssize = eventtags.size();
+			int eventindex = (int)(Math.random()*eventtagssize);
+			List<Integer> eventindexs = new ArrayList<Integer>();
+			if(!eventindexs.contains(eventindex)){
+				DeEventTag eventtag = eventtags.get(eventindex);
+				obj.put("tag",eventtag.getTag());
+				eventindexs.add(eventindex);
+			}
+			
+		
 			String returnstr1 = SendUtils.post(url, obj.toString());
 			enventarr.add(JSONObject.fromObject(returnstr1));
 			System.out.println("将客户绑定事件的json" + obj.toString());
@@ -392,9 +417,12 @@ public class AddcustomerServiceImp implements AddcustomerService {
 			String name = deTag.getTagname();
 			Integer relation = deTag.getRelation();// 标签的互斥关系,有相同数字的标签不能出现在同一个用户身上
 			if(relation == null){
+				int didadd = (int)(Math.random()*10);
+				if(didadd >= 5){
 				tagjson.put("dimension", dimension);
 				tagjson.put("name", name);
 				unrelationtags.add(tagjson);
+				}
 			}else{
 				// 有些标签不能同事出现在同一个人身上,如青年标签,老年标签,这个标签有相同的relation
 				if(differtrelation == 0 || differtrelation == relation){
