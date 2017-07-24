@@ -111,6 +111,7 @@ public class AddcustomerServiceImp implements AddcustomerService {
 			stage = "未知";
 		}
 		Integer stageid = (Integer) stagemap.get("id"); // 客户状态id,通过状态id找到符合对应状态的事件
+		//Integer stageid = 30; // 客户状态id,通过状态id找到符合对应状态的事件
 		List<DeStageEvent> stageevents = eventdao.selectEventsByStage(stageid); // 所有符合客户状态的事件
 		customer.put("stage", stage);
 		String retunrstr = SendUtils.post(url, customer.toString());
@@ -145,6 +146,12 @@ public class AddcustomerServiceImp implements AddcustomerService {
 			int realordecount = (int)(Math.random()*ordecount);
 			if(realordecount == 0){
 				realordecount = 1;
+			}
+			
+			int idoneOrMore = (int)(Math.random()*10);{
+				if(idoneOrMore > 5){
+					realordecount = 1;
+				}
 			}
 			
 			for (int i = 0; i < realordecount; i++){
