@@ -76,7 +76,7 @@ public class AddcustomerServiceImp implements AddcustomerService {
 	private DeEventTagMapper eventtagdao;//内容标签dao
 	
 	@Resource
-	private DeOrderCountMapper ordercountdao;
+	private DeOrderCountMapper ordercountdao; //订单数量区间dao
 
 	private static final String ADDRESS_SET = "address_set"; // 地址配置
 	private static final String DOMIAN_NAME = "domian_name"; // 域名,可配置测试域名或生产域名
