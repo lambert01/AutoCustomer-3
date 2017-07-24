@@ -142,7 +142,6 @@ public class AddcustomerServiceImp implements AddcustomerService {
 				ordercountstr = "10";
 			}
 			int ordecount = Integer.parseInt(ordercountstr);
-			getPropertyInfo("orderCount");
 			int realordecount = (int)(Math.random()*ordecount);
 			if(realordecount == 0){
 				realordecount = 1;
