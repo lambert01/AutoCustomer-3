@@ -4,13 +4,11 @@
   <resultMap id="BaseResultMap" type="com.autoCustomer.entity.DeStageEvent" >
     <id column="eventId" property="eventid" jdbcType="INTEGER" />
     <result column="event" property="event" jdbcType="VARCHAR" />
-    <result column="targetId" property="targetid" jdbcType="VARCHAR" />
-    <result column="targetName" property="targetname" jdbcType="VARCHAR" />
     <result column="stageId" property="stageid" jdbcType="INTEGER" />
     <result column="isRelated" property="isrelated" jdbcType="INTEGER" />
   </resultMap>
   <sql id="Base_Column_List" >
-    eventId, event, targetId, targetName, stageId, isRelated
+    eventId, event,stageId, isRelated
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
@@ -23,10 +21,8 @@
     where eventId = #{eventid,jdbcType=INTEGER}
   </delete>
   <insert id="insert" parameterType="com.autoCustomer.entity.DeStageEvent" >
-    insert into de_stage_event (eventId, event, targetId, 
-      targetName, stageId, isRelated)
-    values (#{eventid,jdbcType=INTEGER}, #{event,jdbcType=VARCHAR}, #{targetid,jdbcType=VARCHAR}, 
-      #{targetname,jdbcType=VARCHAR}, #{stageid,jdbcType=INTEGER}, #{isrelated,jdbcType=INTEGER})
+    insert into de_stage_event (eventId, event, stageId, isRelated)
+    values (#{eventid,jdbcType=INTEGER}, #{event,jdbcType=VARCHAR},#{stageid,jdbcType=INTEGER}, #{isrelated,jdbcType=INTEGER})
   </insert>
   <insert id="insertSelective" parameterType="com.autoCustomer.entity.DeStageEvent" >
     insert into de_stage_event
@@ -36,12 +32,6 @@
       </if>
       <if test="event != null" >
         event,
-      </if>
-      <if test="targetid != null" >
-        targetId,
-      </if>
-      <if test="targetname != null" >
-        targetName,
       </if>
       <if test="stageid != null" >
         stageId,
@@ -57,12 +47,6 @@
       <if test="event != null" >
         #{event,jdbcType=VARCHAR},
       </if>
-      <if test="targetid != null" >
-        #{targetid,jdbcType=VARCHAR},
-      </if>
-      <if test="targetname != null" >
-        #{targetname,jdbcType=VARCHAR},
-      </if>
       <if test="stageid != null" >
         #{stageid,jdbcType=INTEGER},
       </if>
@@ -77,12 +61,6 @@
       <if test="event != null" >
         event = #{event,jdbcType=VARCHAR},
       </if>
-      <if test="targetid != null" >
-        targetId = #{targetid,jdbcType=VARCHAR},
-      </if>
-      <if test="targetname != null" >
-        targetName = #{targetname,jdbcType=VARCHAR},
-      </if>
       <if test="stageid != null" >
         stageId = #{stageid,jdbcType=INTEGER},
       </if>
@@ -95,8 +73,6 @@
   <update id="updateByPrimaryKey" parameterType="com.autoCustomer.entity.DeStageEvent" >
     update de_stage_event
     set event = #{event,jdbcType=VARCHAR},
-      targetId = #{targetid,jdbcType=VARCHAR},
-      targetName = #{targetname,jdbcType=VARCHAR},
       stageId = #{stageid,jdbcType=INTEGER},
       isRelated = #{isrelated,jdbcType=INTEGER}
     where eventId = #{eventid,jdbcType=INTEGER}
