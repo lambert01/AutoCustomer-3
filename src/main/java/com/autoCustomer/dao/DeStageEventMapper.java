@@ -22,4 +22,7 @@ public interface DeStageEventMapper {
     
     //查询与状态无关的事件
     List<DeStageEvent> selectUnRelatedStageEvent();
+     
+    //查询相同阶段的多选事件有几个
+	int selectCountSize(Integer ismultiselect);
 }
