@@ -7,8 +7,9 @@ public class DeStageEvent {
 
     private Integer stageid;
 
-
     private Integer isrelated;
+
+    private Integer ismultiselect;
 
     public Integer getEventid() {
         return eventid;
@@ -25,7 +26,6 @@ public class DeStageEvent {
     public void setEvent(String event) {
         this.event = event == null ? null : event.trim();
     }
- 
 
     public Integer getStageid() {
         return stageid;
@@ -35,12 +35,19 @@ public class DeStageEvent {
         this.stageid = stageid;
     }
 
-
     public Integer getIsrelated() {
         return isrelated;
     }
 
     public void setIsrelated(Integer isrelated) {
         this.isrelated = isrelated;
+    }
+
+    public Integer getIsmultiselect() {
+        return ismultiselect;
+    }
+
+    public void setIsmultiselect(Integer ismultiselect) {
+        this.ismultiselect = ismultiselect;
     }
 }
