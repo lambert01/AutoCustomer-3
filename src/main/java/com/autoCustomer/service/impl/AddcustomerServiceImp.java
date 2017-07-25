@@ -119,8 +119,7 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		}catch (Exception e){
 			stage = "未知";
 		}
-		//Integer stageid = (Integer) stagemap.get("id"); // 客户状态id,通过状态id找到符合对应状态的事件
-		Integer stageid = 30; // 客户状态id,通过状态id找到符合对应状态的事件
+		Integer stageid = (Integer) stagemap.get("id"); // 客户状态id,通过状态id找到符合对应状态的事件
 		List<DeStageEvent> stageevents = eventdao.selectEventsByStage(stageid); // 所有符合客户状态的事件
 		customer.put("stage", stage);
 		String retunrstr = SendUtils.post(url, customer.toString());
