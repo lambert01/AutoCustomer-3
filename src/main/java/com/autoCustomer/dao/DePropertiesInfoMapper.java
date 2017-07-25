@@ -23,5 +23,5 @@ public interface DePropertiesInfoMapper {
 	public List<String> selectPropertyInfoByKind(String kind);
 	
 	//查询kind对应的id
-	public List<Integer> selectIdByKind(String value);
+	public List<Integer> selectIdByValue(String value);
 }
