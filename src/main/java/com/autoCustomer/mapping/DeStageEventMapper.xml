@@ -6,9 +6,10 @@
     <result column="event" property="event" jdbcType="VARCHAR" />
     <result column="stageId" property="stageid" jdbcType="INTEGER" />
     <result column="isRelated" property="isrelated" jdbcType="INTEGER" />
+    <result column="isMultiselect" property="ismultiselect" jdbcType="INTEGER" />
   </resultMap>
   <sql id="Base_Column_List" >
-    eventId, event,stageId, isRelated
+    eventId, event, stageId, isRelated, isMultiselect
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
@@ -21,8 +22,10 @@
     where eventId = #{eventid,jdbcType=INTEGER}
   </delete>
   <insert id="insert" parameterType="com.autoCustomer.entity.DeStageEvent" >
-    insert into de_stage_event (eventId, event, stageId, isRelated)
-    values (#{eventid,jdbcType=INTEGER}, #{event,jdbcType=VARCHAR},#{stageid,jdbcType=INTEGER}, #{isrelated,jdbcType=INTEGER})
+    insert into de_stage_event (eventId, event, stageId, 
+      isRelated, isMultiselect)
+    values (#{eventid,jdbcType=INTEGER}, #{event,jdbcType=VARCHAR}, #{stageid,jdbcType=INTEGER}, 
+      #{isrelated,jdbcType=INTEGER}, #{ismultiselect,jdbcType=INTEGER})
   </insert>
   <insert id="insertSelective" parameterType="com.autoCustomer.entity.DeStageEvent" >
     insert into de_stage_event
@@ -39,6 +42,9 @@
       <if test="isrelated != null" >
         isRelated,
       </if>
+      <if test="ismultiselect != null" >
+        isMultiselect,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="eventid != null" >
@@ -53,11 +59,14 @@
       <if test="isrelated != null" >
         #{isrelated,jdbcType=INTEGER},
       </if>
+      <if test="ismultiselect != null" >
+        #{ismultiselect,jdbcType=INTEGER},
+      </if>
     </trim>
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.autoCustomer.entity.DeStageEvent" >
     update de_stage_event
-    <set>
+    <set >
       <if test="event != null" >
         event = #{event,jdbcType=VARCHAR},
       </if>
@@ -67,6 +76,9 @@
       <if test="isrelated != null" >
         isRelated = #{isrelated,jdbcType=INTEGER},
       </if>
+      <if test="ismultiselect != null" >
+        isMultiselect = #{ismultiselect,jdbcType=INTEGER},
+      </if>
     </set>
     where eventId = #{eventid,jdbcType=INTEGER}
   </update>
@@ -74,11 +86,11 @@
     update de_stage_event
     set event = #{event,jdbcType=VARCHAR},
       stageId = #{stageid,jdbcType=INTEGER},
-      isRelated = #{isrelated,jdbcType=INTEGER}
+      isRelated = #{isrelated,jdbcType=INTEGER},
+      isMultiselect = #{ismultiselect,jdbcType=INTEGER}
     where eventId = #{eventid,jdbcType=INTEGER}
   </update>
-  
-   <select id="selectEventsByStage" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+     <select id="selectEventsByStage" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
     <include refid="Base_Column_List" />
     from de_stage_event
@@ -92,5 +104,8 @@
     where   stageId is null 
   </select>
   
- 
+        <select id="selectCountSize" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+    select count(*)
+    from de_stage_event where isMultiselect = #{ismultiselect,jdbcType=INTEGER}
+  </select>
 </mapper>
