@@ -119,8 +119,32 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		}catch (Exception e){
 			stage = "未知";
 		}
-		Integer stageid = (Integer) stagemap.get("id"); // 客户状态id,通过状态id找到符合对应状态的事件
-		List<DeStageEvent> stageevents = eventdao.selectEventsByStage(stageid); // 所有符合客户状态的事件
+		//Integer stageid = (Integer) stagemap.get("id"); // 客户状态id,通过状态id找到符合对应状态的事件
+		Integer stageid = 29; // 客户状态id,通过状态id找到符合对应状态的事件
+		List<DeStageEvent> stageevents = eventdao.selectEventsByStage(stageid); //所有的符合状态的事件都被搜索出来了,有的事件是多选一,过滤一下
+		List<DeStageEvent> stageeventselecteds = new ArrayList<DeStageEvent>(); //这个是传送给创建事件方法的事件集合
+		List<DeStageEvent> onestageeventselecteds = new ArrayList<DeStageEvent>(); //这个是在多个相同阶段的事件中随机选取一个事件的集合
+		Integer differtrelation = 0;
+		for(DeStageEvent deStageEvent : stageevents){
+			Integer ismultiselect = deStageEvent.getIsmultiselect(); //是否多选一的
+			if(ismultiselect == null){
+				stageeventselecteds.add(deStageEvent);
+			}else{
+				if(differtrelation == 0 || differtrelation == ismultiselect){
+					onestageeventselecteds.add(deStageEvent);
+					int selectcount = onestageeventselecteds.size();
+					int eventselectcount = eventdao.selectCountSize(ismultiselect); //查询该多选事件的数量
+					if(selectcount == eventselectcount){
+						int index = (int)(Math.random() * eventselectcount);
+						DeStageEvent stageevent = onestageeventselecteds.get(index); //随机选取一个事件
+						stageeventselecteds.add(stageevent);
+						onestageeventselecteds.clear();
+						differtrelation = 0;
+					}
+				}
+			}
+		}
+		
 		customer.put("stage", stage);
 		String retunrstr = SendUtils.post(url, customer.toString());
 		JSONObject returnobj = JSONObject.fromObject(retunrstr);
@@ -134,7 +158,7 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		returnjson.put("创建时间", dateJoin);
 		returnjson.put("来源", returnobj.getString("source"));
 		String city = returnobj.getString("city");
-		String ordertime = createCustomerEvent(customeid,secterid,accessToken,dateJoin,stageevents,returnjson);
+		String ordertime = createCustomerEvent(customeid,secterid,accessToken,dateJoin,stageeventselecteds,returnjson);
 		ordertime = paserUtcTime(ordertime);
 		Integer hasOrder = stageorderdao.selectByStageId(stageid);// 是否需要配置订单,状态为1需要配置订单
 		if(hasOrder == null){
@@ -309,13 +333,21 @@ public class AddcustomerServiceImp implements AddcustomerService {
 			querymap.put("eventid", relatedeventid);
 			querymap.put("secretid", secretId);
 			DeEventTarget target = eventtargetdao.selectByEventIdAndserretId(querymap);
+			String targetid = target.getTargetid();
+			if(targetid == null){
+				targetid ="";
+			}
+			String targetname = target.getTargetname();
+			if(targetname == null){
+				targetname ="";
+			}
 			//事件的类型是固定的,但是targetid和targetname不一样
 			JSONObject obj = new JSONObject();
 			obj.put("customerId", customerId);
 			obj.put("date", differentTime);
 			obj.put("event", relatedevent.getEvent());
-			obj.put("targetId", target.getTargetid());
-			obj.put("targetName", target.getTargetname());
+			obj.put("targetId", targetid);
+			obj.put("targetName", targetname);
 			String returnstr = SendUtils.post(url, obj.toString());
 			enventarr.add(JSONObject.fromObject(returnstr));
 			System.out.println("将客户绑定事件的json" + obj.toString());
@@ -325,14 +357,22 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		querymap.put("eventid", event.getEventid());
 		querymap.put("secretid", secretId);
 		DeEventTarget target = eventtargetdao.selectByEventIdAndserretId(querymap);
+		String targetid = target.getTargetid();
+		if(targetid == null){
+			targetid ="";
+		}
+		String targetname = target.getTargetname();
+		if(targetname == null){
+			targetname ="";
+		}
 
 		differentTime = paserUtcTime(differentTime);
 		JSONObject eventobj = new JSONObject();
 		eventobj.put("customerId", customerId);
 		eventobj.put("date", differentTime);
 		eventobj.put("event", event.getEvent());
-		eventobj.put("targetId", target.getTargetid());
-		eventobj.put("targetName", target.getTargetname());
+		eventobj.put("targetId", targetid);
+		eventobj.put("targetName", targetname);
 		String returnstr = SendUtils.post(url, eventobj.toString());
 		enventarr.add(JSONObject.fromObject(returnstr));
 		System.out.println("将客户绑定事件的json" + eventobj.toString());
@@ -342,14 +382,22 @@ public class AddcustomerServiceImp implements AddcustomerService {
 			querymap.put("eventid", deStageEvent.getEventid());
 			querymap.put("secretid", secretId);
 			DeEventTarget everytarget = eventtargetdao.selectByEventIdAndserretId(querymap);
+			String everytargetid = everytarget.getTargetid();
+			if(everytargetid == null){
+				everytargetid = "";
+			}
+			String everytargetname = everytarget.getTargetname();
+			if(everytargetname == null){
+				everytargetname = "";
+			}
 
 			differentTime = paserUtcTime(differentTime); // 事件的发生时间不同
 			JSONObject obj = new JSONObject();
 			obj.put("customerId", customerId);
 			obj.put("date", differentTime);
 			obj.put("event", deStageEvent.getEvent());
-			obj.put("targetId", everytarget.getTargetid());
-			obj.put("targetName", everytarget.getTargetname());
+			obj.put("targetId", everytargetid);
+			obj.put("targetName", everytargetname);
 			
 			int eventtagssize = eventtags.size();
 			int eventindex = (int)(Math.random()*eventtagssize);
