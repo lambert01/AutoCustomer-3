@@ -21,4 +21,7 @@ public interface DePropertiesInfoMapper {
 	void updateValue(Map<String, String> pp);
 
 	public List<String> selectPropertyInfoByKind(String kind);
+	
+	//查询kind对应的id
+	public List<Integer> selectIdByKind(String value);
 }
