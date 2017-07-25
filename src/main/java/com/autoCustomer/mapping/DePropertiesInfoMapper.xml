@@ -25,7 +25,7 @@
     where kind = #{kind,jdbcType=VARCHAR} 
   </select>
   
-    <select id="selectIdByKind" resultType="java.lang.Integer" parameterType="java.lang.String">
+    <select id="selectIdByValue" resultType="java.lang.Integer" parameterType="java.lang.String">
 	select infoId
     from de_properties_info
     where value = #{value,jdbcType=VARCHAR} 
