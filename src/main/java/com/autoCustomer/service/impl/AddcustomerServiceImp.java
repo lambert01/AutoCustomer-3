@@ -582,7 +582,7 @@ public class AddcustomerServiceImp implements AddcustomerService {
 	}
 	
 	public Integer getPropertyId(String value){
-		List<Integer> list = dePropertiesInfoDao.selectIdByKind(value);
+		List<Integer> list = dePropertiesInfoDao.selectIdByValue(value);
 		if(list != null && list.size() > 0){
 			return list.get(0);
 		}
