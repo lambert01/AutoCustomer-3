@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.autoCustomer.dao.DeEventTargetMapper" >
+  <resultMap id="BaseResultMap" type="com.autoCustomer.entity.DeEventTarget" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="eventid" property="eventid" jdbcType="INTEGER" />
+    <result column="secretid" property="secretid" jdbcType="INTEGER" />
+    <result column="targetid" property="targetid" jdbcType="VARCHAR" />
+    <result column="targetname" property="targetname" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, eventid, secretid, targetid, targetname
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from de_event_target
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from de_event_target
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.autoCustomer.entity.DeEventTarget" >
+    insert into de_event_target (id, eventid, secretid, 
+      targetid, targetname)
+    values (#{id,jdbcType=INTEGER}, #{eventid,jdbcType=INTEGER}, #{secretid,jdbcType=INTEGER}, 
+      #{targetid,jdbcType=VARCHAR}, #{targetname,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.autoCustomer.entity.DeEventTarget" >
+    insert into de_event_target
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="eventid != null" >
+        eventid,
+      </if>
+      <if test="secretid != null" >
+        secretid,
+      </if>
+      <if test="targetid != null" >
+        targetid,
+      </if>
+      <if test="targetname != null" >
+        targetname,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="eventid != null" >
+        #{eventid,jdbcType=INTEGER},
+      </if>
+      <if test="secretid != null" >
+        #{secretid,jdbcType=INTEGER},
+      </if>
+      <if test="targetid != null" >
+        #{targetid,jdbcType=VARCHAR},
+      </if>
+      <if test="targetname != null" >
+        #{targetname,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.autoCustomer.entity.DeEventTarget" >
+    update de_event_target
+    <set >
+      <if test="eventid != null" >
+        eventid = #{eventid,jdbcType=INTEGER},
+      </if>
+      <if test="secretid != null" >
+        secretid = #{secretid,jdbcType=INTEGER},
+      </if>
+      <if test="targetid != null" >
+        targetid = #{targetid,jdbcType=VARCHAR},
+      </if>
+      <if test="targetname != null" >
+        targetname = #{targetname,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.autoCustomer.entity.DeEventTarget" >
+    update de_event_target
+    set eventid = #{eventid,jdbcType=INTEGER},
+      secretid = #{secretid,jdbcType=INTEGER},
+      targetid = #{targetid,jdbcType=VARCHAR},
+      targetname = #{targetname,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  
+    <select id="selectByEventIdAndserretId" resultMap="BaseResultMap" parameterType="java.util.Map" >
+    select 
+    <include refid="Base_Column_List" />
+    from de_event_target
+    where eventid = #{eventid,jdbcType=INTEGER} and
+      secretid = #{secretid,jdbcType=INTEGER}
+  </select>
+</mapper>
