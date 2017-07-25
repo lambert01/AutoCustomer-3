@@ -278,13 +278,17 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		return data;
 	}
 
-	/**
-	 * 给客户绑定事件 返回绑定的事件最后的一个事件 有可能绑定订单,订单事件要在最后的
-	 * 返回最后一个事件创建的时间,如果有订单,订单的创建时间要在这个时间之后
-	 * @param customerId
-	 * @param access_token
-	 * @param dateTime
-	 */
+   /**
+    * 给客户绑定事件 返回绑定的事件最后的一个事件 有可能绑定订单,订单事件要在最后的
+	* 返回最后一个事件创建的时间,如果有订单,订单的创建时间要在这个时间之后
+    * @param customerId
+    * @param secretId
+    * @param access_token
+    * @param dateTime
+    * @param events
+    * @param returnjson
+    * @return
+    */
 	private String createCustomerEvent(String customerId,Integer secretId,String access_token,String dateTime,List<DeStageEvent> events,JSONObject returnjson){
 		List<DeStageEvent> unrelatedevents = eventdao.selectUnRelatedStageEvent();
 		String domain = getPropertyInfo(DOMIAN_NAME);
