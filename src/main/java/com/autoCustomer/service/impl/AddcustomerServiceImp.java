@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 import com.autoCustomer.dao.DeAcccountLevelMapper;
 import com.autoCustomer.dao.DeCityLevelMapper;
 import com.autoCustomer.dao.DeEventTagMapper;
+import com.autoCustomer.dao.DeEventTargetMapper;
 import com.autoCustomer.dao.DeImageMapper;
 import com.autoCustomer.dao.DeProductsMapper;
 import com.autoCustomer.dao.DePropertiesInfoMapper;
@@ -25,6 +27,7 @@ import com.autoCustomer.dao.DeStageEventMapper;
 import com.autoCustomer.dao.DeStageOrderMapper;
 import com.autoCustomer.dao.DeTagMapper;
 import com.autoCustomer.entity.DeEventTag;
+import com.autoCustomer.entity.DeEventTarget;
 import com.autoCustomer.entity.DeImage;
 import com.autoCustomer.entity.DeProducts;
 import com.autoCustomer.entity.DeStageEvent;
@@ -74,6 +77,9 @@ public class AddcustomerServiceImp implements AddcustomerService {
 	@Resource
 	private DeEventTagMapper eventtagdao;//内容标签dao
 	
+	@Resource
+	private DeEventTargetMapper eventtargetdao;//事件targetdao
+	
 
 	private static final String ADDRESS_SET = "address_set"; // 地址配置
 	private static final String DOMIAN_NAME = "domian_name"; // 域名,可配置测试域名或生产域名
@@ -95,6 +101,9 @@ public class AddcustomerServiceImp implements AddcustomerService {
 			returnjson.put("error","没有对应的sercet");
 			return returnjson.toString();
 		}
+		Integer secterid = getPropertyId(sercet); //这是secret的id,因为secret唯一,可以认为是账户的id,
+		//给客户添加事件时用,因为不同的使用者想要的事件的targetid和targetname可能是不同的
+		
 		// appid.String accessToken =  getAccessToken("cl02dd15a2228ee92","ce2f7581f4203b257ed5687c2e2106c3978a93be");
 		String accessToken = getAccessToken(appid, sercet);
 		if("".equals(accessToken)){
@@ -110,8 +119,8 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		}catch (Exception e){
 			stage = "未知";
 		}
-		Integer stageid = (Integer) stagemap.get("id"); // 客户状态id,通过状态id找到符合对应状态的事件
-		//Integer stageid = 30; // 客户状态id,通过状态id找到符合对应状态的事件
+		//Integer stageid = (Integer) stagemap.get("id"); // 客户状态id,通过状态id找到符合对应状态的事件
+		Integer stageid = 30; // 客户状态id,通过状态id找到符合对应状态的事件
 		List<DeStageEvent> stageevents = eventdao.selectEventsByStage(stageid); // 所有符合客户状态的事件
 		customer.put("stage", stage);
 		String retunrstr = SendUtils.post(url, customer.toString());
@@ -126,7 +135,7 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		returnjson.put("创建时间", dateJoin);
 		returnjson.put("来源", returnobj.getString("source"));
 		String city = returnobj.getString("city");
-		String ordertime = createCustomerEvent(customeid,accessToken,dateJoin,stageevents,returnjson);
+		String ordertime = createCustomerEvent(customeid,secterid,accessToken,dateJoin,stageevents,returnjson);
 		ordertime = paserUtcTime(ordertime);
 		Integer hasOrder = stageorderdao.selectByStageId(stageid);// 是否需要配置订单
 		if(hasOrder == null){
@@ -276,14 +285,14 @@ public class AddcustomerServiceImp implements AddcustomerService {
 	 * @param access_token
 	 * @param dateTime
 	 */
-	public String createCustomerEvent(String customerId,String access_token,String dateTime,List<DeStageEvent> events,JSONObject returnjson){
+	public String createCustomerEvent(String customerId,Integer secretId,String access_token,String dateTime,List<DeStageEvent> events,JSONObject returnjson){
 		List<DeStageEvent> unrelatedevents = eventdao.selectUnRelatedStageEvent();
 		String domain = getPropertyInfo(DOMIAN_NAME);
 		String url = domain + "/v1/customerevents?access_token=" + access_token;
 		
 		List<DeEventTag> eventtags = eventtagdao.selectAllEventTag(); //查询内容标签
 		 
-		
+		Map<String, Object> querymap = new HashMap<String, Object>();
 		
 		JSONArray enventarr = new JSONArray();
 		String differentTime = dateTime;
@@ -294,24 +303,34 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		if(related != null && related != 0){
 			differentTime = paserUtcTime(differentTime);
 			DeStageEvent relatedevent = eventdao.selectByPrimaryKey(related);
+			
+		
+			Integer relatedeventid = relatedevent.getEventid();
+			querymap.put("eventid", relatedeventid);
+			querymap.put("secretid", secretId);
+			DeEventTarget target = eventtargetdao.selectByEventIdAndserretId(querymap);
 			JSONObject obj = new JSONObject();
 			obj.put("customerId", customerId);
 			obj.put("date", differentTime);
 			obj.put("event", relatedevent.getEvent());
-			obj.put("targetId", relatedevent.getTargetid());
-			obj.put("targetName", relatedevent.getTargetname());
+			obj.put("targetId", target.getTargetid());
+			obj.put("targetName", target.getTargetname());
 			String returnstr = SendUtils.post(url, obj.toString());
 			enventarr.add(JSONObject.fromObject(returnstr));
 			System.out.println("将客户绑定事件的json" + obj.toString());
 		}
+		
+		querymap.put("eventid", event.getEventid());
+		querymap.put("secretid", secretId);
+		DeEventTarget target = eventtargetdao.selectByEventIdAndserretId(querymap);
 
 		differentTime = paserUtcTime(differentTime);
 		JSONObject eventobj = new JSONObject();
 		eventobj.put("customerId", customerId);
 		eventobj.put("date", differentTime);
 		eventobj.put("event", event.getEvent());
-		eventobj.put("targetId", event.getTargetid());
-		eventobj.put("targetName", event.getTargetname());
+		eventobj.put("targetId", target.getTargetid());
+		eventobj.put("targetName", target.getTargetname());
 		String returnstr = SendUtils.post(url, eventobj.toString());
 		enventarr.add(JSONObject.fromObject(returnstr));
 		System.out.println("将客户绑定事件的json" + eventobj.toString());
@@ -319,14 +338,17 @@ public class AddcustomerServiceImp implements AddcustomerService {
 	
 
 		for (DeStageEvent deStageEvent : events){
+			querymap.put("eventid", deStageEvent.getEventid());
+			querymap.put("secretid", secretId);
+			DeEventTarget everytarget = eventtargetdao.selectByEventIdAndserretId(querymap);
 
 			differentTime = paserUtcTime(differentTime); // 事件的发生时间不同
 			JSONObject obj = new JSONObject();
 			obj.put("customerId", customerId);
 			obj.put("date", differentTime);
 			obj.put("event", deStageEvent.getEvent());
-			obj.put("targetId", deStageEvent.getTargetid());
-			obj.put("targetName", deStageEvent.getTargetname());
+			obj.put("targetId", everytarget.getTargetid());
+			obj.put("targetName", everytarget.getTargetname());
 			
 			int eventtagssize = eventtags.size();
 			int eventindex = (int)(Math.random()*eventtagssize);
@@ -557,6 +579,14 @@ public class AddcustomerServiceImp implements AddcustomerService {
 			return list.get(0);
 		}
 		return "";
+	}
+	
+	public Integer getPropertyId(String value){
+		List<Integer> list = dePropertiesInfoDao.selectIdByKind(value);
+		if(list != null && list.size() > 0){
+			return list.get(0);
+		}
+		return null;
 	}
 
 	/**
