@@ -229,7 +229,7 @@ public class AddcustomerServiceImp implements AddcustomerService {
 	 * @param openid
 	 * @param unionid
 	 */
-	public JSONObject getcustomer(){
+	private JSONObject getcustomer(){
 		JSONObject data = new JSONObject();
 
 		JSONObject custidentitie = new JSONObject();
@@ -285,7 +285,7 @@ public class AddcustomerServiceImp implements AddcustomerService {
 	 * @param access_token
 	 * @param dateTime
 	 */
-	public String createCustomerEvent(String customerId,Integer secretId,String access_token,String dateTime,List<DeStageEvent> events,JSONObject returnjson){
+	private String createCustomerEvent(String customerId,Integer secretId,String access_token,String dateTime,List<DeStageEvent> events,JSONObject returnjson){
 		List<DeStageEvent> unrelatedevents = eventdao.selectUnRelatedStageEvent();
 		String domain = getPropertyInfo(DOMIAN_NAME);
 		String url = domain + "/v1/customerevents?access_token=" + access_token;
@@ -371,7 +371,7 @@ public class AddcustomerServiceImp implements AddcustomerService {
 	 * @param listId
 	 * @param access_token
 	 */
-	public String addcustomerDeals(String customerId,String access_token,List<DeProducts> products,String ordertime){
+	private String addcustomerDeals(String customerId,String access_token,List<DeProducts> products,String ordertime){
 		String domain = getPropertyInfo(DOMIAN_NAME);
 		String url = domain + "/v1/deals" + "?access_token=" + access_token;
 		JSONObject order = new JSONObject();
@@ -408,7 +408,7 @@ public class AddcustomerServiceImp implements AddcustomerService {
 	/**
 	 * 返回随机数量的不同的商品信息,每个商品的出售数量也随机
 	 */
-	public List<DeProducts> getproducts(){
+	private List<DeProducts> getproducts(){
 		List<DeProducts> products = productdao.selectProduct();
 		int selected = (int) ((Math.random() * 5) + 1);// 返回随机数量的商品
 		List<DeProducts> reList = new ArrayList<DeProducts>();
@@ -446,7 +446,7 @@ public class AddcustomerServiceImp implements AddcustomerService {
 	/**
 	 * 将客户与标签绑定
 	 */
-	public String addCustomerTag(String customerId,String access_token,String citylevel,String accountlevel){
+	private String addCustomerTag(String customerId,String access_token,String citylevel,String accountlevel){
 		String domain = getPropertyInfo(DOMIAN_NAME);
 		String url = domain + "/v1/tagservice/addCustomerTag?access_token=" + access_token;
 		JSONObject obj = new JSONObject();
@@ -526,7 +526,7 @@ public class AddcustomerServiceImp implements AddcustomerService {
 	 * @param URL
 	 * @param json
 	 */
-	public String createList(String access_token,String name){
+	private String createList(String access_token,String name){
 		String domain = getPropertyInfo(DOMIAN_NAME);
 		String url = domain + "/v1/lists?access_token=" + access_token;
 		JSONObject obj = new JSONObject();
@@ -542,7 +542,7 @@ public class AddcustomerServiceImp implements AddcustomerService {
 	 * @param URL
 	 * @param json
 	 */
-	public String addcustomertoList(String customerId,String listId,String access_token){
+	private String addcustomertoList(String customerId,String listId,String access_token){
 		String domain = getPropertyInfo(DOMIAN_NAME);
 		String url = domain + "/v1/listMembers" + "?access_token=" + access_token;
 		JSONObject data = new JSONObject();
@@ -573,7 +573,7 @@ public class AddcustomerServiceImp implements AddcustomerService {
 	 * 获取配置数据
 	 * @param kind
 	 */
-	public String getPropertyInfo(String kind){
+	private String getPropertyInfo(String kind){
 		List<String> list = dePropertiesInfoDao.selectPropertyInfoByKind(kind);
 		if(list != null && list.size() > 0){
 			return list.get(0);
@@ -581,7 +581,7 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		return "";
 	}
 	
-	public Integer getPropertyId(String value){
+	private Integer getPropertyId(String value){
 		List<Integer> list = dePropertiesInfoDao.selectIdByValue(value);
 		if(list != null && list.size() > 0){
 			return list.get(0);
@@ -593,7 +593,7 @@ public class AddcustomerServiceImp implements AddcustomerService {
 	 * 返回不同的时间
 	 * @param time
 	 */
-	public String paserUtcTime(String time){
+	private String paserUtcTime(String time){
 		Date date = null;
 		SimpleDateFormat df1 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 		df1.setTimeZone(TimeZone.getTimeZone("GMT"));
