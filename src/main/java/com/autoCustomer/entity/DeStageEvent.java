@@ -5,10 +5,6 @@ public class DeStageEvent {
 
     private String event;
 
-    private String targetid;
-
-    private String targetname;
-
     private Integer stageid;
 
 
@@ -29,22 +25,7 @@ public class DeStageEvent {
     public void setEvent(String event) {
         this.event = event == null ? null : event.trim();
     }
-
-    public String getTargetid() {
-        return targetid;
-    }
-
-    public void setTargetid(String targetid) {
-        this.targetid = targetid;
-    }
-
-    public String getTargetname() {
-        return targetname;
-    }
-
-    public void setTargetname(String targetname) {
-        this.targetname = targetname == null ? null : targetname.trim();
-    }
+ 
 
     public Integer getStageid() {
         return stageid;
