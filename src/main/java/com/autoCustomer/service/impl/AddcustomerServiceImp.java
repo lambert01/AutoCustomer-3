@@ -85,7 +85,7 @@ public class AddcustomerServiceImp implements AddcustomerService {
 	private static final String DOMIAN_NAME = "domian_name"; // 域名,可配置测试域名或生产域名
 	private static final String APPID = "appid_";
 	private static final String SERCET = "sercet_";
-	private static final String ORDERCOUNT = "orderCount";
+	private static final String ORDERCOUNT = "orderCount"; //订单数量区间
 
 	@Override
 	public String addcustomer(String username){
@@ -101,7 +101,7 @@ public class AddcustomerServiceImp implements AddcustomerService {
 			returnjson.put("error","没有对应的sercet");
 			return returnjson.toString();
 		}
-		Integer secterid = getPropertyId(sercet); //这是secret的id,因为secret唯一,可以认为是账户的id,
+		Integer secterid = getPropertyId(sercet); //这是secret的id,因为secret唯一,可以认为等同于是账户的id
 		//给客户添加事件时用,因为不同的使用者想要的事件的targetid和targetname可能是不同的
 		
 		// appid.String accessToken =  getAccessToken("cl02dd15a2228ee92","ce2f7581f4203b257ed5687c2e2106c3978a93be");
@@ -136,7 +136,7 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		String city = returnobj.getString("city");
 		String ordertime = createCustomerEvent(customeid,secterid,accessToken,dateJoin,stageevents,returnjson);
 		ordertime = paserUtcTime(ordertime);
-		Integer hasOrder = stageorderdao.selectByStageId(stageid);// 是否需要配置订单
+		Integer hasOrder = stageorderdao.selectByStageId(stageid);// 是否需要配置订单,状态为1需要配置订单
 		if(hasOrder == null){
 			hasOrder = 0;
 		}
@@ -156,11 +156,10 @@ public class AddcustomerServiceImp implements AddcustomerService {
 				realordecount = 1;
 			}
 			
-			int idoneOrMore = (int)(Math.random()*10);{
-				if(idoneOrMore > 5){
+			int isoneOrMore = (int)(Math.random()*10);//随机决定该客户有一个还是多个订单
+				if(isoneOrMore > 5){
 					realordecount = 1;
 				}
-			}
 			
 			for (int i = 0; i < realordecount; i++){
 				List<DeProducts> products = getproducts();
@@ -179,8 +178,6 @@ public class AddcustomerServiceImp implements AddcustomerService {
 				accountLevel = accountleveldao.selectMaxLevel(allamountPaid);
 			}
 			
-			
-		
 		}
 		cityLevel = cityleveldao.selectLevelBycity(city);
 		if(cityLevel == null || "".equals(cityLevel)){
@@ -190,16 +187,14 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		System.out.println("创建标签返回的结果是" + tagreturn);
 		JSONArray tagarr = JSONArray.fromObject(tagreturn);
 		List<String> listtag = new ArrayList<String>();
-		for (Object tag : tagarr) {
+		for (Object tag : tagarr){
 			JSONObject jsontag = JSONObject.fromObject(tag);
 			String tagname = jsontag.getString("name");
 			listtag.add(tagname);
-			
 		}
+		
 		returnjson.put("标签", listtag);
-
 		return returnjson.toString();
-
 	}
 
 	/**
@@ -231,24 +226,25 @@ public class AddcustomerServiceImp implements AddcustomerService {
 	private JSONObject getcustomer(){
 		JSONObject data = new JSONObject();
 
-		JSONObject custidentitie = new JSONObject();
-		JSONObject cust = new JSONObject();
-		String moblie = MessageUtil.getMobile();
-		int sex = MessageUtil.getGender();
+		JSONObject custidentitie = new JSONObject(); //客户身份json
+		JSONObject cust = new JSONObject(); //客户json
+		String moblie = MessageUtil.getMobile(); //手机号
+		int sex = MessageUtil.getGender(); //性别
 		String addressSet = getPropertyInfo(ADDRESS_SET);
 		String provinceAndcity = LocalUtil2.getProvinceAndCity(addressSet); // json字符串
-		JSONObject obj = JSONObject.fromObject(provinceAndcity);
-		String province = obj.getString("province");
-		String city = obj.getString("city");
-		String county = obj.getString("countys");
+		JSONObject provinceAndcityjson = JSONObject.fromObject(provinceAndcity);
+		String province = provinceAndcityjson.getString("province");//省份
+		String city = provinceAndcityjson.getString("city");//城市
+		String county = provinceAndcityjson.getString("countys");//区县
 
 		cust.put("email", MessageUtil.getEmail(6,9));
-		cust.put("dateJoin", percentageService.getRanCreateTime());
+		cust.put("dateJoin", percentageService.getRanCreateTime()); //客户的创建时间
 		cust.put("img", getImage());
 		cust.put("name", MessageUtil.getChineseName(sex));
 		cust.put("country", "中国");
 		if("北京".equals(province) || "天津".equals(province) || "重庆".equals(province)
 				|| "上海".equals(province)|| "澳门".equals(province) || "香港".equals(province)){
+			//如果城市是以上几个城市,省份,城市相同
 			cust.put("province",province);
 			cust.put("city",province);
 			cust.put("county",city);
@@ -263,7 +259,7 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		cust.put("county",county);
 		cust.put("mobile",moblie);
 		cust.put("gender",sex);
-		cust.put("source",percentageService.getActiveData());
+		cust.put("source",percentageService.getActiveData());//客户来源
 		JSONArray identitiesarr = new JSONArray();
 		for(int i = 0;i < 1;i++){
 			custidentitie.put("identityType","wechat");
@@ -286,32 +282,34 @@ public class AddcustomerServiceImp implements AddcustomerService {
     * @param dateTime
     * @param events
     * @param returnjson
-    * @return
     */
 	private String createCustomerEvent(String customerId,Integer secretId,String access_token,String dateTime,List<DeStageEvent> events,JSONObject returnjson){
-		List<DeStageEvent> unrelatedevents = eventdao.selectUnRelatedStageEvent();
+	
+		List<DeStageEvent> unrelatedevents = eventdao.selectUnRelatedStageEvent(); //这是与状态无关的事件,随机推送
 		String domain = getPropertyInfo(DOMIAN_NAME);
 		String url = domain + "/v1/customerevents?access_token=" + access_token;
 		
 		List<DeEventTag> eventtags = eventtagdao.selectAllEventTag(); //查询内容标签
 		 
-		Map<String, Object> querymap = new HashMap<String, Object>();
+		Map<String, Object> querymap = new HashMap<String, Object>(); //保存eventid与secretid
 		
 		JSONArray enventarr = new JSONArray();
 		String differentTime = dateTime;
 		int eventsize = unrelatedevents.size();
 		int index = (int) (Math.random() * eventsize);
 		DeStageEvent event = unrelatedevents.get(index);
-		Integer related = event.getIsrelated();
-		if(related != null && related != 0){
+		Integer relatedId = event.getIsrelated();
+		if(relatedId != null && relatedId != 0){
+			//当前事件与其它事件有关联,关联事件要先发生,该事件才能后发生
 			differentTime = paserUtcTime(differentTime);
-			DeStageEvent relatedevent = eventdao.selectByPrimaryKey(related);
-			
+			DeStageEvent relatedevent = eventdao.selectByPrimaryKey(relatedId);
+			//这个related就是关联事件的eventid
 		
 			Integer relatedeventid = relatedevent.getEventid();
 			querymap.put("eventid", relatedeventid);
 			querymap.put("secretid", secretId);
 			DeEventTarget target = eventtargetdao.selectByEventIdAndserretId(querymap);
+			//事件的类型是固定的,但是targetid和targetname不一样
 			JSONObject obj = new JSONObject();
 			obj.put("customerId", customerId);
 			obj.put("date", differentTime);
@@ -323,6 +321,7 @@ public class AddcustomerServiceImp implements AddcustomerService {
 			System.out.println("将客户绑定事件的json" + obj.toString());
 		}
 		
+		//如果没有关联的事件,直接推送事件
 		querymap.put("eventid", event.getEventid());
 		querymap.put("secretid", secretId);
 		DeEventTarget target = eventtargetdao.selectByEventIdAndserretId(querymap);
@@ -338,9 +337,8 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		enventarr.add(JSONObject.fromObject(returnstr));
 		System.out.println("将客户绑定事件的json" + eventobj.toString());
 		
-	
-
 		for (DeStageEvent deStageEvent : events){
+			//循环与状态有关的事件,开始推送
 			querymap.put("eventid", deStageEvent.getEventid());
 			querymap.put("secretid", secretId);
 			DeEventTarget everytarget = eventtargetdao.selectByEventIdAndserretId(querymap);
@@ -357,7 +355,6 @@ public class AddcustomerServiceImp implements AddcustomerService {
 			int eventindex = (int)(Math.random()*eventtagssize);
 				DeEventTag eventtag = eventtags.get(eventindex);
 				obj.put("tag",eventtag.getTag());
-			
 		
 			String returnstr1 = SendUtils.post(url, obj.toString());
 			enventarr.add(JSONObject.fromObject(returnstr1));
@@ -418,14 +415,14 @@ public class AddcustomerServiceImp implements AddcustomerService {
 
 		Random random = new Random();
 		// 先抽取，备选数量的个数
-		if (products.size() >= selected){
+		if(products.size() >= selected){
 			for(int i = 0; i < selected; i++){
 				// 随机数的范围为0-list.size()-1;
 				int target = random.nextInt(products.size());
 				reList.add(products.get(target));
 				products.remove(target);
 			}
-		} else {
+		}else{
 			selected = products.size();
 			for(int i = 0; i < selected; i++){
 				// 随机数的范围为0-list.size()-1;
@@ -504,7 +501,6 @@ public class AddcustomerServiceImp implements AddcustomerService {
 			if(!unrelationtag.isEmpty()){
 				tagsarr.add(unrelationtag);
 			}
-
 		}
 
 		JSONObject cityandleveljson = new JSONObject();
@@ -517,6 +513,7 @@ public class AddcustomerServiceImp implements AddcustomerService {
 			accountleveljson.put("name", accountlevel);
 			tagsarr.add(accountleveljson);
 		}
+		
 		tagsarr.add(cityandleveljson);
 		obj.put("tags", tagsarr);
 		System.out.println("创建标签的json是 " + obj.toString());
@@ -584,6 +581,11 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		return "";
 	}
 	
+	/**
+	 * 通过value过的id
+	 * @param value
+	 * @return
+	 */
 	private Integer getPropertyId(String value){
 		List<Integer> list = dePropertiesInfoDao.selectIdByValue(value);
 		if(list != null && list.size() > 0){
