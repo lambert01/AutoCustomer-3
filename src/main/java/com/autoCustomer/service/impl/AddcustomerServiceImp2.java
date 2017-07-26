@@ -1,10 +1,12 @@
 package com.autoCustomer.service.impl;
 
+import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -255,9 +257,18 @@ public class AddcustomerServiceImp2 implements AddcustomerService {
 		String province = provinceAndcityjson.getString("province");//省份
 		String city = provinceAndcityjson.getString("city");//城市
 		String county = provinceAndcityjson.getString("countys");//区县
-
+		
+        String datejointime = percentageService.getRanCreateTime();
+        while(datejointime == null){
+        	datejointime = percentageService.getRanCreateTime();
+        }
+ 
+        if(datejointime.contains("2017-07")){
+        	System.out.println("-----------------------------------------");
+        	
+        }
 		cust.put("email", MessageUtil.getEmail(6,9));
-		cust.put("dateJoin", percentageService.getRanCreateTime()); //客户的创建时间
+		cust.put("dateJoin", datejointime); //客户的创建时间
 		cust.put("img", getImage());
 		cust.put("name", MessageUtil.getChineseName(sex));
 		cust.put("country", "中国");
@@ -354,7 +365,30 @@ public class AddcustomerServiceImp2 implements AddcustomerService {
 		for (DeStageEventTarget deStageEventTarget : events){
 			//循环与状态有关的事件,开始推送
 			 
- 
+			String eventwechat = deStageEventTarget.getEvent();
+			if("subscribe".equals(eventwechat)){
+              Map<String, Object> idmap = getwechatid(access_token);
+              String id = idmap.get("id").toString();
+              String name = idmap.get("name").toString();
+              differentTime = paserUtcTime(differentTime); // 事件的发生时间不同
+  			JSONObject obj = new JSONObject();
+  			obj.put("customerId", customerId);
+  			obj.put("date", differentTime);
+  			obj.put("event", deStageEventTarget.getEvent());
+  			obj.put("targetId",id );
+  			obj.put("targetName", name);
+  			
+  			int eventtagssize = eventtags.size();
+  			int eventindex = (int)(Math.random()*eventtagssize);
+  				DeEventTag eventtag = eventtags.get(eventindex);
+  				obj.put("tag",eventtag.getTag());
+  		
+  			String returnstr1 = SendUtils.post(url, obj.toString());
+  			enventarr.add(JSONObject.fromObject(returnstr1));
+  			System.out.println("将客户绑定事件的json" + obj.toString());
+  			continue;
+				
+			}
 
 			differentTime = paserUtcTime(differentTime); // 事件的发生时间不同
 			JSONObject obj = new JSONObject();
@@ -628,6 +662,32 @@ public class AddcustomerServiceImp2 implements AddcustomerService {
 		String returnCode = SendUtils.post(url, list.toString());
 		return returnCode;
 	}
+	
+    public Map<String,Object> getwechatid(String access_token){
+    	Map<String,Object>  idmap = new HashMap<String, Object>();
+    	String domain = getPropertyInfo(DOMIAN_NAME);
+    	String url = domain+"/v1/wechataccounts";
+    	String param = "access_token="+access_token;
+    	String returncode = SendUtils.sendGet(url, param);
+    	JSONArray arrs  = JSONArray.fromObject(returncode);
+    	if(arrs.size() ==0){
+    		idmap.put("id", "11");
+    		idmap.put("name", "convertlab学堂");
+    		
+    	}else{
+    		Object object = arrs.get(0);
+    		JSONObject wechatjson = JSONObject.fromObject(object);
+    		String id = wechatjson.get("id").toString();
+    		String name = wechatjson.get("name").toString();
+    		try {
+				name = new String(name.getBytes("gbk"), "utf-8");
+			} catch (UnsupportedEncodingException e) {
+			}
+    		idmap.put("id", id);
+    		idmap.put("name",name);
+    	}
+    	return idmap;
+    }
 
 	/**
 	 * 随机返回一个图片的路径
@@ -662,6 +722,10 @@ public class AddcustomerServiceImp2 implements AddcustomerService {
 	 * @param time
 	 */
 	private String paserUtcTime(String time){
+		int mintime = (int)(Math.random()*300);
+		if(mintime <10){
+			mintime = 10;
+		}
 		Date date = null;
 		SimpleDateFormat df1 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 		df1.setTimeZone(TimeZone.getTimeZone("GMT"));
@@ -672,9 +736,9 @@ public class AddcustomerServiceImp2 implements AddcustomerService {
 		}
 		Calendar ca = Calendar.getInstance();
 		ca.setTime(date);
-		ca.add(Calendar.HOUR_OF_DAY, 3);
+		ca.add(Calendar.MINUTE,mintime);
 		String returndate = df1.format(ca.getTime());
 		return returndate;
 	}
-
+	
 }
