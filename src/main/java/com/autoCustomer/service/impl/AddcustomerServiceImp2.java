@@ -569,13 +569,13 @@ public class AddcustomerServiceImp2 implements AddcustomerService {
 			List<DeTagList> taglists = taglistdao.selectAllTagList();
 			List<String> hadtagdemendions = new ArrayList<String>();
 		
-			for (Object tag : arrs) {
+			for(Object tag : arrs){
 				JSONObject jsontag = JSONObject.fromObject(tag);
 				String dimensionkey = jsontag.getString("dimensionKey");
 				hadtagdemendions.add(dimensionkey);
 			}
 			
-			for (DeTagList deTagList : taglists) {
+			for(DeTagList deTagList : taglists){
 				String dimensionkey = deTagList.getDimensionkey();
 				if(!hadtagdemendions.contains(dimensionkey)){
 					DeTagList addtag = taglistdao.selectTagListCheckDidHad(dimensionkey);
