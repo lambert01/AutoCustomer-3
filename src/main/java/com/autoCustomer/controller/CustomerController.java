@@ -27,7 +27,7 @@ public class CustomerController {
 	private DePercentageService percentageService;
 	
 	@Autowired
-	private AddcustomerService addcustomerService;
+	private AddcustomerService addcustomerService2;
 	
 	@RequestMapping(value="/createTime",method= RequestMethod.GET,produces = "application/json;charset=UTF-8")
 	@ResponseBody
@@ -67,7 +67,7 @@ public class CustomerController {
 			size = 1;
 		}
 		for (int i = 0; i < size; i++) { 
-			String mes = addcustomerService.addcustomer(username);
+			String mes = addcustomerService2.addcustomer(username);
 			arr.add(mes);
 		}
 		String retnemmes = arr.toString();
