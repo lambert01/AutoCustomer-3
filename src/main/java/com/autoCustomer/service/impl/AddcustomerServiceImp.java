@@ -107,7 +107,7 @@ public class AddcustomerServiceImp implements AddcustomerService {
 		// appid.String accessToken =  getAccessToken("cl02dd15a2228ee92","ce2f7581f4203b257ed5687c2e2106c3978a93be");
 		String accessToken = getAccessToken(appid, sercet);
 		if("".equals(accessToken)){
-			returnjson.put("error","没有对应的token");
+			returnjson.put("error","没有对应的accesstoken");
 			return returnjson.toString();
 		}
 		String url = domain + "/v1/customerandidentities?access_token=" + accessToken;
@@ -120,7 +120,7 @@ public class AddcustomerServiceImp implements AddcustomerService {
 			stage = "未知";
 		}
 		//Integer stageid = (Integer) stagemap.get("id"); // 客户状态id,通过状态id找到符合对应状态的事件
-		Integer stageid = 29; // 客户状态id,通过状态id找到符合对应状态的事件
+		Integer stageid = 30; // 客户状态id,通过状态id找到符合对应状态的事件
 		List<DeStageEvent> stageevents = eventdao.selectEventsByStage(stageid); //所有的符合状态的事件都被搜索出来了,有的事件是多选一,过滤一下
 		List<DeStageEvent> stageeventselecteds = new ArrayList<DeStageEvent>(); //这个是传送给创建事件方法的事件集合
 		List<DeStageEvent> onestageeventselecteds = new ArrayList<DeStageEvent>(); //这个是在多个相同阶段的事件中随机选取一个事件的集合
@@ -179,11 +179,6 @@ public class AddcustomerServiceImp implements AddcustomerService {
 			if(realordecount == 0){
 				realordecount = 1;
 			}
-			
-			int isoneOrMore = (int)(Math.random()*10);//随机决定该客户有一个还是多个订单
-				if(isoneOrMore > 5){
-					realordecount = 1;
-				}
 			
 			for (int i = 0; i < realordecount; i++){
 				List<DeProducts> products = getproducts();
@@ -458,7 +453,8 @@ public class AddcustomerServiceImp implements AddcustomerService {
 	 */
 	private List<DeProducts> getproducts(){
 		List<DeProducts> products = productdao.selectProduct();
-		int selected = (int) ((Math.random() * 5) + 1);// 返回随机数量的商品
+		//int selected = (int) ((Math.random() * 5) + 1);// 返回随机数量的商品
+		int selected = 1;
 		List<DeProducts> reList = new ArrayList<DeProducts>();
 
 		Random random = new Random();
