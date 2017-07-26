@@ -1,7 +1,6 @@
 package com.autoCustomer.service.impl;
 
 import java.text.DecimalFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -88,10 +87,11 @@ public class DePercentageServiceImpl implements DePercentageService{
 		 Date date = null;
 		 try {
 			  date = df2.parse(createTime);
-		} catch (ParseException e) {
-			date = new Date();
+			  createTime = df1.format(date);
+		} catch (Exception e) {
+			createTime = null;
 		}
-		 createTime = df1.format(date);
+		 
 		return createTime;
 	}
 	
