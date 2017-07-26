@@ -31,7 +31,7 @@ public class CustomerController {
 	
 	@RequestMapping(value="/createTime",method= RequestMethod.GET,produces = "application/json;charset=UTF-8")
 	@ResponseBody
-	public String excete(HttpServletResponse response) throws UnsupportedEncodingException{
+	public String excete(HttpServletResponse response) {
 		JSONObject json = new JSONObject();
 		//response.setContentType("application/json;charset=UTF-8");
 		response.setHeader("Content-Type", "application/xml; charset=UTF-8");  
