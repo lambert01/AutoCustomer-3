@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.autoCustomer.dao.DeStageEventTargetMapper" >
+  <resultMap id="BaseResultMap" type="com.autoCustomer.entity.DeStageEventTarget" >
+    <id column="eventId" property="eventid" jdbcType="INTEGER" />
+    <result column="event" property="event" jdbcType="VARCHAR" />
+    <result column="eventName" property="eventname" jdbcType="VARCHAR" />
+    <result column="stageId" property="stageid" jdbcType="INTEGER" />
+    <result column="targetId" property="targetid" jdbcType="VARCHAR" />
+    <result column="targetName" property="targetname" jdbcType="VARCHAR" />
+    <result column="isRelated" property="isrelated" jdbcType="INTEGER" />
+    <result column="isMultiselect" property="ismultiselect" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    eventId, event, eventName, stageId, targetId, targetName, isRelated, isMultiselect
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from de_stage_event_target
+    where eventId = #{eventid,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from de_stage_event_target
+    where eventId = #{eventid,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.autoCustomer.entity.DeStageEventTarget" >
+    insert into de_stage_event_target (eventId, event, eventName, 
+      stageId, targetId, targetName, 
+      isRelated, isMultiselect)
+    values (#{eventid,jdbcType=INTEGER}, #{event,jdbcType=VARCHAR}, #{eventname,jdbcType=VARCHAR}, 
+      #{stageid,jdbcType=INTEGER}, #{targetid,jdbcType=VARCHAR}, #{targetname,jdbcType=VARCHAR}, 
+      #{isrelated,jdbcType=INTEGER}, #{ismultiselect,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.autoCustomer.entity.DeStageEventTarget" >
+    insert into de_stage_event_target
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="eventid != null" >
+        eventId,
+      </if>
+      <if test="event != null" >
+        event,
+      </if>
+      <if test="eventname != null" >
+        eventName,
+      </if>
+      <if test="stageid != null" >
+        stageId,
+      </if>
+      <if test="targetid != null" >
+        targetId,
+      </if>
+      <if test="targetname != null" >
+        targetName,
+      </if>
+      <if test="isrelated != null" >
+        isRelated,
+      </if>
+      <if test="ismultiselect != null" >
+        isMultiselect,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="eventid != null" >
+        #{eventid,jdbcType=INTEGER},
+      </if>
+      <if test="event != null" >
+        #{event,jdbcType=VARCHAR},
+      </if>
+      <if test="eventname != null" >
+        #{eventname,jdbcType=VARCHAR},
+      </if>
+      <if test="stageid != null" >
+        #{stageid,jdbcType=INTEGER},
+      </if>
+      <if test="targetid != null" >
+        #{targetid,jdbcType=VARCHAR},
+      </if>
+      <if test="targetname != null" >
+        #{targetname,jdbcType=VARCHAR},
+      </if>
+      <if test="isrelated != null" >
+        #{isrelated,jdbcType=INTEGER},
+      </if>
+      <if test="ismultiselect != null" >
+        #{ismultiselect,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.autoCustomer.entity.DeStageEventTarget" >
+    update de_stage_event_target
+    <set >
+      <if test="event != null" >
+        event = #{event,jdbcType=VARCHAR},
+      </if>
+      <if test="eventname != null" >
+        eventName = #{eventname,jdbcType=VARCHAR},
+      </if>
+      <if test="stageid != null" >
+        stageId = #{stageid,jdbcType=INTEGER},
+      </if>
+      <if test="targetid != null" >
+        targetId = #{targetid,jdbcType=VARCHAR},
+      </if>
+      <if test="targetname != null" >
+        targetName = #{targetname,jdbcType=VARCHAR},
+      </if>
+      <if test="isrelated != null" >
+        isRelated = #{isrelated,jdbcType=INTEGER},
+      </if>
+      <if test="ismultiselect != null" >
+        isMultiselect = #{ismultiselect,jdbcType=INTEGER},
+      </if>
+    </set>
+    where eventId = #{eventid,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.autoCustomer.entity.DeStageEventTarget" >
+    update de_stage_event_target
+    set event = #{event,jdbcType=VARCHAR},
+      eventName = #{eventname,jdbcType=VARCHAR},
+      stageId = #{stageid,jdbcType=INTEGER},
+      targetId = #{targetid,jdbcType=VARCHAR},
+      targetName = #{targetname,jdbcType=VARCHAR},
+      isRelated = #{isrelated,jdbcType=INTEGER},
+      isMultiselect = #{ismultiselect,jdbcType=INTEGER}
+    where eventId = #{eventid,jdbcType=INTEGER}
+  </update>
+  
+   <select id="selectEventsByStage" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from de_stage_event_target
+    where stageId &lt;= #{stageid,jdbcType=INTEGER} order by stageId 
+  </select>
+  
+   <select id="selectUnRelatedStageEvent" resultMap="BaseResultMap" >
+    select 
+    <include refid="Base_Column_List" />
+    from de_stage_event_target
+    where   stageId is null 
+  </select>
+  
+   <select id="selectCountSize" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+    select count(*)
+    from de_stage_event_target where isMultiselect = #{ismultiselect,jdbcType=INTEGER}
+  </select>
+</mapper>
