@@ -23,12 +23,14 @@ import com.autoCustomer.dao.DeProductsMapper;
 import com.autoCustomer.dao.DePropertiesInfoMapper;
 import com.autoCustomer.dao.DeStageEventTargetMapper;
 import com.autoCustomer.dao.DeStageOrderMapper;
+import com.autoCustomer.dao.DeTagListMapper;
 import com.autoCustomer.dao.DeTagMapper;
 import com.autoCustomer.entity.DeEventTag;
 import com.autoCustomer.entity.DeImage;
 import com.autoCustomer.entity.DeProducts;
 import com.autoCustomer.entity.DeStageEventTarget;
 import com.autoCustomer.entity.DeTag;
+import com.autoCustomer.entity.DeTagList;
 import com.autoCustomer.service.AddcustomerService;
 import com.autoCustomer.service.DePercentageService;
 import com.autoCustomer.util.LocalUtil2;
@@ -73,6 +75,9 @@ public class AddcustomerServiceImp2 implements AddcustomerService {
 	
 	@Resource
 	private DeEventTagMapper eventtagdao;//内容标签dao
+	
+	@Resource
+	private DeTagListMapper taglistdao;//标签分组dao
 
 
 	private static final String ADDRESS_SET = "address_set"; // 地址配置
@@ -113,6 +118,7 @@ public class AddcustomerServiceImp2 implements AddcustomerService {
 			stage = "未知";
 		}
 		Integer stageid = (Integer) stagemap.get("id"); // 客户状态id,通过状态id找到符合对应状态的事件
+
 		List<DeStageEventTarget> stageevents = eventdao.selectEventsByStage(stageid); //所有的符合状态的事件都被搜索出来了,有的事件是多选一,过滤一下
 		List<DeStageEventTarget> stageeventselecteds = new ArrayList<DeStageEventTarget>(); //这个是传送给创建事件方法的事件集合
 		List<DeStageEventTarget> onestageeventselecteds = new ArrayList<DeStageEventTarget>(); //这个是在多个相同阶段的事件中随机选取一个事件的集合
@@ -158,6 +164,8 @@ public class AddcustomerServiceImp2 implements AddcustomerService {
 		}
  
 		// 开始配置标签
+		String tagrelistturn = gettaglist(accessToken);
+		returnjson.put("标签群组", tagrelistturn);
 		String accountLevel = "";
 		String cityLevel = "";
 		if(hasOrder == 1){
@@ -541,6 +549,67 @@ public class AddcustomerServiceImp2 implements AddcustomerService {
 		JSONObject returnObj = JSONObject.fromObject(returnCode);
 		String listid = returnObj.getString("id");// 群组id
 		return listid;
+	}
+	
+	/**
+	 * 创建标签前先检查群组是否创建
+	 * @param access_token
+	 * @return
+	 */
+	public String gettaglist(String access_token){
+		String domain = getPropertyInfo(DOMIAN_NAME);
+		String url =domain+"/v1/tagdimensions" ;
+		String param = "access_token=" + access_token;
+		String returncode = SendUtils.sendGet(url, param);
+		JSONArray arrs = JSONArray.fromObject(returncode);
+		List<String> returnarr = new ArrayList<String>();
+		if(arrs.size() == 0){
+			createTagList(access_token);
+		}else{
+			List<DeTagList> taglists = taglistdao.selectAllTagList();
+			List<String> hadtagdemendions = new ArrayList<String>();
+		
+			for (Object tag : arrs) {
+				JSONObject jsontag = JSONObject.fromObject(tag);
+				String dimensionkey = jsontag.getString("dimensionKey");
+				hadtagdemendions.add(dimensionkey);
+			}
+			
+			for (DeTagList deTagList : taglists) {
+				String dimensionkey = deTagList.getDimensionkey();
+				if(!hadtagdemendions.contains(dimensionkey)){
+					DeTagList addtag = taglistdao.selectTagListCheckDidHad(dimensionkey);
+					JSONObject obj = new JSONObject();
+					obj.put("name", addtag.getTagname());
+					obj.put("dimensionKey", addtag.getDimensionkey());
+					String addlisturl = domain+"/v1/tagdimensions?access_token=" + access_token;
+					String returnCode = SendUtils.post(addlisturl, obj.toString());
+					returnarr.add(returnCode);
+				}
+			}
+		}
+		return returnarr.toString();
+		
+	}
+	
+	/**
+	 * 创建客户标签群组
+	 * @return
+	 */
+	public  String createTagList(String access_token){
+		String domain = getPropertyInfo(DOMIAN_NAME);
+		String url =domain+"/v1/tagdimensions"+ "?access_token=" + access_token;
+		List<DeTagList> taglists = taglistdao.selectAllTagList();
+		List<String> returnarr = new ArrayList<String>();
+		for (DeTagList deTagList : taglists) {
+			JSONObject taglistjson = new JSONObject();
+			taglistjson.put("name", deTagList.getTagname());
+			taglistjson.put("dimensionKey", deTagList.getDimensionkey());
+			String returnCode = SendUtils.post(url, taglistjson.toString());
+			returnarr.add(returnCode);
+		}
+		return returnarr.toString();
+		
 	}
 
 	/**
