@@ -67,6 +67,7 @@ public class CustomerController {
 			size = 1;
 		}
 		for (int i = 0; i < size; i++) { 
+			
 			String mes = addcustomerService2.addcustomer(username);
 			arr.add(mes);
 		}
