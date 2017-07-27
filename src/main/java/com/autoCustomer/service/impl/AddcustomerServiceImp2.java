@@ -106,30 +106,19 @@ public class AddcustomerServiceImp2 implements AddcustomerService {
 			stage = "未知";
 		}
 		Integer stageid = (Integer) stagemap.get("id"); // 客户状态id,通过状态id找到符合对应状态的事件
+		//这是针对A类客户,有复购行为,事件发生在购买之后
+		boolean isRepeateBuy = false;
+		stage = "复购客户";
+		stageid = 30;
+		if("复购客户".equals(stage)){
+			stageid = stageid-1;
+			isRepeateBuy = true;
+			
+		}
 
 		List<DeStageEventTarget> stageevents = eventdao.selectEventsByStage(stageid); //所有的符合状态的事件都被搜索出来了,有的事件是多选一,过滤一下
-		List<DeStageEventTarget> stageeventselecteds = new ArrayList<DeStageEventTarget>(); //这个是传送给创建事件方法的事件集合
-		List<DeStageEventTarget> onestageeventselecteds = new ArrayList<DeStageEventTarget>(); //这个是在多个相同阶段的事件中随机选取一个事件的集合
-		Integer differtrelation = 0;
-		for(DeStageEventTarget DeStageEventTarget : stageevents){
-			Integer ismultiselect = DeStageEventTarget.getIsmultiselect(); //是否多选一的
-			if(ismultiselect == null){
-				stageeventselecteds.add(DeStageEventTarget);
-			}else{
-				if(differtrelation == 0 || differtrelation == ismultiselect){
-					onestageeventselecteds.add(DeStageEventTarget);
-					int selectcount = onestageeventselecteds.size();
-					int eventselectcount = eventdao.selectCountSize(ismultiselect); //查询该多选事件的数量
-					if(selectcount == eventselectcount){
-						int index = (int)(Math.random() * eventselectcount);
-						DeStageEventTarget stageevent = onestageeventselecteds.get(index); //随机选取一个事件
-						stageeventselecteds.add(stageevent);
-						onestageeventselecteds.clear();
-						differtrelation = 0;
-					}
-				}
-			}
-		}
+		List<DeStageEventTarget> stageeventselecteds = getWantedDeEvent(stageevents); //对查询出的事件处理,随机排除并列的事件
+
 		
 		customer.put("stage", stage);
 		String retunrstr = SendUtils.post(url, customer.toString());
@@ -146,6 +135,9 @@ public class AddcustomerServiceImp2 implements AddcustomerService {
 		String city = returnobj.getString("city");
 		String ordertime = createCustomerEvent(customeid,accessToken,dateJoin,stageeventselecteds,returnjson);
 		ordertime = paserUtcTime(ordertime);
+		if(isRepeateBuy){
+			stageid+=1;
+		}
 		Integer hasOrder = stageorderdao.selectByStageId(stageid);// 是否需要配置订单,状态为1需要配置订单
 		if(hasOrder == null){
 			hasOrder = 0;
@@ -154,12 +146,18 @@ public class AddcustomerServiceImp2 implements AddcustomerService {
 		// 开始配置标签
 		String accountLevel = "";
 		String cityLevel = "";
-		if(hasOrder == 1){
+		if(hasOrder >= 1){
 			//发送订单并返回客户级别
-			accountLevel = senddeals(customeid,accessToken,ordertime,accountLevel,1,returnjson);
+			accountLevel = senddeals(customeid,accessToken,ordertime,accountLevel,1,returnjson,null);
 		}
 		
 		if(hasOrder > 1){
+			//是复购客户,在重复购买订单之前发送浏览页面,加入购物车事件,在重复购买订单发送后发送复购事件
+			Map<String, Object> repeatebuymap = new HashMap<String, Object>();
+			List<DeStageEventTarget>  repeatebuystagevents = eventdao.selectEventstageEvent(stageid); //只是复购阶段的事件
+			List<DeStageEventTarget>  beforerepeatebuystagevents = eventdao.selectEventstageEvent(stageid-2); //复购阶段之前的事件
+			repeatebuymap.put("repeatebuystagevents", repeatebuystagevents);
+			repeatebuymap.put("beforerepeatebuystagevents", beforerepeatebuystagevents);
 			String ordercountstr = getPropertyInfo(ORDERCOUNT);
 			if(ordercountstr == null || "".equals(ordercountstr)){
 				ordercountstr = "20";
@@ -168,14 +166,14 @@ public class AddcustomerServiceImp2 implements AddcustomerService {
 			try {
 				ordecount = Integer.parseInt(ordercountstr);
 			} catch (NumberFormatException e) {
-				ordecount = 1;
+				ordecount = 2;
 			}
 			int realordecount = (int)(Math.random()*ordecount);
 			if(realordecount == 0){
-				realordecount = 1;
+				realordecount = 2;
 			}
 			//是复购客户,再次购买
-			accountLevel = senddeals(customeid,accessToken,ordertime,accountLevel,realordecount,returnjson);
+			accountLevel = senddeals(customeid,accessToken,ordertime,accountLevel,realordecount,returnjson,repeatebuymap);
 			
 		}
 		
@@ -206,15 +204,74 @@ public class AddcustomerServiceImp2 implements AddcustomerService {
 	 * @param accountLevel
 	 * @param returnjson
 	 */
-	public String senddeals(String customeid,String accessToken,String ordertime,String accountLevel,int realordecount,JSONObject returnjson){
+	public String senddeals(String customeid,String accessToken,String ordertime,String accountLevel,int realordecount,JSONObject returnjson,Map<String,Object> map){
 		Double allamountPaid = 0d;
 		String addordertime = ordertime;
+		DeStageEventTarget lastevent = null;
+		List<DeStageEventTarget> hadcheckedbeforerepeatebuystagevents = null;
+		if(map != null){
+			List<DeStageEventTarget> repeatebuystagevents = (List<DeStageEventTarget>)map.get("repeatebuystagevents");
+			List<DeStageEventTarget> beforerepeatebuystagevents = (List<DeStageEventTarget>)map.get("beforerepeatebuystagevents");	
+			if(repeatebuystagevents !=null && repeatebuystagevents.size() != 0){
+				lastevent = repeatebuystagevents.get(0);
+			}
+			
+			if(repeatebuystagevents !=null && repeatebuystagevents.size() != 0){
+				hadcheckedbeforerepeatebuystagevents = getWantedDeEvent(beforerepeatebuystagevents);
+			}
+		}
+
 
 		for (int i = 0; i < realordecount; i++){
-			addordertime = paserUtcTime(addordertime);
+			if(lastevent == null){
+				addordertime = paserUtcTime(addordertime);
+			}else{
+				addordertime = paserRepeateBuyingUtcTime(addordertime);	
+			}
+			if(hadcheckedbeforerepeatebuystagevents != null){
+				//这是复购之前的事件
+				for (DeStageEventTarget brforeevent : hadcheckedbeforerepeatebuystagevents) {
+					addordertime = paserUtcTime(addordertime);
+					String event = brforeevent.getEvent();
+					String targetid = brforeevent.getTargetid();
+					String targetname = brforeevent.getTargetname();
+					String domain = getPropertyInfo(DOMIAN_NAME);
+					String url = domain + "/v1/customerevents?access_token=" + accessToken;
+					JSONObject obj = new JSONObject();
+					obj.put("customerId", customeid);
+					obj.put("date", addordertime);
+					obj.put("event", event);
+					obj.put("targetId", targetid);
+					obj.put("targetName", targetname);
+					String returnstr = SendUtils.post(url, obj.toString());
+					System.out.println("创建复购之前的事件返回的是"+returnstr);
+					
+				}
+			}
+			
+	
+			//如果是复购行为,推送一次订单,推送一个复购事件
 			List<DeProducts> products = getproducts();
 			String returndeal = addcustomerDeals(customeid,accessToken,products,addordertime);
 			System.out.println("创建订单返回的 " + returndeal);
+			if(lastevent != null){
+					String event = lastevent.getEvent();
+					String targetid = lastevent.getTargetid();
+					String targetname = lastevent.getTargetname();
+					String domain = getPropertyInfo(DOMIAN_NAME);
+					String url = domain + "/v1/customerevents?access_token=" + accessToken;
+					JSONObject obj = new JSONObject();
+					obj.put("customerId", customeid);
+					obj.put("date", addordertime);
+					obj.put("event", event);
+					obj.put("targetId", targetid);
+					obj.put("targetName", targetname);
+					String returnstr = SendUtils.post(url, obj.toString());
+					System.out.println("创建复购事件返回的是"+returnstr);
+					
+				
+			}
+			
 			
 			returnjson.put("订单", JSONObject.fromObject(returndeal));
 			JSONObject returndealobj = JSONObject.fromObject(returndeal);
@@ -281,7 +338,7 @@ public class AddcustomerServiceImp2 implements AddcustomerService {
 		String city = provinceAndcityjson.getString("city");//城市
 		String county = provinceAndcityjson.getString("countys");//区县
 		
-        String datejointime = percentageService.getRanCreateTime();
+        String datejointime = percentageService.frontPercentage(); //a类方法
         while(datejointime == null){
         	datejointime = percentageService.frontPercentage();
         }
@@ -354,7 +411,6 @@ public class AddcustomerServiceImp2 implements AddcustomerService {
 	 
 			 
 		 
-			//事件的类型是固定的,但是targetid和targetname不一样
 			JSONObject obj = new JSONObject();
 			obj.put("customerId", customerId);
 			obj.put("date", differentTime);
@@ -367,8 +423,6 @@ public class AddcustomerServiceImp2 implements AddcustomerService {
 		}
 		
 		//如果没有关联的事件,直接推送事件
-	 
- 
 
 		differentTime = paserUtcTime(differentTime);
 		JSONObject eventobj = new JSONObject();
@@ -619,6 +673,37 @@ public class AddcustomerServiceImp2 implements AddcustomerService {
 	}
 	
 	/**
+	 * 事件有并联关系的,处理事件
+	 * 参数是查询出的所有的符合要求的事件,过滤事件
+	 * @param stageevents
+	 * @return
+	 */
+	public List<DeStageEventTarget> getWantedDeEvent(List<DeStageEventTarget> stageevents){
+		List<DeStageEventTarget> stageeventselecteds = new ArrayList<DeStageEventTarget>(); //这个是传送给创建事件方法的事件集合
+		List<DeStageEventTarget> onestageeventselecteds = new ArrayList<DeStageEventTarget>(); //这个是在多个相同阶段的事件中随机选取一个事件的集合
+		Integer differtrelation = 0;
+		for(DeStageEventTarget DeStageEventTarget : stageevents){
+			Integer ismultiselect = DeStageEventTarget.getIsmultiselect(); //是否多选一的
+			if(ismultiselect == null){
+				stageeventselecteds.add(DeStageEventTarget);
+			}else{
+				if(differtrelation == 0 || differtrelation == ismultiselect){
+					onestageeventselecteds.add(DeStageEventTarget);
+					int selectcount = onestageeventselecteds.size();
+					int eventselectcount = eventdao.selectCountSize(ismultiselect); //查询该多选事件的数量
+					if(selectcount == eventselectcount){
+						int index = (int)(Math.random() * eventselectcount);
+						DeStageEventTarget stageevent = onestageeventselecteds.get(index); //随机选取一个事件
+						stageeventselecteds.add(stageevent);
+						onestageeventselecteds.clear();
+						differtrelation = 0;
+					}
+				}
+			}
+		}
+		return stageeventselecteds;
+	}
+	/**
 	 * 在创建标签群组前删除所有的标签
 	 * @return
 	 */
@@ -828,9 +913,10 @@ public class AddcustomerServiceImp2 implements AddcustomerService {
 	 * @param time
 	 */
 	private String paserUtcTime(String time){
-		int mintime = (int)(Math.random()*300);
-		if(mintime <5){
-			mintime = 5;
+		int count = 180*60;
+		int mintime = (int)(Math.random()*count);
+		if(mintime <5*60){
+			mintime = 5*60;
 		}
 		Date date = null;
 		SimpleDateFormat df1 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
@@ -842,7 +928,34 @@ public class AddcustomerServiceImp2 implements AddcustomerService {
 		}
 		Calendar ca = Calendar.getInstance();
 		ca.setTime(date);
-		ca.add(Calendar.MINUTE,mintime);
+		ca.add(Calendar.SECOND,mintime);
+		String returndate = df1.format(ca.getTime());
+		return returndate;
+	}
+	
+	
+	
+	/**
+	 * 返回复购不同的时间
+	 * @param time
+	 */
+	private String paserRepeateBuyingUtcTime(String time){
+		int count = 24*60*60*5;
+		int min = (int)(Math.random()*count);
+		if(min < 24*60*60){
+			min = 24*60*60;
+		}
+		Date date = null;
+		SimpleDateFormat df1 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+		df1.setTimeZone(TimeZone.getTimeZone("GMT"));
+		try{
+			date = df1.parse(time);
+		}catch (ParseException e){
+			e.printStackTrace();
+		}
+		Calendar ca = Calendar.getInstance();
+		ca.setTime(date);
+		ca.add(Calendar.SECOND,min);
 		String returndate = df1.format(ca.getTime());
 		return returndate;
 	}
