@@ -76,7 +76,7 @@ public class StressCustomerTest {
          	customermap.put("dateJoin", dateJoin);
          	JSONObject customer = getcustomer(customermap);
          	String accessToken = getAccessToken();
-         	String url = "http://api.convertwork.cn/v1/customerandidentities?access_token=" + accessToken;
+         	String url = "https://api.convertlab.com/v1/customerandidentities?access_token=" + accessToken;
          	String retunrstr = SendUtils.post(url, customer.toString());
          	JSONObject returnobj = JSONObject.fromObject(retunrstr);
          	System.out.println("创建客户返回的json是"+retunrstr);
@@ -181,9 +181,9 @@ public class StressCustomerTest {
 	}
 	
 	private static String getAccessToken(){
-		String appid ="cl02dd15a2228ee92";
-		String sercet ="ce2f7581f4203b257ed5687c2e2106c3978a93be";
-		String url =  "http://api.convertwork.cn/security/accesstoken";
+		String appid ="cl002115d78a615d2";
+		String sercet ="509369090e4fd3fea899c6d15bc61740a41f81ed";
+		String url =  "https://api.convertlab.com/security/accesstoken";
 		String retunrstr = SendUtils.sendGet(url,"grant_type=client_credentials&appid="+appid+"&secret="+sercet+"");
 		// 发送get请求,通过appid和sercet获取accesstoken.
 		// retunrstr ="{\"error_code\":0,\"access_token\":\"123\"}";
@@ -199,7 +199,7 @@ public class StressCustomerTest {
 	
 	
 	public static String createCustomerEvent(Map<String, Object> map,String access_token ){
-		String url =  "http://api.convertwork.cn/v1/customerevents?access_token=" + access_token;
+		String url =  "https://api.convertlab.com/v1/customerevents?access_token=" + access_token;
 			JSONObject obj = new JSONObject();
 			obj.put("customerId", map.get("customerId"));
 			obj.put("date", map.get("date"));
@@ -219,7 +219,6 @@ public class StressCustomerTest {
 			b = false;
 		}
     	return b;
-    	
     }
     
     public static String getwanttime(String time){
