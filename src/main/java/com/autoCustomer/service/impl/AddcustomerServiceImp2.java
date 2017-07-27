@@ -263,10 +263,6 @@ public class AddcustomerServiceImp2 implements AddcustomerService {
         	datejointime = percentageService.getRanCreateTime();
         }
  
-        if(datejointime.contains("2017-07")){
-        	System.out.println("-----------------------------------------");
-        	
-        }
 		cust.put("email", MessageUtil.getEmail(6,9));
 		cust.put("dateJoin", datejointime); //客户的创建时间
 		cust.put("img", getImage());
@@ -613,11 +609,26 @@ public class AddcustomerServiceImp2 implements AddcustomerService {
 				String dimensionkey = deTagList.getDimensionkey();
 				if(!hadtagdemendions.contains(dimensionkey)){
 					DeTagList addtag = taglistdao.selectTagListCheckDidHad(dimensionkey);
+					String dimensionKey = addtag.getDimensionkey();
 					JSONObject obj = new JSONObject();
 					obj.put("name", addtag.getTagname());
-					obj.put("dimensionKey", addtag.getDimensionkey());
+					obj.put("dimensionKey", dimensionKey);
 					String addlisturl = domain+"/v1/tagdimensions?access_token=" + access_token;
 					String returnCode = SendUtils.post(addlisturl, obj.toString());
+					//给系统中没有的标签群组添加完群组后,添加该群组对应的标签
+					List<DeTag> dimensiontags = tagdao.selectAllTagHavingSameDemension(dimensionKey);
+					if(dimensiontags.size()>0){
+						String addtagurl = domain+"/v1/tags"+ "?access_token=" + access_token;
+						for (DeTag deTag : dimensiontags) {
+							JSONObject tag = new JSONObject();
+							tag.put("name",deTag.getTagname());
+							tag.put("dimension",deTag.getDimension());
+							String addtagreturnCode = SendUtils.post(addtagurl, tag.toString());
+							returnarr.add(addtagreturnCode);
+							
+						}
+					}
+					
 					returnarr.add(returnCode);
 				}
 			}
@@ -628,6 +639,7 @@ public class AddcustomerServiceImp2 implements AddcustomerService {
 	
 	/**
 	 * 创建客户标签群组
+	 * 并把标签放入对应的标签群组中
 	 * @return
 	 */
 	public  String createTagList(String access_token){
@@ -637,9 +649,23 @@ public class AddcustomerServiceImp2 implements AddcustomerService {
 		List<String> returnarr = new ArrayList<String>();
 		for (DeTagList deTagList : taglists) {
 			JSONObject taglistjson = new JSONObject();
+			String dimension = deTagList.getDimensionkey();//通过dimension获得数据库中所有赌赢dimension的标签
 			taglistjson.put("name", deTagList.getTagname());
-			taglistjson.put("dimensionKey", deTagList.getDimensionkey());
+			taglistjson.put("dimensionKey", dimension);
 			String returnCode = SendUtils.post(url, taglistjson.toString());
+			List<DeTag> dimensiontags = tagdao.selectAllTagHavingSameDemension(dimension);
+			if(dimensiontags.size()>0){
+				String addtagurl = domain+"/v1/tags"+ "?access_token=" + access_token;
+				for (DeTag deTag : dimensiontags) {
+					JSONObject tag = new JSONObject();
+					tag.put("name",deTag.getTagname());
+					tag.put("dimension",deTag.getDimension());
+					String addtagreturnCode = SendUtils.post(addtagurl, tag.toString());
+					returnarr.add(addtagreturnCode);
+					
+				}
+			}
+	
 			returnarr.add(returnCode);
 		}
 		return returnarr.toString();
