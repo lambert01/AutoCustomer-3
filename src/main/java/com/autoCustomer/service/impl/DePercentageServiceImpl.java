@@ -256,7 +256,7 @@ public class DePercentageServiceImpl implements DePercentageService{
 		    Calendar c = Calendar.getInstance();
 		    SimpleDateFormat sim = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		    c.setTime(date);
-		    c.add(Calendar.DAY_OF_MONTH, -1);
+		    c.add(Calendar.DAY_OF_MONTH, -30);
 		    date = c.getTime();
 		    c.setTime(date);
 		    if(ranNum >=0.0 && ranNum <= 0.4){
