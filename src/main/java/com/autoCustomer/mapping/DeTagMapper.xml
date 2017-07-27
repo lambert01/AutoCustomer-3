@@ -90,4 +90,10 @@
     select count(*)
     from de_tag where relation = #{relation,jdbcType=INTEGER}
   </select>
+  
+      <select id="selectAllTagHavingSameDemension" resultMap="BaseResultMap" parameterType="java.lang.String">
+    select 
+    <include refid="Base_Column_List" />
+    from de_tag where dimension = #{dimension,jdbcType=VARCHAR}
+  </select>
 </mapper>
