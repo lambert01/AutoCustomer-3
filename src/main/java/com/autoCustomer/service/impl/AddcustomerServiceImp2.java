@@ -89,6 +89,7 @@ public class AddcustomerServiceImp2 implements AddcustomerService {
 	private static final String APPID = "appid_";
 	private static final String SERCET = "sercet_";
 	private static final String ORDERCOUNT = "orderCount"; //订单数量区间
+	private static final String PRODUCTCOUNT = "productCount"; //产品数量区间
 
 	@Override
 	public String addcustomer(String username,String accessToken){
@@ -151,41 +152,33 @@ public class AddcustomerServiceImp2 implements AddcustomerService {
 		}
  
 		// 开始配置标签
-	//	deleteAllTag(accessToken); //在开始之前删除所有的标签
-		//String tagrelistturn = gettaglist(accessToken);
-		//returnjson.put("标签群组", tagrelistturn);
 		String accountLevel = "";
 		String cityLevel = "";
 		if(hasOrder == 1){
-			Double allamountPaid = 0d;
+			//发送订单并返回客户级别
+			accountLevel = senddeals(customeid,accessToken,ordertime,accountLevel,1,returnjson);
+		}
+		
+		if(hasOrder > 1){
 			String ordercountstr = getPropertyInfo(ORDERCOUNT);
 			if(ordercountstr == null || "".equals(ordercountstr)){
-				ordercountstr = "10";
+				ordercountstr = "20";
 			}
-			int ordecount = Integer.parseInt(ordercountstr);
+			int ordecount = 1;
+			try {
+				ordecount = Integer.parseInt(ordercountstr);
+			} catch (NumberFormatException e) {
+				ordecount = 1;
+			}
 			int realordecount = (int)(Math.random()*ordecount);
 			if(realordecount == 0){
 				realordecount = 1;
 			}
-			
-			for (int i = 0; i < realordecount; i++){
-				List<DeProducts> products = getproducts();
-				String returndeal = addcustomerDeals(customeid,accessToken,products,ordertime);
-				System.out.println("创建订单返回的 " + returndeal);
-				
-				returnjson.put("订单", JSONObject.fromObject(returndeal));
-				JSONObject returndealobj = JSONObject.fromObject(returndeal);
-				
-				Double amountPaid = Double.parseDouble(returndealobj.get("amountPaid").toString());
-				allamountPaid += amountPaid; //有多个订单,计算多个订单的总价
-			}
-			
-			accountLevel = accountleveldao.selectLevelByAccount(allamountPaid);
-			if(accountLevel == null || "".equals(accountLevel)){
-				accountLevel = accountleveldao.selectMaxLevel(allamountPaid);
-			}
+			//是复购客户,再次购买
+			accountLevel = senddeals(customeid,accessToken,ordertime,accountLevel,realordecount,returnjson);
 			
 		}
+		
 		cityLevel = cityleveldao.selectLevelBycity(city);
 		if(cityLevel == null || "".equals(cityLevel)){
 			cityLevel = "三四线城市";
@@ -202,6 +195,40 @@ public class AddcustomerServiceImp2 implements AddcustomerService {
 		
 		returnjson.put("标签", listtag);
 		return returnjson.toString();
+	}
+	
+	/**
+	 * 发送订单,并计算是白领还是金领,蓝领
+	 * 返回的是白领级别,String类型的需要返回重新赋值
+	 * @param customeid
+	 * @param accessToken
+	 * @param ordertime
+	 * @param accountLevel
+	 * @param returnjson
+	 */
+	public String senddeals(String customeid,String accessToken,String ordertime,String accountLevel,int realordecount,JSONObject returnjson){
+		Double allamountPaid = 0d;
+		String addordertime = ordertime;
+
+		for (int i = 0; i < realordecount; i++){
+			addordertime = paserUtcTime(addordertime);
+			List<DeProducts> products = getproducts();
+			String returndeal = addcustomerDeals(customeid,accessToken,products,addordertime);
+			System.out.println("创建订单返回的 " + returndeal);
+			
+			returnjson.put("订单", JSONObject.fromObject(returndeal));
+			JSONObject returndealobj = JSONObject.fromObject(returndeal);
+			
+			Double amountPaid = Double.parseDouble(returndealobj.get("amountPaid").toString());
+			allamountPaid += amountPaid; //有多个订单,计算多个订单的总价
+		}
+		
+		accountLevel = accountleveldao.selectLevelByAccount(allamountPaid);
+		if(accountLevel == null || "".equals(accountLevel)){
+			accountLevel = accountleveldao.selectMaxLevel(allamountPaid);
+		}
+		return accountLevel;
+		
 	}
 
 	/**
@@ -451,6 +478,20 @@ public class AddcustomerServiceImp2 implements AddcustomerService {
 		List<DeProducts> products = productdao.selectProduct();
 		//int selected = (int) ((Math.random() * 5) + 1);// 返回随机数量的商品
 		int selected = 1;
+		String productcount = getPropertyInfo(PRODUCTCOUNT);
+		if(productcount != null && !"".equals(productcount)){
+			try {
+				int count = Integer.parseInt(productcount);
+				selected = (int)(Math.random() * count);
+				if(selected == 0){
+					selected =1;
+				}
+			} catch (NumberFormatException e) {
+				selected = 1;
+			}
+			
+		}
+
 		List<DeProducts> reList = new ArrayList<DeProducts>();
 
 		Random random = new Random();
