@@ -43,10 +43,10 @@ public class StressProductTest {
 			String productQuantity ="";
 			String amountDiscount ="";
 			try {
-				productName = "'"+strs[0].trim()+"'";
-				productPrice = "'"+strs[1].trim()+"'";
-				productQuantity = "'"+strs[3].trim()+"'";
-				amountDiscount = "'"+strs[5].trim()+"'";
+				productName = "'"+strs[0].trim().replaceAll("\"","")+"'";
+				productPrice = "'"+strs[1].trim().replaceAll("\"","")+"'";
+				productQuantity = "'"+strs[3].trim().replaceAll("\"","")+"'";
+				amountDiscount = "'"+strs[5].trim().replaceAll("\"","")+"'";
 			} catch (Exception e1) {
 			 
 			 
