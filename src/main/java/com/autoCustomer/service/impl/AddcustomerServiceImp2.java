@@ -91,27 +91,10 @@ public class AddcustomerServiceImp2 implements AddcustomerService {
 	private static final String ORDERCOUNT = "orderCount"; //订单数量区间
 
 	@Override
-	public String addcustomer(String username){
+	public String addcustomer(String username,String accessToken){
 		JSONObject returnjson = new JSONObject();
 		String domain = getPropertyInfo(DOMIAN_NAME);
-		String appid = getPropertyInfo(APPID+username);
-		if(appid == null || "".equals(appid)){
-			returnjson.put("error","没有对应的appid");
-			return returnjson.toString();
-		}
-		String sercet = getPropertyInfo(SERCET+username);
-		if(sercet == null || "".equals(sercet)){
-			returnjson.put("error","没有对应的sercet");
-			return returnjson.toString();
-		}
-		//给客户添加事件时用,因为不同的使用者想要的事件的targetid和targetname可能是不同的
-		
-		// appid.String accessToken =  getAccessToken("cl02dd15a2228ee92","ce2f7581f4203b257ed5687c2e2106c3978a93be");
-		String accessToken = getAccessToken(appid, sercet);
-		if("".equals(accessToken)){
-			returnjson.put("error","没有对应的accesstoken");
-			return returnjson.toString();
-		}
+
 		String url = domain + "/v1/customerandidentities?access_token=" + accessToken;
 		JSONObject customer = getcustomer();
 		Map<String,Object> stagemap = percentageService.getCurrentStage();
@@ -168,9 +151,9 @@ public class AddcustomerServiceImp2 implements AddcustomerService {
 		}
  
 		// 开始配置标签
-		deleteAllTag(accessToken); //在开始之前删除所有的标签
-		String tagrelistturn = gettaglist(accessToken);
-		returnjson.put("标签群组", tagrelistturn);
+	//	deleteAllTag(accessToken); //在开始之前删除所有的标签
+		//String tagrelistturn = gettaglist(accessToken);
+		//returnjson.put("标签群组", tagrelistturn);
 		String accountLevel = "";
 		String cityLevel = "";
 		if(hasOrder == 1){
@@ -226,8 +209,18 @@ public class AddcustomerServiceImp2 implements AddcustomerService {
 	 * @param appid
 	 * @param sercet
 	 */
-	private String getAccessToken(String appid,String sercet){
+	@Override
+	public String getAccessToken(String username){
+		String appid = getPropertyInfo(APPID+username);
+		 String sercet = getPropertyInfo(SERCET+username);
 		String domain = getPropertyInfo(DOMIAN_NAME);
+		if(appid == null || "".equals(appid)){
+			return "";
+		}
+		if(sercet == null || "".equals(sercet)){
+			return "";
+		}
+		
 		String url = domain + "/security/accesstoken";
 		String retunrstr = SendUtils.sendGet(url,"grant_type=client_credentials&appid="+appid+"&secret="+sercet+"");
 		// 发送get请求,通过appid和sercet获取accesstoken.
@@ -588,12 +581,14 @@ public class AddcustomerServiceImp2 implements AddcustomerService {
 	 * 在创建标签群组前删除所有的标签
 	 * @return
 	 */
-	public void deleteAllTag(String access_token){
+	public void deleteAllTag(String access_token){/*
 		String domain = getPropertyInfo(DOMIAN_NAME);
 		String queryurl =domain+"/v1/tags";
-		String json = SendUtils.sendGet(queryurl,"access_token="+access_token+"&rows=100");
-		JSONObject customerjson = JSONObject.fromObject(json);
-		JSONArray arr = customerjson.getJSONArray("rows");
+		String json = SendUtils.sendGet(queryurl,"access_token="+access_token+"&rows=10");
+		System.out.println("返回的json是"+json);
+	 
+		JSONObject tagsjson = JSONObject.fromObject(json);
+		JSONArray arr = tagsjson.getJSONArray("rows");
 		System.out.println(arr.size());
 		for (Object object : arr) {
 			JSONObject tag = JSONObject.fromObject(object);
@@ -607,13 +602,14 @@ public class AddcustomerServiceImp2 implements AddcustomerService {
 		}
 	
 		
-	}
+	*/}
 	
 	/**
 	 * 创建标签前先检查群组是否创建
 	 * @param access_token
 	 * @return
 	 */
+	@Override
 	public String gettaglist(String access_token){
 		String domain = getPropertyInfo(DOMIAN_NAME);
 		String url =domain+"/v1/tagdimensions" ;
@@ -776,7 +772,8 @@ public class AddcustomerServiceImp2 implements AddcustomerService {
 	 * 获取配置数据
 	 * @param kind
 	 */
-	private String getPropertyInfo(String kind){
+	@Override
+	public String getPropertyInfo(String kind){
 		List<String> list = dePropertiesInfoDao.selectPropertyInfoByKind(kind);
 		if(list != null && list.size() > 0){
 			return list.get(0);
