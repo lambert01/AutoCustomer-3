@@ -1,6 +1,8 @@
 package com.autoCustomer.service.impl;
 
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -166,6 +168,7 @@ public class AddcustomerServiceImp2 implements AddcustomerService {
 		}
  
 		// 开始配置标签
+		deleteAllTag(accessToken); //在开始之前删除所有的标签
 		String tagrelistturn = gettaglist(accessToken);
 		returnjson.put("标签群组", tagrelistturn);
 		String accountLevel = "";
@@ -582,6 +585,31 @@ public class AddcustomerServiceImp2 implements AddcustomerService {
 	}
 	
 	/**
+	 * 在创建标签群组前删除所有的标签
+	 * @return
+	 */
+	public void deleteAllTag(String access_token){
+		String domain = getPropertyInfo(DOMIAN_NAME);
+		String queryurl =domain+"/v1/tags";
+		String json = SendUtils.sendGet(queryurl,"access_token="+access_token+"&rows=100");
+		JSONObject customerjson = JSONObject.fromObject(json);
+		JSONArray arr = customerjson.getJSONArray("rows");
+		System.out.println(arr.size());
+		for (Object object : arr) {
+			JSONObject tag = JSONObject.fromObject(object);
+			String id = tag.get("id").toString();
+			String deleteurl =domain+"/v1/tags/"+id;
+			  try {
+				  doDelete(deleteurl,"access_token="+access_token);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	
+		
+	}
+	
+	/**
 	 * 创建标签前先检查群组是否创建
 	 * @param access_token
 	 * @return
@@ -608,6 +636,7 @@ public class AddcustomerServiceImp2 implements AddcustomerService {
 			for(DeTagList deTagList : taglists){
 				String dimensionkey = deTagList.getDimensionkey();
 				if(!hadtagdemendions.contains(dimensionkey)){
+					//hadtagdemendions中保存的是系统中的标签群组
 					DeTagList addtag = taglistdao.selectTagListCheckDidHad(dimensionkey);
 					String dimensionKey = addtag.getDimensionkey();
 					JSONObject obj = new JSONObject();
@@ -630,6 +659,19 @@ public class AddcustomerServiceImp2 implements AddcustomerService {
 					}
 					
 					returnarr.add(returnCode);
+				}else{
+					//系统中有的群组,已经被清空,重新添加标签
+					List<DeTag> dimensiontags = tagdao.selectAllTagHavingSameDemension(dimensionkey);
+					if(dimensiontags.size()>0){
+						String addtagurl = domain+"/v1/tags"+ "?access_token=" + access_token;
+						for (DeTag deTag : dimensiontags) {
+							JSONObject tag = new JSONObject();
+							tag.put("name",deTag.getTagname());
+							tag.put("dimension",deTag.getDimension());
+							String addtagreturnCode = SendUtils.post(addtagurl, tag.toString());
+							returnarr.add(addtagreturnCode);
+						}
+					}
 				}
 			}
 		}
@@ -749,8 +791,8 @@ public class AddcustomerServiceImp2 implements AddcustomerService {
 	 */
 	private String paserUtcTime(String time){
 		int mintime = (int)(Math.random()*300);
-		if(mintime <10){
-			mintime = 10;
+		if(mintime <5){
+			mintime = 5;
 		}
 		Date date = null;
 		SimpleDateFormat df1 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
@@ -766,5 +808,25 @@ public class AddcustomerServiceImp2 implements AddcustomerService {
 		String returndate = df1.format(ca.getTime());
 		return returndate;
 	}
+	
+    public static void doDelete(String urlStr,String acctoken) throws Exception{  
+        
+        urlStr +="?"+acctoken;  
+    System.out.println(urlStr);  
+    URL url = new URL(urlStr);  
+    HttpURLConnection conn = (HttpURLConnection)url.openConnection();  
+    conn.setDoOutput(true);  
+    conn.setRequestMethod("DELETE");  
+    //屏蔽掉的代码是错误的，java.net.ProtocolException: HTTP method DELETE doesn't support output  
+/*      OutputStream os = conn.getOutputStream();      
+    os.write(paramStr.toString().getBytes("utf-8"));      
+    os.close();  */   
+      
+    if(conn.getResponseCode() ==200){  
+        System.out.println("成功");  
+    }else{  
+        System.out.println(conn.getResponseCode());  
+    }  
+} 
 	
 }
