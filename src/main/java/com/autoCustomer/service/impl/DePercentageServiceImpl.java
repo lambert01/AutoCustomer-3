@@ -2,6 +2,7 @@ package com.autoCustomer.service.impl;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -24,6 +25,7 @@ public class DePercentageServiceImpl implements DePercentageService{
 	@Resource
 	private DePercentageMapper dePercentageMapper;
 	
+	private final static int time = 90;
 	
 	
 	public Map<String, Object> getCurrentStage() {
@@ -244,6 +246,36 @@ public class DePercentageServiceImpl implements DePercentageService{
 		    int num = ran.nextInt(60);
 		    String strTime = str[num];
 		    return strTime;
+		  }
+		
+		public  String frontPercentage(){
+			double ranNum = getNum(2);
+		    Random ran = new Random();
+		    int num = ran.nextInt(91);
+		    Date date = new Date();
+		    Calendar c = Calendar.getInstance();
+		    SimpleDateFormat sim = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		    c.setTime(date);
+		    c.add(Calendar.DAY_OF_MONTH, -1);
+		    date = c.getTime();
+		    c.setTime(date);
+		    if(ranNum >=0.0 && ranNum <= 0.4){
+		      c.add(Calendar.DAY_OF_MONTH, -(time+num));
+		    }else{
+		      c.add(Calendar.DAY_OF_MONTH, -num);
+		    }
+		    date = c.getTime();
+		    String createTime ="";
+			 SimpleDateFormat df1 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+			 df1.setTimeZone(TimeZone.getTimeZone("UTC"));
+			 try {
+				  createTime = df1.format(date);
+			} catch (Exception e) {
+				createTime = null;
+			}
+			 return createTime;
+		  //  String dateStr = sim.format(date);
+		  //  return dateStr;
 		  }
 		
 }
