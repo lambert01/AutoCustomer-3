@@ -20,7 +20,6 @@ import net.sf.json.JSONObject;
 @Controller
 @RequestMapping("/demo")
 public class CustomerController {
-
 	
 	@Autowired
 	private DePercentageService percentageService;
@@ -65,9 +64,22 @@ public class CustomerController {
 		if(size <= 0){
 			size = 1;
 		}
+		String  token = addcustomerService2.getAccessToken(username);
+		
+		if(token == null || "".equals(token)){
+			return "没有对应的token";
+		}
+		
+		addcustomerService2.gettaglist(token);
+		
+		int countsize = 0;
 		for (int i = 0; i < size; i++) { 
 			
-			String mes = addcustomerService2.addcustomer(username);
+			String mes = addcustomerService2.addcustomer(username,token);
+			countsize++;
+			if(countsize == 500){
+				token = addcustomerService2.getAccessToken(username);
+			}
 			arr.add(mes);
 		}
 		String retnemmes = arr.toString();
