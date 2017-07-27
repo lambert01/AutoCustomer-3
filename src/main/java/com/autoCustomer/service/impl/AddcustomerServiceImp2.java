@@ -256,7 +256,7 @@ public class AddcustomerServiceImp2 implements AddcustomerService {
 		
         String datejointime = percentageService.getRanCreateTime();
         while(datejointime == null){
-        	datejointime = percentageService.getRanCreateTime();
+        	datejointime = percentageService.frontPercentage();
         }
  
 		cust.put("email", MessageUtil.getEmail(6,9));
