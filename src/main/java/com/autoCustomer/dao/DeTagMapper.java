@@ -15,6 +15,9 @@ public interface DeTagMapper {
     
     //搜索所有的标签
     List<DeTag> selectAllTag();
+    
+    //搜索所有的有相同分组关系的标签
+    List<DeTag> selectAllTagHavingSameDemension(String dimension);
 
     int updateByPrimaryKeySelective(DeTag record);
     
