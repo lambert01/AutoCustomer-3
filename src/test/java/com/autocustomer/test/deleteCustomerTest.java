@@ -12,11 +12,12 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 public class deleteCustomerTest {
+	static String domian = "https://api.convertlab.com/";
 	static String getaccessToken(){
 
-		String url ="http://api.convertwork.cn/security/accesstoken";
-		String appid ="cl029015d6ef5320a";
-		String sercet ="ddb6172910bd7c59f2c083a11fcd72752d363995";
+		String url =domian+"security/accesstoken";
+		String appid ="cl017715d7e3d57c4";
+		String sercet ="46e364854f61686f7ca5fbee0961298515656f7f";
 		String retunrstr = SendUtils.sendGet(url,"grant_type=client_credentials&appid="+appid+"&secret="+sercet+"");
 		// 发送get请求,通过appid和sercet获取accesstoken.
 		// retunrstr ="{\"error_code\":0,\"access_token\":\"123\"}";
@@ -34,8 +35,8 @@ public class deleteCustomerTest {
 	
 	static void deletecustomer() throws IOException{
 		String accesstoken = getaccessToken();
-		String queryurl ="http://api.convertwork.cn/v1/customers";
-		String json = SendUtils.sendGet(queryurl,"access_token="+accesstoken+"&rows=1000");
+		String queryurl =domian+"v1/customers";
+		String json = SendUtils.sendGet(queryurl,"access_token="+accesstoken+"&rows=7000");
 		JSONObject customerjson = JSONObject.fromObject(json);
 		JSONArray arr = customerjson.getJSONArray("rows");
 		System.out.println(arr.size());
@@ -43,7 +44,7 @@ public class deleteCustomerTest {
 			JSONObject cust = JSONObject.fromObject(object);
 			String id = cust.get("id").toString();
 			System.out.println(id);
-			String deleteurl ="http://api.convertwork.cn/v1/customers/"+id;
+			String deleteurl =domian+"v1/customers/"+id;
 			  try {
 				  doDelete(deleteurl,"access_token="+accesstoken);
 			} catch (Exception e) {
