@@ -1,7 +1,5 @@
 package com.autocustomer.test;
 
-import java.util.Random;
-
 import com.autoCustomer.util.MessageUtil;
 import com.autoCustomer.util.SendUtils;
 import com.google.gson.JsonObject;
@@ -13,56 +11,29 @@ import net.sf.json.JSONObject;
  * Created by house on 17-5-15.
  */
 public class OpenApiTest {
-	public static void main(String[] args) {/*JSONObject order = new JSONObject();
-	 JSONArray lines = new JSONArray();
-	 for (int i = 0; i < 1; i++) {
-		 JSONObject product = new JSONObject();
-		 product.put("productName", "");
-		 product.put("productId", "");
-		 product.put("skuId", "");
-		 product.put("category", "");
-		 product.put("qty", "");
-		 product.put("priceUnit", "");
-		 product.put("priceSubTotal", "");
-		 lines.add(product);
+	public static void main(String[] args) {
+		String accessToken = getAccessToken("cl029015d6ef5320a", "ddb6172910bd7c59f2c083a11fcd72752d363995");
+
+
+		String url = "http://api.convertwork.cn/v1/tagdimensions";
+		String param = "access_token=" + accessToken;
+		String returncode = SendUtils.sendGet(url, param);
+		System.out.println(returncode);
+		JSONArray arrs = JSONArray.fromObject(returncode);
+		System.out.println(arrs.size());
+		for (Object object : arrs) {
+			JSONObject taglist = JSONObject.fromObject(object);
+			String str = taglist.get("dimensionKey").toString();
+			System.out.println(str);
+			
+		}
+		
+		
+	
+		
+	
 		
 	}
-	 order.put("customerId", "");
-	 order.put("orderNo", "");
-	 order.put("amountTotal", "");
-	 order.put("amountPaid", "");
-	 order.put("amountDiscount", "");
-	 order.put("counponCode", "");
-	 order.put("groupId", "");
-	 order.put("paymentTerm", "");
-	 order.put("paymentNo", "");
-	 order.put("type", "");
-	 order.put("dateOrder", "");
-	 order.put("store", "");
-	 order.put("salesChannel", "");
-	 order.put("shippingMethod", "");
-	 order.put("contactName", "");
-	 order.put("contactTel", "");
-	 order.put("shippingProvince", "");
-	 order.put("shippingCity", "");
-	 order.put("shippingCounty", "");
-	 order.put("shippingStreet", "");
-	 order.put("shippingAddress", "");
-	 order.put("lines", lines);
-	 System.out.println(order.toString());
-	 
-	 */
-		//addcustomer();
-		StringBuilder str=new StringBuilder();//定义变长字符串
-		Random random=new Random();
-		//随机生成数字，并添加到字符串
-		for(int i=0;i<18;i++){
-		    str.append(random.nextInt(10));
-		}
-		//将字符串转换为数字并输出
-		String num=str.toString();
-		System.out.println(num);
-		}
 	
   
 	public static String addcustomer() {
