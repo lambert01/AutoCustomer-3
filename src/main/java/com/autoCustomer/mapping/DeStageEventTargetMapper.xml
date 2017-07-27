@@ -140,6 +140,14 @@
     where   stageId is null 
   </select>
   
+  <!-- 查询指定阶段对应的事件 -->
+   <select id="selectEventstageEvent" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+    select 
+    <include refid="Base_Column_List" />
+    from de_stage_event_target
+    where   stageId = #{stageid,jdbcType=INTEGER}
+  </select>
+  
    <select id="selectCountSize" resultType="java.lang.Integer" parameterType="java.lang.Integer">
     select count(*)
     from de_stage_event_target where isMultiselect = #{ismultiselect,jdbcType=INTEGER}
