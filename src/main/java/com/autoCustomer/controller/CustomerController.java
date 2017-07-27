@@ -1,6 +1,5 @@
 package com.autoCustomer.controller;
 
-import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
