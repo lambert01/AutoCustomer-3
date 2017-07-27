@@ -33,12 +33,14 @@ public class CustomerController {
 		JSONObject json = new JSONObject();
 		//response.setContentType("application/json;charset=UTF-8");
 		response.setHeader("Content-Type", "application/xml; charset=UTF-8");  
-		String createTime = percentageService.getRanCreateTime();
+		String createTime = percentageService.frontPercentage();
+		System.out.println("客户的创建时间是"+createTime);
 		System.out.println("createTime:"+createTime);
 		for (int i = 0; i < 10; i++) {
 			Map<String, Object> currentStages = percentageService.getCurrentStage();
 			String meaage = currentStages.get("message").toString();
 			System.out.println("客户状态是 "+meaage);
+			percentageService.getRanCreateTime();
 		}
 		
 		//System.out.println("currentStage:"+currentStage);
