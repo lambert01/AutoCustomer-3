@@ -16,8 +16,8 @@ public class deleteCustomerTest {
 	static String getaccessToken(){
 
 		String url =domian+"security/accesstoken";
-		String appid ="cl017715d7e3d57c4";
-		String sercet ="46e364854f61686f7ca5fbee0961298515656f7f";
+		String appid ="cl02d515d8356ee74";
+		String sercet ="6b1d3f8573d3cb325b58cad72856b278715e2278";
 		String retunrstr = SendUtils.sendGet(url,"grant_type=client_credentials&appid="+appid+"&secret="+sercet+"");
 		// 发送get请求,通过appid和sercet获取accesstoken.
 		// retunrstr ="{\"error_code\":0,\"access_token\":\"123\"}";
