@@ -72,8 +72,7 @@ public class SendUtils {
                     logger.info(key + "--->" + map.get(key));
                 }
                 // 定义 BufferedReader输入流来读取URL的响应
-                inpo = new BufferedReader(new InputStreamReader(
-                        connection.getInputStream()));
+                inpo = new BufferedReader(new InputStreamReader(connection.getInputStream(),"UTF-8"));
                 String line;
                 while ((line = inpo.readLine()) != null) {
                     result += line;
