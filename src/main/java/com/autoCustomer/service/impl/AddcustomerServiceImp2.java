@@ -309,7 +309,6 @@ public class AddcustomerServiceImp2 implements AddcustomerService {
 		}
 		
 		String url = domain + "/security/accesstoken";
-		System.out.println("url is "+url);
 		String retunrstr = SendUtils.sendGet(url,"grant_type=client_credentials&appid="+appid+"&secret="+sercet+"");
 		// 发送get请求,通过appid和sercet获取accesstoken.
 		// retunrstr ="{\"error_code\":0,\"access_token\":\"123\"}";
