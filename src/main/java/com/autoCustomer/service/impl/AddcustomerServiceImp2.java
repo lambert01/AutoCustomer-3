@@ -160,7 +160,7 @@ public class AddcustomerServiceImp2 implements AddcustomerService {
 			//是复购客户,在重复购买订单之前发送浏览页面,加入购物车事件,在重复购买订单发送后发送复购事件
 			Map<String, Object> repeatebuymap = new HashMap<String, Object>();
 			List<DeStageEventTarget>  repeatebuystagevents = eventdao.selectEventstageEvent(stageid); //只是复购阶段的事件
-			List<DeStageEventTarget>  beforerepeatebuystagevents = eventdao.selectEventstageEvent(stageid-2); //复购阶段之前的事件
+			List<DeStageEventTarget>  beforerepeatebuystagevents = eventdao.selectEventstageEvent(stageid-2); //复购阶段之前2阶段的事件
 			repeatebuymap.put("repeatebuystagevents", repeatebuystagevents);
 			repeatebuymap.put("beforerepeatebuystagevents", beforerepeatebuystagevents);
 			String ordercountstr = getPropertyInfo(ORDERCOUNT);
@@ -203,7 +203,6 @@ public class AddcustomerServiceImp2 implements AddcustomerService {
 	
 	/**
 	 * 发送订单,并计算是白领还是金领,蓝领
-	 * 返回的是白领级别,String类型的需要返回重新赋值
 	 * @param customeid
 	 * @param accessToken
 	 * @param ordertime
