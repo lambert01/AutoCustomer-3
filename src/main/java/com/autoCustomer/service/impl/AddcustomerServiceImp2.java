@@ -109,15 +109,18 @@ public class AddcustomerServiceImp2 implements AddcustomerService {
 		//这是针对A类客户,有复购行为,事件发生在购买之后
 		boolean isRepeateBuy = false;
 		//stage = "复购客户";
-		//stageid = 30;
+	   //stageid = 29;
 		if("复购客户".equals(stage)){
+			//复购的行为发生在购买商品之后,状态减1的事件发生在购买之前,购买后再补上复购事件
 			stageid = stageid-1;
 			isRepeateBuy = true;
-			
 		}
-
-		List<DeStageEventTarget> stageevents = eventdao.selectEventsByStage(stageid); //所有的符合状态的事件都被搜索出来了,有的事件是多选一,过滤一下
-		List<DeStageEventTarget> stageeventselecteds = getWantedDeEvent(stageevents); //对查询出的事件处理,随机排除并列的事件
+        
+		
+		List<DeStageEventTarget> stageevents = eventdao.selectEventsByStage(stageid); 
+		//所有的符合状态的事件都被搜索出来了,有的事件是多选一,过滤一下
+		List<DeStageEventTarget> stageeventselecteds = getWantedDeEvent(stageevents); 
+		//对查询出的事件处理,随机排除并列的事件
 
 		
 		customer.put("stage", stage);
@@ -133,8 +136,11 @@ public class AddcustomerServiceImp2 implements AddcustomerService {
 		returnjson.put("创建时间", dateJoin);
 		returnjson.put("来源", returnobj.getString("source"));
 		String city = returnobj.getString("city");
+		//开始创建客户事件
 		String ordertime = createCustomerEvent(customeid,accessToken,dateJoin,stageeventselecteds,returnjson);
 		ordertime = paserUtcTime(ordertime);
+		
+		//开始查询状态对应的订单有无,多少,恢复真实的阶段
 		if(isRepeateBuy){
 			stageid+=1;
 		}
@@ -268,10 +274,7 @@ public class AddcustomerServiceImp2 implements AddcustomerService {
 					obj.put("targetName", targetname);
 					String returnstr = SendUtils.post(url, obj.toString());
 					System.out.println("创建复购事件返回的是"+returnstr);
-					
-				
 			}
-			
 			
 			returnjson.put("订单", JSONObject.fromObject(returndeal));
 			JSONObject returndealobj = JSONObject.fromObject(returndeal);
@@ -394,50 +397,18 @@ public class AddcustomerServiceImp2 implements AddcustomerService {
 		List<DeStageEventTarget> unrelatedevents = eventdao.selectUnRelatedStageEvent(); //这是与状态无关的事件,随机推送
 		String domain = getPropertyInfo(DOMIAN_NAME);
 		String url = domain + "/v1/customerevents?access_token=" + access_token;
-		
-		List<DeEventTag> eventtags = eventtagdao.selectAllEventTag(); //查询内容标签;
-		
-		JSONArray enventarr = new JSONArray();
 		String differentTime = dateTime;
-		int eventsize = unrelatedevents.size();
-		int index = (int) (Math.random() * eventsize);
-		DeStageEventTarget event = unrelatedevents.get(index);
-		Integer relatedId = event.getIsrelated();
-		if(relatedId != null && relatedId != 0){
-			//当前事件与其它事件有关联,关联事件要先发生,该事件才能后发生
-			differentTime = paserUtcTime(differentTime);
-			DeStageEventTarget relatedevent = eventdao.selectByPrimaryKey(relatedId);
-			//这个related就是关联事件的eventid
-	 
-			 
-		 
-			JSONObject obj = new JSONObject();
-			obj.put("customerId", customerId);
-			obj.put("date", differentTime);
-			obj.put("event", relatedevent.getEvent());
-			obj.put("targetId", relatedevent.getTargetid());
-			obj.put("targetName", relatedevent.getTargetname());
-			String returnstr = SendUtils.post(url, obj.toString());
-			enventarr.add(JSONObject.fromObject(returnstr));
-			System.out.println("将客户绑定事件的json" + obj.toString());
-		}
-		
-		//如果没有关联的事件,直接推送事件
-
-		differentTime = paserUtcTime(differentTime);
-		JSONObject eventobj = new JSONObject();
-		eventobj.put("customerId", customerId);
-		eventobj.put("date", differentTime);
-		eventobj.put("event", event.getEvent());
-		eventobj.put("targetId", event.getTargetid());
-		eventobj.put("targetName", event.getTargetname());
-		String returnstr = SendUtils.post(url, eventobj.toString());
-		enventarr.add(JSONObject.fromObject(returnstr));
-		System.out.println("将客户绑定事件的json" + eventobj.toString());
-		
+		JSONArray enventarr = new JSONArray();
+		List<DeEventTag> eventtags = eventtagdao.selectAllEventTag(); //查询内容标签;
+		List<Integer> eventids = new ArrayList<Integer>();
 		for (DeStageEventTarget deStageEventTarget : events){
+			Integer stageid = deStageEventTarget.getStageid();
+			if(stageid != null){
+				Integer eventid = deStageEventTarget.getEventid();
+				eventids.add(eventid);
+			}
+
 			//循环与状态有关的事件,开始推送
-			 
 			String eventwechat = deStageEventTarget.getEvent();
 			if("subscribe".equals(eventwechat)){
               Map<String, Object> idmap = getwechatid(access_token);
@@ -460,7 +431,6 @@ public class AddcustomerServiceImp2 implements AddcustomerService {
   			enventarr.add(JSONObject.fromObject(returnstr1));
   			System.out.println("将客户绑定事件的json" + obj.toString());
   			continue;
-				
 			}
 
 			differentTime = paserUtcTime(differentTime); // 事件的发生时间不同
@@ -479,7 +449,50 @@ public class AddcustomerServiceImp2 implements AddcustomerService {
 			String returnstr1 = SendUtils.post(url, obj.toString());
 			enventarr.add(JSONObject.fromObject(returnstr1));
 			System.out.println("将客户绑定事件的json" + obj.toString());
+		
 		}
+		
+		int eventsize = unrelatedevents.size();
+		int index = (int) (Math.random() * eventsize);
+		DeStageEventTarget event = unrelatedevents.get(index);
+		Integer relatedId = event.getIsrelated();
+		if(relatedId != null && relatedId != 0){
+			if(!eventids.contains(relatedId)){
+				//如果要推送
+				//当前事件与其它事件有关联,关联事件要先发生,该事件才能后发生
+				//再推关联事件之前,先查一下该关联事件是否在必须推送的事件中,如果在,就不推了
+				//在推送过来的集合中查询一下,看看关联id在集合中是否有
+				
+				differentTime = paserUtcTime(differentTime);
+				DeStageEventTarget relatedevent = eventdao.selectByPrimaryKey(relatedId);
+				//这个related就是关联事件的eventid
+			 
+				JSONObject obj = new JSONObject();
+				obj.put("customerId", customerId);
+				obj.put("date", differentTime);
+				obj.put("event", relatedevent.getEvent());
+				obj.put("targetId", relatedevent.getTargetid());
+				obj.put("targetName", relatedevent.getTargetname());
+				String returnstr = SendUtils.post(url, obj.toString());
+				enventarr.add(JSONObject.fromObject(returnstr));
+				System.out.println("将客户绑定事件的json" + obj.toString());
+			}
+		
+		}
+		
+		//如果没有关联的事件,直接推送事件
+
+		differentTime = paserUtcTime(differentTime);
+		JSONObject eventobj = new JSONObject();
+		eventobj.put("customerId", customerId);
+		eventobj.put("date", differentTime);
+		eventobj.put("event", event.getEvent());
+		eventobj.put("targetId", event.getTargetid());
+		eventobj.put("targetName", event.getTargetname());
+		String returnstr = SendUtils.post(url, eventobj.toString());
+		enventarr.add(JSONObject.fromObject(returnstr));
+		System.out.println("将客户绑定事件的json" + eventobj.toString());
+		
 		returnjson.put("事件", enventarr);
 		return differentTime;
 	}
@@ -530,7 +543,6 @@ public class AddcustomerServiceImp2 implements AddcustomerService {
 	 */
 	private List<DeProducts> getproducts(){
 		List<DeProducts> products = productdao.selectProduct();
-		//int selected = (int) ((Math.random() * 5) + 1);// 返回随机数量的商品
 		int selected = 1;
 		String productcount = getPropertyInfo(PRODUCTCOUNT);
 		if(productcount != null && !"".equals(productcount)){
