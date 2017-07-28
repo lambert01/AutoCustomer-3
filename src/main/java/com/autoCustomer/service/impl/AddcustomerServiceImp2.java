@@ -881,10 +881,7 @@ public class AddcustomerServiceImp2 implements AddcustomerService {
     		JSONObject wechatjson = JSONObject.fromObject(object);
     		String id = wechatjson.get("id").toString();
     		String name = wechatjson.get("name").toString();
-    		try {
-				name = new String(name.getBytes("gbk"), "utf-8");
-			} catch (UnsupportedEncodingException e) {
-			}
+   
     		idmap.put("id", id);
     		idmap.put("name",name);
     	}
