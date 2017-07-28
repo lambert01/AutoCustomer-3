@@ -141,7 +141,7 @@ public class AddcustomerServiceImp2 implements AddcustomerService {
 		
 		//开始查询状态对应的订单有无,多少,恢复真实的阶段
 		if(isRepeateBuy){
-			stageid+=1;
+			stageid += 1;
 		}
 		Integer hasOrder = stageorderdao.selectByStageId(stageid);// 是否需要配置订单,状态为1需要配置订单
 		if(hasOrder == null){
@@ -179,13 +179,14 @@ public class AddcustomerServiceImp2 implements AddcustomerService {
 			}
 			//是复购客户,再次购买
 			accountLevel = senddeals(customeid,accessToken,ordertime,accountLevel,realordecount,returnjson,repeatebuymap);
-			
 		}
 		
 		cityLevel = cityleveldao.selectLevelBycity(city);
+		//查询城市级别,不是一二线的都按三四线城市算
 		if(cityLevel == null || "".equals(cityLevel)){
 			cityLevel = "三四线城市";
 		}
+		
 		String tagreturn = addCustomerTag(customeid,accessToken,cityLevel,accountLevel);
 		System.out.println("创建标签返回的结果是" + tagreturn);
 		JSONArray tagarr = JSONArray.fromObject(tagreturn);
@@ -226,7 +227,6 @@ public class AddcustomerServiceImp2 implements AddcustomerService {
 			}
 		}
 
-
 		for (int i = 0; i < realordecount; i++){
 			if(lastevent == null){
 				addordertime = paserUtcTime(addordertime);
@@ -250,7 +250,6 @@ public class AddcustomerServiceImp2 implements AddcustomerService {
 					obj.put("targetName", targetname);
 					String returnstr = SendUtils.post(url, obj.toString());
 					System.out.println("创建复购之前的事件返回的是"+returnstr);
-					
 				}
 			}
 			
