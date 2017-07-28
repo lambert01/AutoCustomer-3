@@ -108,8 +108,8 @@ public class AddcustomerServiceImp2 implements AddcustomerService {
 		Integer stageid = (Integer) stagemap.get("id"); // 客户状态id,通过状态id找到符合对应状态的事件
 		//这是针对A类客户,有复购行为,事件发生在购买之后
 		boolean isRepeateBuy = false;
-		stage = "复购客户";
-		stageid = 30;
+		//stage = "复购客户";
+		//stageid = 30;
 		if("复购客户".equals(stage)){
 			stageid = stageid-1;
 			isRepeateBuy = true;
@@ -932,7 +932,6 @@ public class AddcustomerServiceImp2 implements AddcustomerService {
 		String returndate = df1.format(ca.getTime());
 		return returndate;
 	}
-	
 	
 	
 	/**
