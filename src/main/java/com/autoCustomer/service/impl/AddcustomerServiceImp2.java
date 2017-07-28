@@ -1,6 +1,5 @@
 package com.autoCustomer.service.impl;
 
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.ParseException;
