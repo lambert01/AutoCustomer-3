@@ -117,7 +117,7 @@ public class AddcustomerServiceImp2 implements AddcustomerService {
         
 		
 		List<DeStageEventTarget> stageevents = eventdao.selectEventsByStage(stageid); 
-		//所有的符合状态的事件都被搜索出来了,有的事件是多选一,过滤一下
+		//所有的符合状态的事件都被搜索出来了,有的事件是多选一,过滤一下,只选其中一个
 		List<DeStageEventTarget> stageeventselecteds = getWantedDeEvent(stageevents); 
 		//对查询出的事件处理,随机排除并列的事件
 
