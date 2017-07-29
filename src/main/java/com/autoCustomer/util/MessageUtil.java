@@ -1,6 +1,11 @@
 package com.autoCustomer.util;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Random;
+import java.util.TimeZone;
 import java.util.UUID;
 
 public class MessageUtil {
@@ -106,6 +111,57 @@ public class MessageUtil {
 		//将字符串转换为数字并输出
 		String num=str.toString();
 		return num;
+	}
+	
+	
+	/**
+	 * 返回复购不同的时间
+	 * @param time
+	 */
+	public static String paserRepeateBuyingUtcTime(String time){
+		int count = 24*60*60*5;
+		int min = (int)(Math.random()*count);
+		if(min < 24*60*60){
+			min = 24*60*60;
+		}
+		Date date = null;
+		SimpleDateFormat df1 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+		df1.setTimeZone(TimeZone.getTimeZone("GMT"));
+		try{
+			date = df1.parse(time);
+		}catch (ParseException e){
+			e.printStackTrace();
+		}
+		Calendar ca = Calendar.getInstance();
+		ca.setTime(date);
+		ca.add(Calendar.SECOND,min);
+		String returndate = df1.format(ca.getTime());
+		return returndate;
+	}
+	
+	/**
+	 * 返回不同的时间
+	 * @param time
+	 */
+	public static String paserUtcTime(String time){
+		int count = 180*60;
+		int mintime = (int)(Math.random()*count);
+		if(mintime <5*60){
+			mintime = 5*60;
+		}
+		Date date = null;
+		SimpleDateFormat df1 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+		df1.setTimeZone(TimeZone.getTimeZone("GMT"));
+		try{
+			date = df1.parse(time);
+		}catch (ParseException e){
+			e.printStackTrace();
+		}
+		Calendar ca = Calendar.getInstance();
+		ca.setTime(date);
+		ca.add(Calendar.SECOND,mintime);
+		String returndate = df1.format(ca.getTime());
+		return returndate;
 	}
 	
 }
