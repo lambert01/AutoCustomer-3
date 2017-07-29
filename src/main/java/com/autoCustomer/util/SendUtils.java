@@ -287,6 +287,24 @@ public class SendUtils {
         return result;
     }
     
+    public static void doDelete(String urlStr,String acctoken) throws Exception{  
+        urlStr +="?"+acctoken;  
+    System.out.println(urlStr);  
+    URL url = new URL(urlStr);  
+    HttpURLConnection conn = (HttpURLConnection)url.openConnection();  
+    conn.setDoOutput(true);  
+    conn.setRequestMethod("DELETE");  
+    //屏蔽掉的代码是错误的，java.net.ProtocolException: HTTP method DELETE doesn't support output  
+/*      OutputStream os = conn.getOutputStream();      
+    os.write(paramStr.toString().getBytes("utf-8"));      
+    os.close();  */   
+      
+    if(conn.getResponseCode() ==200){  
+        System.out.println("成功");  
+    }else{  
+        System.out.println(conn.getResponseCode());  
+    }  
+} 
     
     public static String  postHttps(String url,String params){
     	DefaultHttpClient client = new DefaultHttpClient();
