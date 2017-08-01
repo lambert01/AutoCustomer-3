@@ -12,12 +12,12 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 public class deleteCustomerTest {
-	static String domian = "https://api.convertlab.com/";
+	static String domian = "http://api.convertwork.cn/";
 	static String getaccessToken(){
 
 		String url =domian+"security/accesstoken";
-		String appid ="cl02d515d8356ee74";
-		String sercet ="6b1d3f8573d3cb325b58cad72856b278715e2278";
+		String appid ="cl029015d6ef5320a";
+		String sercet ="ddb6172910bd7c59f2c083a11fcd72752d363995";
 		String retunrstr = SendUtils.sendGet(url,"grant_type=client_credentials&appid="+appid+"&secret="+sercet+"");
 		// 发送get请求,通过appid和sercet获取accesstoken.
 		// retunrstr ="{\"error_code\":0,\"access_token\":\"123\"}";
@@ -36,7 +36,7 @@ public class deleteCustomerTest {
 	static void deletecustomer() throws IOException{
 		String accesstoken = getaccessToken();
 		String queryurl =domian+"v1/customers";
-		String json = SendUtils.sendGet(queryurl,"access_token="+accesstoken+"&rows=7000");
+		String json = SendUtils.sendGet(queryurl,"access_token="+accesstoken+"&rows="+500);
 		JSONObject customerjson = JSONObject.fromObject(json);
 		JSONArray arr = customerjson.getJSONArray("rows");
 		System.out.println(arr.size());
