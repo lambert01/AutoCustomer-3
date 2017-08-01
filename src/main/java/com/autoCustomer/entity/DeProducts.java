@@ -11,6 +11,8 @@ public class DeProducts {
 
     private Double amountdiscount;
 
+    private String accounttype;
+
     public Integer getProductid() {
         return productid;
     }
@@ -49,5 +51,13 @@ public class DeProducts {
 
     public void setAmountdiscount(Double amountdiscount) {
         this.amountdiscount = amountdiscount;
+    }
+
+    public String getAccounttype() {
+        return accounttype;
+    }
+
+    public void setAccounttype(String accounttype) {
+        this.accounttype = accounttype == null ? null : accounttype.trim();
     }
 }

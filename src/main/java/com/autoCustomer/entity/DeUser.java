@@ -1,11 +1,11 @@
 package com.autoCustomer.entity;
 
-public class DeTagList {
+public class DeUser {
     private Integer id;
 
-    private String dimensionkey;
+    private String username;
 
-    private String tagname;
+    private String password;
 
     private String accounttype;
 
@@ -17,20 +17,20 @@ public class DeTagList {
         this.id = id;
     }
 
-    public String getDimensionkey() {
-        return dimensionkey;
+    public String getUsername() {
+        return username;
     }
 
-    public void setDimensionkey(String dimensionkey) {
-        this.dimensionkey = dimensionkey == null ? null : dimensionkey.trim();
+    public void setUsername(String username) {
+        this.username = username == null ? null : username.trim();
     }
 
-    public String getTagname() {
-        return tagname;
+    public String getPassword() {
+        return password;
     }
 
-    public void setTagname(String tagname) {
-        this.tagname = tagname == null ? null : tagname.trim();
+    public void setPassword(String password) {
+        this.password = password == null ? null : password.trim();
     }
 
     public String getAccounttype() {

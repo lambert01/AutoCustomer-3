@@ -9,6 +9,8 @@ public class DeTag {
 
     private Integer relation;
 
+    private String accounttype;
+
     public Integer getTagid() {
         return tagid;
     }
@@ -39,5 +41,13 @@ public class DeTag {
 
     public void setRelation(Integer relation) {
         this.relation = relation;
+    }
+
+    public String getAccounttype() {
+        return accounttype;
+    }
+
+    public void setAccounttype(String accounttype) {
+        this.accounttype = accounttype == null ? null : accounttype.trim();
     }
 }

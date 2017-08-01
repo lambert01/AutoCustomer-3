@@ -17,6 +17,8 @@ public class DeStageEventTarget {
 
     private Integer ismultiselect;
 
+    private String accounttype;
+
     public Integer getEventid() {
         return eventid;
     }
@@ -79,5 +81,13 @@ public class DeStageEventTarget {
 
     public void setIsmultiselect(Integer ismultiselect) {
         this.ismultiselect = ismultiselect;
+    }
+
+    public String getAccounttype() {
+        return accounttype;
+    }
+
+    public void setAccounttype(String accounttype) {
+        this.accounttype = accounttype == null ? null : accounttype.trim();
     }
 }

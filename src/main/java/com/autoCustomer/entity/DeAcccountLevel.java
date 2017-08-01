@@ -9,6 +9,8 @@ public class DeAcccountLevel {
 
     private String level;
 
+    private String accounttype;
+
     public Integer getId() {
         return id;
     }
@@ -39,5 +41,13 @@ public class DeAcccountLevel {
 
     public void setLevel(String level) {
         this.level = level == null ? null : level.trim();
+    }
+
+    public String getAccounttype() {
+        return accounttype;
+    }
+
+    public void setAccounttype(String accounttype) {
+        this.accounttype = accounttype == null ? null : accounttype.trim();
     }
 }

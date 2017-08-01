@@ -5,6 +5,8 @@ public class DeEventTag {
 
     private String tag;
 
+    private String accounttype;
+
     public Integer getId() {
         return id;
     }
@@ -19,5 +21,13 @@ public class DeEventTag {
 
     public void setTag(String tag) {
         this.tag = tag == null ? null : tag.trim();
+    }
+
+    public String getAccounttype() {
+        return accounttype;
+    }
+
+    public void setAccounttype(String accounttype) {
+        this.accounttype = accounttype == null ? null : accounttype.trim();
     }
 }

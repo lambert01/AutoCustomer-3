@@ -9,6 +9,8 @@ public class DeStageOrder {
 
     private Integer hasorder;
 
+    private String accounttype;
+
     public Integer getId() {
         return id;
     }
@@ -39,5 +41,13 @@ public class DeStageOrder {
 
     public void setHasorder(Integer hasorder) {
         this.hasorder = hasorder;
+    }
+
+    public String getAccounttype() {
+        return accounttype;
+    }
+
+    public void setAccounttype(String accounttype) {
+        this.accounttype = accounttype == null ? null : accounttype.trim();
     }
 }
