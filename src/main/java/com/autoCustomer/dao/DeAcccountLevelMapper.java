@@ -1,5 +1,7 @@
 package com.autoCustomer.dao;
 
+import java.util.Map;
+
 import com.autoCustomer.entity.DeAcccountLevel;
 
 public interface DeAcccountLevelMapper {
@@ -16,8 +18,8 @@ public interface DeAcccountLevelMapper {
     int updateByPrimaryKey(DeAcccountLevel record);
     
    //返回该订单的金额对应的客户级别
-    String selectLevelByAccount(Double account);
+    String selectLevelByAccount(Map<String, Object> map);
     
     //如果没搜到对应的级别,看看是不是订单金额超过了金领的最大额
-    String selectMaxLevel(Double account);
+    String selectMaxLevel(Map<String, Object> map);
 }

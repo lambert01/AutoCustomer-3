@@ -1,5 +1,7 @@
 package com.autoCustomer.dao;
 
+import java.util.Map;
+
 import com.autoCustomer.entity.DeStageOrder;
 
 public interface DeStageOrderMapper {
@@ -16,5 +18,5 @@ public interface DeStageOrderMapper {
     int updateByPrimaryKey(DeStageOrder record);
     
     //通过stageid,客户状态id查找该状态是否有订单
-    Integer selectByStageId(Integer stageid);
+    Integer selectByStageId(Map<String, Object> map);
 }

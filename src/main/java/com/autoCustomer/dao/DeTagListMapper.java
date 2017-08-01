@@ -1,6 +1,7 @@
 package com.autoCustomer.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import com.autoCustomer.entity.DeTagList;
 
@@ -13,9 +14,9 @@ public interface DeTagListMapper {
 
     DeTagList selectByPrimaryKey(Integer id);
     
-    List<DeTagList> selectAllTagList();
+    List<DeTagList> selectAllTagList(String accounttype);
     
-    DeTagList selectTagListCheckDidHad(String dimensionkey);
+    DeTagList selectTagListCheckDidHad(Map<String, Object> map);
 
     int updateByPrimaryKeySelective(DeTagList record);
 

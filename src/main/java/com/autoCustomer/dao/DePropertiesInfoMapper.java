@@ -24,4 +24,11 @@ public interface DePropertiesInfoMapper {
 	
 	//查询kind对应的id
 	public List<Integer> selectIdByValue(String value);
+    
+	
+	//返回所有的字段
+	DePropertiesInfo selectallPropertyInfoByKind(String kind);
+	
+    ///查询符合要求的kind和status对应的信息
+	List<DePropertiesInfo> getPropertyInfoBymap(Map<String, Object> querymap);
 }

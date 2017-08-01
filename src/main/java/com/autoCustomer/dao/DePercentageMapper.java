@@ -6,6 +6,6 @@ import java.util.Map;
 
 public interface DePercentageMapper {
 	
-	List<Map<String,Object>> selectByType(String type);
+	List<Map<String,Object>> selectByType(Map<String, Object> map);
 	
 }

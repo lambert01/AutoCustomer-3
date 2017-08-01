@@ -17,5 +17,5 @@ public interface DeProductsMapper {
 
     int updateByPrimaryKey(DeProducts record);
     
-   List<DeProducts> selectProduct();
+   List<DeProducts> selectProduct(String accounttype);
 }

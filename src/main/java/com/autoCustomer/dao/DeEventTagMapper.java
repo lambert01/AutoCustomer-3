@@ -17,5 +17,5 @@ public interface DeEventTagMapper {
 
     int updateByPrimaryKey(DeEventTag record);
     
-    List<DeEventTag> selectAllEventTag();
+    List<DeEventTag> selectAllEventTag(String accounttype);
 }
