@@ -6,9 +6,10 @@
     <result column="accountMin" property="accountmin" jdbcType="DOUBLE" />
     <result column="accountMax" property="accountmax" jdbcType="DOUBLE" />
     <result column="level" property="level" jdbcType="VARCHAR" />
+    <result column="accounttype" property="accounttype" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, accountMin, accountMax, level
+    id, accountMin, accountMax, level, accounttype
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
@@ -22,9 +23,9 @@
   </delete>
   <insert id="insert" parameterType="com.autoCustomer.entity.DeAcccountLevel" >
     insert into de_acccount_level (id, accountMin, accountMax, 
-      level)
+      level, accounttype)
     values (#{id,jdbcType=INTEGER}, #{accountmin,jdbcType=DOUBLE}, #{accountmax,jdbcType=DOUBLE}, 
-      #{level,jdbcType=VARCHAR})
+      #{level,jdbcType=VARCHAR}, #{accounttype,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.autoCustomer.entity.DeAcccountLevel" >
     insert into de_acccount_level
@@ -41,6 +42,9 @@
       <if test="level != null" >
         level,
       </if>
+      <if test="accounttype != null" >
+        accounttype,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -54,6 +58,9 @@
       </if>
       <if test="level != null" >
         #{level,jdbcType=VARCHAR},
+      </if>
+      <if test="accounttype != null" >
+        #{accounttype,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -69,6 +76,9 @@
       <if test="level != null" >
         level = #{level,jdbcType=VARCHAR},
       </if>
+      <if test="accounttype != null" >
+        accounttype = #{accounttype,jdbcType=VARCHAR},
+      </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -76,20 +86,24 @@
     update de_acccount_level
     set accountMin = #{accountmin,jdbcType=DOUBLE},
       accountMax = #{accountmax,jdbcType=DOUBLE},
-      level = #{level,jdbcType=VARCHAR}
+      level = #{level,jdbcType=VARCHAR},
+      accounttype = #{accounttype,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
   
   
-    <select id="selectLevelByAccount" resultType="java.lang.String" parameterType="java.lang.Double" >
+  <select id="selectLevelByAccount" resultType="java.lang.String" parameterType="java.util.Map" >
     select level
     from de_acccount_level
     where accountMin &lt;=#{account,jdbcType=DOUBLE} AND accountMax  &gt;#{account,jdbcType=DOUBLE}
+    and accounttype = #{accounttype,jdbcType=VARCHAR}
   </select>
   
-     <select id="selectMaxLevel" resultType="java.lang.String" parameterType="java.lang.Double" >
+  <select id="selectMaxLevel" resultType="java.lang.String" parameterType="java.util.Map" >
     select level
     from de_acccount_level
-    where  accountMax  &lt;=#{account,jdbcType=DOUBLE} order by accountMax desc limit 1
+    where  accountMax  &lt;=#{account,jdbcType=DOUBLE} 
+     and accounttype = #{accounttype,jdbcType=VARCHAR} 
+     order by accountMax desc limit 1
   </select>
 </mapper>

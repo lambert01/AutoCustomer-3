@@ -6,9 +6,10 @@
     <result column="stageId" property="stageid" jdbcType="INTEGER" />
     <result column="stageName" property="stagename" jdbcType="VARCHAR" />
     <result column="hasOrder" property="hasorder" jdbcType="INTEGER" />
+    <result column="accounttype" property="accounttype" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, stageId, stageName, hasOrder
+    id, stageId, stageName, hasOrder, accounttype
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
@@ -22,9 +23,9 @@
   </delete>
   <insert id="insert" parameterType="com.autoCustomer.entity.DeStageOrder" >
     insert into de_stage_order (id, stageId, stageName, 
-      hasOrder)
+      hasOrder, accounttype)
     values (#{id,jdbcType=INTEGER}, #{stageid,jdbcType=INTEGER}, #{stagename,jdbcType=VARCHAR}, 
-      #{hasorder,jdbcType=INTEGER})
+      #{hasorder,jdbcType=INTEGER}, #{accounttype,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.autoCustomer.entity.DeStageOrder" >
     insert into de_stage_order
@@ -41,6 +42,9 @@
       <if test="hasorder != null" >
         hasOrder,
       </if>
+      <if test="accounttype != null" >
+        accounttype,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -54,6 +58,9 @@
       </if>
       <if test="hasorder != null" >
         #{hasorder,jdbcType=INTEGER},
+      </if>
+      <if test="accounttype != null" >
+        #{accounttype,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -69,6 +76,9 @@
       <if test="hasorder != null" >
         hasOrder = #{hasorder,jdbcType=INTEGER},
       </if>
+      <if test="accounttype != null" >
+        accounttype = #{accounttype,jdbcType=VARCHAR},
+      </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -76,14 +86,15 @@
     update de_stage_order
     set stageId = #{stageid,jdbcType=INTEGER},
       stageName = #{stagename,jdbcType=VARCHAR},
-      hasOrder = #{hasorder,jdbcType=INTEGER}
+      hasOrder = #{hasorder,jdbcType=INTEGER},
+      accounttype = #{accounttype,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
   
-    <select id="selectByStageId" resultType="java.lang.Integer" parameterType="java.lang.Integer" >
+    <select id="selectByStageId" resultType="java.lang.Integer" parameterType="java.util.Map" >
     select 
     hasOrder
     from de_stage_order
-    where stageid = #{stageid,jdbcType=INTEGER}
+    where stageid = #{stageid,jdbcType=INTEGER} and accounttype = #{accounttype,jdbcType=VARCHAR}
   </select>
 </mapper>

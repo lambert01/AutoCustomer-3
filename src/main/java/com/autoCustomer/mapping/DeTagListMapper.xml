@@ -5,9 +5,10 @@
     <id column="id" property="id" jdbcType="INTEGER" />
     <result column="dimensionKey" property="dimensionkey" jdbcType="VARCHAR" />
     <result column="tagname" property="tagname" jdbcType="VARCHAR" />
+    <result column="accounttype" property="accounttype" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, dimensionKey, tagname
+    id, dimensionKey, tagname, accounttype
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
@@ -20,10 +21,10 @@
     where id = #{id,jdbcType=INTEGER}
   </delete>
   <insert id="insert" parameterType="com.autoCustomer.entity.DeTagList" >
-    insert into de_tag_list (id, dimensionKey, tagname
-      )
-    values (#{id,jdbcType=INTEGER}, #{dimensionkey,jdbcType=VARCHAR}, #{tagname,jdbcType=VARCHAR}
-      )
+    insert into de_tag_list (id, dimensionKey, tagname, 
+      accounttype)
+    values (#{id,jdbcType=INTEGER}, #{dimensionkey,jdbcType=VARCHAR}, #{tagname,jdbcType=VARCHAR}, 
+      #{accounttype,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.autoCustomer.entity.DeTagList" >
     insert into de_tag_list
@@ -37,6 +38,9 @@
       <if test="tagname != null" >
         tagname,
       </if>
+      <if test="accounttype != null" >
+        accounttype,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -47,6 +51,9 @@
       </if>
       <if test="tagname != null" >
         #{tagname,jdbcType=VARCHAR},
+      </if>
+      <if test="accounttype != null" >
+        #{accounttype,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -59,27 +66,35 @@
       <if test="tagname != null" >
         tagname = #{tagname,jdbcType=VARCHAR},
       </if>
+      <if test="accounttype != null" >
+        accounttype = #{accounttype,jdbcType=VARCHAR},
+      </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.autoCustomer.entity.DeTagList" >
     update de_tag_list
     set dimensionKey = #{dimensionkey,jdbcType=VARCHAR},
-      tagname = #{tagname,jdbcType=VARCHAR}
+      tagname = #{tagname,jdbcType=VARCHAR},
+      accounttype = #{accounttype,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
   
-    <select id="selectAllTagList" resultMap="BaseResultMap" >
+    <select id="selectAllTagList" resultMap="BaseResultMap" parameterType="java.lang.String">
     select 
     <include refid="Base_Column_List" />
-    from de_tag_list
+    from de_tag_list 
+    where
+    accounttype = #{accounttype,jdbcType=VARCHAR}
   </select>
   
-      <select id="selectTagListCheckDidHad" resultMap="BaseResultMap" parameterType="java.lang.String">
+      <select id="selectTagListCheckDidHad" resultMap="BaseResultMap" parameterType="java.util.Map">
     select 
      <include refid="Base_Column_List" />
        from de_tag_list
-    where dimensionKey = #{dimensionkey,jdbcType=VARCHAR} limit 1
+    where 
+    dimensionKey = #{dimensionkey,jdbcType=VARCHAR} and accounttype = #{accounttype,jdbcType=VARCHAR}
+     limit 1
   </select>
   
 </mapper>

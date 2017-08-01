@@ -4,9 +4,10 @@
   <resultMap id="BaseResultMap" type="com.autoCustomer.entity.DeEventTag" >
     <id column="id" property="id" jdbcType="INTEGER" />
     <result column="tag" property="tag" jdbcType="VARCHAR" />
+    <result column="accounttype" property="accounttype" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, tag
+    id, tag, accounttype
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
@@ -19,8 +20,10 @@
     where id = #{id,jdbcType=INTEGER}
   </delete>
   <insert id="insert" parameterType="com.autoCustomer.entity.DeEventTag" >
-    insert into de_event_tag (id, tag)
-    values (#{id,jdbcType=INTEGER}, #{tag,jdbcType=VARCHAR})
+    insert into de_event_tag (id, tag, accounttype
+      )
+    values (#{id,jdbcType=INTEGER}, #{tag,jdbcType=VARCHAR}, #{accounttype,jdbcType=VARCHAR}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.autoCustomer.entity.DeEventTag" >
     insert into de_event_tag
@@ -31,6 +34,9 @@
       <if test="tag != null" >
         tag,
       </if>
+      <if test="accounttype != null" >
+        accounttype,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -38,6 +44,9 @@
       </if>
       <if test="tag != null" >
         #{tag,jdbcType=VARCHAR},
+      </if>
+      <if test="accounttype != null" >
+        #{accounttype,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -47,18 +56,24 @@
       <if test="tag != null" >
         tag = #{tag,jdbcType=VARCHAR},
       </if>
+      <if test="accounttype != null" >
+        accounttype = #{accounttype,jdbcType=VARCHAR},
+      </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.autoCustomer.entity.DeEventTag" >
     update de_event_tag
-    set tag = #{tag,jdbcType=VARCHAR}
+    set tag = #{tag,jdbcType=VARCHAR},
+      accounttype = #{accounttype,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
   
-    <select id="selectAllEventTag" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    <select id="selectAllEventTag" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 
     <include refid="Base_Column_List" />
     from de_event_tag
+    where 
+    accounttype = #{accounttype,jdbcType=VARCHAR}
   </select>
 </mapper>

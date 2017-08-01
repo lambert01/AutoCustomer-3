@@ -6,9 +6,10 @@
     <result column="dimension" property="dimension" jdbcType="VARCHAR" />
     <result column="tagname" property="tagname" jdbcType="VARCHAR" />
     <result column="relation" property="relation" jdbcType="INTEGER" />
+    <result column="accounttype" property="accounttype" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
-    tagId, dimension, tagname, relation
+    tagId, dimension, tagname, relation, accounttype
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
@@ -22,9 +23,9 @@
   </delete>
   <insert id="insert" parameterType="com.autoCustomer.entity.DeTag" >
     insert into de_tag (tagId, dimension, tagname, 
-      relation)
+      relation, accounttype)
     values (#{tagid,jdbcType=INTEGER}, #{dimension,jdbcType=VARCHAR}, #{tagname,jdbcType=VARCHAR}, 
-      #{relation,jdbcType=INTEGER})
+      #{relation,jdbcType=INTEGER}, #{accounttype,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.autoCustomer.entity.DeTag" >
     insert into de_tag
@@ -41,6 +42,9 @@
       <if test="relation != null" >
         relation,
       </if>
+      <if test="accounttype != null" >
+        accounttype,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="tagid != null" >
@@ -54,6 +58,9 @@
       </if>
       <if test="relation != null" >
         #{relation,jdbcType=INTEGER},
+      </if>
+      <if test="accounttype != null" >
+        #{accounttype,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -69,6 +76,9 @@
       <if test="relation != null" >
         relation = #{relation,jdbcType=INTEGER},
       </if>
+      <if test="accounttype != null" >
+        accounttype = #{accounttype,jdbcType=VARCHAR},
+      </if>
     </set>
     where tagId = #{tagid,jdbcType=INTEGER}
   </update>
@@ -76,24 +86,36 @@
     update de_tag
     set dimension = #{dimension,jdbcType=VARCHAR},
       tagname = #{tagname,jdbcType=VARCHAR},
-      relation = #{relation,jdbcType=INTEGER}
+      relation = #{relation,jdbcType=INTEGER},
+      accounttype = #{accounttype,jdbcType=VARCHAR}
     where tagId = #{tagid,jdbcType=INTEGER}
   </update>
   
-    <select id="selectAllTag" resultMap="BaseResultMap">
+    <select id="selectAllTag" resultMap="BaseResultMap" parameterType="java.lang.String">
     select 
     <include refid="Base_Column_List" />
-    from de_tag order by relation
+    from de_tag 
+    where 
+    relation > 0
+    and accounttype = #{accounttype,jdbcType=VARCHAR}
+    order by relation
+    
   </select>
-  
-      <select id="selectCountSize" resultType="java.lang.Integer" parameterType="java.lang.Integer">
-    select count(*)
-    from de_tag where relation = #{relation,jdbcType=INTEGER}
-  </select>
-  
-      <select id="selectAllTagHavingSameDemension" resultMap="BaseResultMap" parameterType="java.lang.String">
-    select 
-    <include refid="Base_Column_List" />
-    from de_input_tag where dimension = #{dimension,jdbcType=VARCHAR}
-  </select>
+
+	<select id="selectCountSize" resultType="java.lang.Integer" parameterType="java.util.Map">
+		select count(*)
+		from de_tag
+		where
+		relation = #{relation,jdbcType=INTEGER} 
+		and accounttype = #{accounttype,jdbcType=VARCHAR}
+	</select>
+	
+	<select id="selectAllTagHavingSameDemension" resultMap="BaseResultMap" parameterType="java.util.Map">
+		select
+		<include refid="Base_Column_List" />
+		from de_tag
+		where
+		dimension = #{dimension,jdbcType=VARCHAR} 
+		and accounttype = #{accounttype,jdbcType=VARCHAR}
+	</select>
 </mapper>

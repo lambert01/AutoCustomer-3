@@ -7,9 +7,10 @@
     <result column="productPrice" property="productprice" jdbcType="DOUBLE" />
     <result column="productQuantity" property="productquantity" jdbcType="INTEGER" />
     <result column="amountDiscount" property="amountdiscount" jdbcType="DOUBLE" />
+    <result column="accounttype" property="accounttype" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
-    productId, productName, productPrice, productQuantity, amountDiscount
+    productId, productName, productPrice, productQuantity, amountDiscount, accounttype
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
@@ -23,9 +24,11 @@
   </delete>
   <insert id="insert" parameterType="com.autoCustomer.entity.DeProducts" >
     insert into de_products (productId, productName, productPrice, 
-      productQuantity, amountDiscount)
+      productQuantity, amountDiscount, accounttype
+      )
     values (#{productid,jdbcType=INTEGER}, #{productname,jdbcType=VARCHAR}, #{productprice,jdbcType=DOUBLE}, 
-      #{productquantity,jdbcType=INTEGER}, #{amountdiscount,jdbcType=DOUBLE})
+      #{productquantity,jdbcType=INTEGER}, #{amountdiscount,jdbcType=DOUBLE}, #{accounttype,jdbcType=VARCHAR}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.autoCustomer.entity.DeProducts" >
     insert into de_products
@@ -45,6 +48,9 @@
       <if test="amountdiscount != null" >
         amountDiscount,
       </if>
+      <if test="accounttype != null" >
+        accounttype,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="productid != null" >
@@ -61,6 +67,9 @@
       </if>
       <if test="amountdiscount != null" >
         #{amountdiscount,jdbcType=DOUBLE},
+      </if>
+      <if test="accounttype != null" >
+        #{accounttype,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -79,6 +88,9 @@
       <if test="amountdiscount != null" >
         amountDiscount = #{amountdiscount,jdbcType=DOUBLE},
       </if>
+      <if test="accounttype != null" >
+        accounttype = #{accounttype,jdbcType=VARCHAR},
+      </if>
     </set>
     where productId = #{productid,jdbcType=INTEGER}
   </update>
@@ -87,13 +99,16 @@
     set productName = #{productname,jdbcType=VARCHAR},
       productPrice = #{productprice,jdbcType=DOUBLE},
       productQuantity = #{productquantity,jdbcType=INTEGER},
-      amountDiscount = #{amountdiscount,jdbcType=DOUBLE}
+      amountDiscount = #{amountdiscount,jdbcType=DOUBLE},
+      accounttype = #{accounttype,jdbcType=VARCHAR}
     where productId = #{productid,jdbcType=INTEGER}
   </update>
   
-    <select id="selectProduct" resultMap="BaseResultMap" >
+    <select id="selectProduct" resultMap="BaseResultMap" parameterType="java.lang.String">
     select 
     <include refid="Base_Column_List" />
     from de_products
+    where
+     accounttype = #{accounttype,jdbcType=VARCHAR}
   </select>
 </mapper>

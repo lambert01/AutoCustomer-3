@@ -10,9 +10,11 @@
     <result column="targetName" property="targetname" jdbcType="VARCHAR" />
     <result column="isRelated" property="isrelated" jdbcType="INTEGER" />
     <result column="isMultiselect" property="ismultiselect" jdbcType="INTEGER" />
+    <result column="accounttype" property="accounttype" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
-    eventId, event, eventName, stageId, targetId, targetName, isRelated, isMultiselect
+    eventId, event, eventName, stageId, targetId, targetName, isRelated, isMultiselect, 
+    accounttype
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
@@ -27,10 +29,12 @@
   <insert id="insert" parameterType="com.autoCustomer.entity.DeStageEventTarget" >
     insert into de_stage_event_target (eventId, event, eventName, 
       stageId, targetId, targetName, 
-      isRelated, isMultiselect)
+      isRelated, isMultiselect, accounttype
+      )
     values (#{eventid,jdbcType=INTEGER}, #{event,jdbcType=VARCHAR}, #{eventname,jdbcType=VARCHAR}, 
       #{stageid,jdbcType=INTEGER}, #{targetid,jdbcType=VARCHAR}, #{targetname,jdbcType=VARCHAR}, 
-      #{isrelated,jdbcType=INTEGER}, #{ismultiselect,jdbcType=INTEGER})
+      #{isrelated,jdbcType=INTEGER}, #{ismultiselect,jdbcType=INTEGER}, #{accounttype,jdbcType=VARCHAR}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.autoCustomer.entity.DeStageEventTarget" >
     insert into de_stage_event_target
@@ -59,6 +63,9 @@
       <if test="ismultiselect != null" >
         isMultiselect,
       </if>
+      <if test="accounttype != null" >
+        accounttype,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="eventid != null" >
@@ -84,6 +91,9 @@
       </if>
       <if test="ismultiselect != null" >
         #{ismultiselect,jdbcType=INTEGER},
+      </if>
+      <if test="accounttype != null" >
+        #{accounttype,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -111,6 +121,9 @@
       <if test="ismultiselect != null" >
         isMultiselect = #{ismultiselect,jdbcType=INTEGER},
       </if>
+      <if test="accounttype != null" >
+        accounttype = #{accounttype,jdbcType=VARCHAR},
+      </if>
     </set>
     where eventId = #{eventid,jdbcType=INTEGER}
   </update>
@@ -122,15 +135,18 @@
       targetId = #{targetid,jdbcType=VARCHAR},
       targetName = #{targetname,jdbcType=VARCHAR},
       isRelated = #{isrelated,jdbcType=INTEGER},
-      isMultiselect = #{ismultiselect,jdbcType=INTEGER}
+      isMultiselect = #{ismultiselect,jdbcType=INTEGER},
+      accounttype = #{accounttype,jdbcType=VARCHAR}
     where eventId = #{eventid,jdbcType=INTEGER}
   </update>
+
   
-   <select id="selectEventsByStage" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+   <select id="selectEventsByStage" resultMap="BaseResultMap" parameterType="java.util.Map" >
     select 
     <include refid="Base_Column_List" />
     from de_stage_event_target
-    where stageId &lt;= #{stageid,jdbcType=INTEGER} order by stageId 
+    where stageId &lt;= #{stageid,jdbcType=INTEGER} 
+    and  accounttype = #{accounttype,jdbcType=VARCHAR} order by stageId 
   </select>
   
    <select id="selectUnRelatedStageEvent" resultMap="BaseResultMap" >
@@ -138,18 +154,22 @@
     <include refid="Base_Column_List" />
     from de_stage_event_target
     where   stageId is null 
+    and accounttype = #{accounttype,jdbcType=VARCHAR}
   </select>
   
   <!-- 查询指定阶段对应的事件 -->
-   <select id="selectEventstageEvent" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+   <select id="selectEventstageEvent" resultMap="BaseResultMap" parameterType="java.util.Map">
     select 
     <include refid="Base_Column_List" />
     from de_stage_event_target
-    where   stageId = #{stageid,jdbcType=INTEGER}
+    where  
+     stageId = #{stageid,jdbcType=INTEGER} 
+     and accounttype = #{accounttype,jdbcType=VARCHAR}
   </select>
   
-   <select id="selectCountSize" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+   <select id="selectCountSize" resultType="java.lang.Integer" parameterType="java.util.Map">
     select count(*)
-    from de_stage_event_target where isMultiselect = #{ismultiselect,jdbcType=INTEGER}
+    from de_stage_event_target where isMultiselect = #{ismultiselect,jdbcType=INTEGER}  
+    and accounttype = #{accounttype,jdbcType=VARCHAR}
   </select>
 </mapper>

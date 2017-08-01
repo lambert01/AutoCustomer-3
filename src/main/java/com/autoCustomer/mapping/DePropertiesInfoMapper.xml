@@ -25,6 +25,22 @@
     where kind = #{kind,jdbcType=VARCHAR} 
   </select>
   
+  
+  <select id="selectallPropertyInfoByKind" resultMap="BaseResultMap" parameterType="java.lang.String">
+	select 
+    <include refid="Base_Column_List" />
+    from de_properties_info
+    where kind = #{kind,jdbcType=VARCHAR} 
+  </select>
+  
+  
+  <select id="getPropertyInfoBymap" resultMap="BaseResultMap" parameterType="java.util.Map">
+	select 
+    <include refid="Base_Column_List" />
+    from de_properties_info
+    where kind = #{kind,jdbcType=VARCHAR} and status = #{accounttype,jdbcType=VARCHAR}
+  </select>
+  
     <select id="selectIdByValue" resultType="java.lang.Integer" parameterType="java.lang.String">
 	select infoId
     from de_properties_info

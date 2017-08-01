@@ -1,20 +1,134 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.autoCustomer.dao.DePercentageMapper" >
- 
- 	<resultMap id="BaseResultMap" type="com.autoCustomer.entity.DePercentage" >
- 		<id column="id" property="id" jdbcType="INTEGER" />
-    	<result column="spread" property="spread" jdbcType="VARCHAR" />
-    	<result column="type" property="type" jdbcType="VARCHAR" />
-    	<result column="message" property="message" jdbcType="VARCHAR" />
-    	<result column="start_date" property="startDate" jdbcType="DATE" />
-   	 	<result column="end_date" property="endDate" jdbcType="DATE" />
- 		<result column="percentage" property="percentage" jdbcType="DOUBLE" />
- 	</resultMap>
+  <resultMap id="BaseResultMap" type="com.autoCustomer.entity.DePercentage" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="start_date" property="startDate" jdbcType="VARCHAR" />
+    <result column="end_date" property="endDate" jdbcType="VARCHAR" />
+    <result column="percentage" property="percentage" jdbcType="DOUBLE" />
+    <result column="spread" property="spread" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="VARCHAR" />
+    <result column="message" property="message" jdbcType="VARCHAR" />
+    <result column="accounttype" property="accounttype" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, start_date, end_date, percentage, spread, type, message, accounttype
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from de_percentage
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from de_percentage
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.autoCustomer.entity.DePercentage" >
+    insert into de_percentage (id, start_date, end_date, 
+      percentage, spread, type, 
+      message, accounttype)
+    values (#{id,jdbcType=INTEGER}, #{startDate,jdbcType=VARCHAR}, #{endDate,jdbcType=VARCHAR}, 
+      #{percentage,jdbcType=DOUBLE}, #{spread,jdbcType=VARCHAR}, #{type,jdbcType=VARCHAR}, 
+      #{message,jdbcType=VARCHAR}, #{accounttype,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.autoCustomer.entity.DePercentage" >
+    insert into de_percentage
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="startDate != null" >
+        start_date,
+      </if>
+      <if test="endDate != null" >
+        end_date,
+      </if>
+      <if test="percentage != null" >
+        percentage,
+      </if>
+      <if test="spread != null" >
+        spread,
+      </if>
+      <if test="type != null" >
+        type,
+      </if>
+      <if test="message != null" >
+        message,
+      </if>
+      <if test="accounttype != null" >
+        accounttype,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="startDate != null" >
+        #{startDate,jdbcType=VARCHAR},
+      </if>
+      <if test="endDate != null" >
+        #{endDate,jdbcType=VARCHAR},
+      </if>
+      <if test="percentage != null" >
+        #{percentage,jdbcType=DOUBLE},
+      </if>
+      <if test="spread != null" >
+        #{spread,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null" >
+        #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="message != null" >
+        #{message,jdbcType=VARCHAR},
+      </if>
+      <if test="accounttype != null" >
+        #{accounttype,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.autoCustomer.entity.DePercentage" >
+    update de_percentage
+    <set >
+      <if test="startDate != null" >
+        start_date = #{startDate,jdbcType=VARCHAR},
+      </if>
+      <if test="endDate != null" >
+        end_date = #{endDate,jdbcType=VARCHAR},
+      </if>
+      <if test="percentage != null" >
+        percentage = #{percentage,jdbcType=DOUBLE},
+      </if>
+      <if test="spread != null" >
+        spread = #{spread,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null" >
+        type = #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="message != null" >
+        message = #{message,jdbcType=VARCHAR},
+      </if>
+      <if test="accounttype != null" >
+        accounttype = #{accounttype,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.autoCustomer.entity.DePercentage" >
+    update de_percentage
+    set start_date = #{startDate,jdbcType=VARCHAR},
+      end_date = #{endDate,jdbcType=VARCHAR},
+      percentage = #{percentage,jdbcType=DOUBLE},
+      spread = #{spread,jdbcType=VARCHAR},
+      type = #{type,jdbcType=VARCHAR},
+      message = #{message,jdbcType=VARCHAR},
+      accounttype = #{accounttype,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
   
-  	<select id="selectByType" resultType="Map" parameterType="java.lang.String">
+  	<select id="selectByType" resultType="Map" parameterType="java.util.Map">
   		select start_date,end_date,percentage,spread,message,id from de_percentage
-  		 where type=#{type} order by percentage
+  		 where type=#{type} and  accounttype = #{accounttype,jdbcType=VARCHAR} order by percentage
   	</select>
   
 </mapper>
