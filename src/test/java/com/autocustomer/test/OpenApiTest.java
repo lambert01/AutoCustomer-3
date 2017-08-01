@@ -14,8 +14,8 @@ public class OpenApiTest {
 	public static void main(String[] args) {
 		String accessToken = getAccessToken("cl029015d6ef5320a", "ddb6172910bd7c59f2c083a11fcd72752d363995");
 
-
-		String url = "http://api.convertwork.cn/v1/tagdimensions";
+System.out.println(accessToken);
+	/*	String url = "http://api.convertwork.cn/v1/tagdimensions";
 		String param = "access_token=" + accessToken;
 		String returncode = SendUtils.sendGet(url, param);
 		System.out.println(returncode);
@@ -26,7 +26,7 @@ public class OpenApiTest {
 			String str = taglist.get("dimensionKey").toString();
 			System.out.println(str);
 			
-		}
+		}*/
 		
 		
 	
