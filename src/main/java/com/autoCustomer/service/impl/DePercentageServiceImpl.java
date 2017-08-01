@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import com.autoCustomer.dao.DePercentageMapper;
 import com.autoCustomer.service.DePercentageService;
 import com.autoCustomer.util.Constant;
+import com.sun.mail.imap.protocol.MailboxInfo;
 
 @Service("dePercentageServiceImpl")
 public class DePercentageServiceImpl implements DePercentageService{
@@ -28,9 +29,12 @@ public class DePercentageServiceImpl implements DePercentageService{
 	private final static int time = 90;
 	
 	
-	public Map<String, Object> getCurrentStage() {
+	public Map<String, Object> getCurrentStage(String accounttype) {
 		Map<String, Object> returnMap = new HashMap<String, Object>();
-		List<Map<String, Object>> list = dePercentageMapper.selectByType(Constant.CURRENT_STAGE);
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("accounttype", accounttype);
+		map.put("type", Constant.CURRENT_STAGE);
+		List<Map<String, Object>> list = dePercentageMapper.selectByType(map);
 		double num = getNum(Constant.DIGIT2);
 		String message = "";
 		for(int i=0;i<list.size();i++){
@@ -49,8 +53,11 @@ public class DePercentageServiceImpl implements DePercentageService{
 	}
 	
 	
-	public String getActiveData() {
-		List<Map<String, Object>> list = dePercentageMapper.selectByType(Constant.ACTIVITY);
+	public String getActiveData(String accounttype) {
+		Map<String, Object> querymap = new HashMap<String, Object>();
+		querymap.put("accounttype", accounttype);
+		querymap.put("type", Constant.ACTIVITY);
+		List<Map<String, Object>> list = dePercentageMapper.selectByType(querymap);
 		double num = getNum(Constant.DIGIT2);
 		String message = "";
 		for(int i=0;i<list.size();i++){
@@ -65,11 +72,15 @@ public class DePercentageServiceImpl implements DePercentageService{
 		return message;
 	}
 	
-	public String getRanCreateTime() {
+	public String getRanCreateTime(String accounttype) {
 		double b = Math.random();
 		String createTime = "";
 		DecimalFormat df = new DecimalFormat(Constant.DIGIT);
-		List<Map<String, Object>> monthList = dePercentageMapper.selectByType("0");
+		Map<String, Object> querymap = new HashMap<String, Object>();
+		querymap.put("accounttype", accounttype);
+		querymap.put("type", 0);
+		
+		List<Map<String, Object>> monthList = dePercentageMapper.selectByType(querymap);
 		double d = Double.valueOf(df.format(b));
 		//double d = 0.607;
 		for(int i=0;i<monthList.size();i++){
@@ -79,7 +90,7 @@ public class DePercentageServiceImpl implements DePercentageService{
 			if(d > start && d<= end){
 				String state_date = ((String) (monthList.get(i).get("start_date"))).split("-")[0];
 				String end_date = ((String) monthList.get(i).get("end_date")).split("-")[1];
-				createTime = Constant.YEAR+"-"+getRandomMonth(state_date,end_date);
+				createTime = Constant.YEAR+"-"+getRandomMonth(state_date,end_date,accounttype);
 				break;
 			}
 		}
@@ -99,7 +110,7 @@ public class DePercentageServiceImpl implements DePercentageService{
 	
 	
 	
-	public String getRandomMonth(String state_date,String end_date){
+	public String getRandomMonth(String state_date,String end_date,String accounttype){
 		List<Map<String,Object>> monthList = null;
 		String recursion = "";
 		double start = 0.0;
@@ -113,7 +124,10 @@ public class DePercentageServiceImpl implements DePercentageService{
 		double num = getNum(Constant.DIGIT2);
 		//double num = 0.25;
 		if("04".equals(state_date) || "4".equals(state_date) ){
-			monthList = dePercentageMapper.selectByType(getString(state_date));
+			Map<String, Object> querymap = new HashMap<String, Object>();
+			querymap.put("accounttype", accounttype);
+			querymap.put("type", getString(state_date));
+			monthList = dePercentageMapper.selectByType(querymap);
 			//double num = 0.6;
 			for(int j = 0;j<monthList.size();j++){
 				recursion =  getRecursionData(j,monthList);
@@ -124,13 +138,17 @@ public class DePercentageServiceImpl implements DePercentageService{
 					end_time = ((String) (monthList.get(j).get("end_date"))).split("-")[1];
 					spread = (String)monthList.get(j).get("spread");
 					day = getRanTime(Integer.valueOf(start_time),Integer.valueOf(end_time));
-					time = getTime(spread);
+					time = getTime(spread,accounttype);
 					data = state_date+"-"+day+" "+time;
 					break;
 				}
 			}
 		}else if("05".equals(state_date) || "5".equals(state_date)){
-			monthList = dePercentageMapper.selectByType(getString(state_date));
+			Map<String, Object> querymap = new HashMap<String, Object>();
+			querymap.put("accounttype", accounttype);
+			querymap.put("type", getString(state_date));
+			
+			monthList = dePercentageMapper.selectByType(querymap);
 			//double num = 0.6;
 			for(int j = 0;j<monthList.size();j++){
 				recursion =  getRecursionData(j,monthList);
@@ -141,21 +159,21 @@ public class DePercentageServiceImpl implements DePercentageService{
 					end_time = ((String) (monthList.get(j).get("end_date"))).split("-")[1];
 					spread = (String)monthList.get(j).get("spread");
 					day = getRanTime(Integer.valueOf(start_time),Integer.valueOf(end_time));
-					time = getTime(spread);
+					time = getTime(spread,accounttype);
 					data = state_date+"-"+day+" "+time;
 					break;
 				}
 			}
 		}else{
 			day = getRanTime(Integer.valueOf(state_date),Integer.valueOf(end_date));
-			time = getTime("");
+			time = getTime("",accounttype);
 			data = state_date+"-"+day+" "+time;
 		}
 		return data;
 	}
 	
 	
-	public String getTime(String spread){
+	public String getTime(String spread,String accounttype){
 		List<Map<String,Object>> monthList = null;
 		String recursion = "";
 		double start = 0.0;
@@ -165,7 +183,11 @@ public class DePercentageServiceImpl implements DePercentageService{
 		String time = "";
 		double num = getNum(Constant.DIGIT2);
 		if(null != spread && !"".equals(spread) && spread.equals(Constant.MAJORITY_DATE)){
-			monthList = dePercentageMapper.selectByType(Constant.MAJORITY);
+			Map<String, Object> querymap = new HashMap<String, Object>();
+			querymap.put("accounttype", accounttype);
+			querymap.put("type", Constant.MAJORITY);
+			
+			monthList = dePercentageMapper.selectByType(querymap);
 			for(int i = 0;i<monthList.size();i++){
 				recursion =  getRecursionData(i,monthList);
 				start = Double.parseDouble(recursion.split(":")[0]);
@@ -177,7 +199,10 @@ public class DePercentageServiceImpl implements DePercentageService{
 				}
 			}
 		}else{
-			monthList = dePercentageMapper.selectByType(Constant.AVERAGE_DATE);
+			Map<String, Object> querymap = new HashMap<String, Object>();
+			querymap.put("accounttype", accounttype);
+			querymap.put("type", Constant.AVERAGE_DATE);
+			monthList = dePercentageMapper.selectByType(querymap);
 			for(int i = 0;i<monthList.size();i++){
 				recursion =  getRecursionData(i,monthList);
 				start = Double.parseDouble(recursion.split(":")[0]);
@@ -248,7 +273,7 @@ public class DePercentageServiceImpl implements DePercentageService{
 		    return strTime;
 		  }
 		
-		public  String frontPercentage(){
+		public  String frontPercentage(String accounttype){
 			double ranNum = getNum(2);
 		    Random ran = new Random();
 		    int num = ran.nextInt(91);
@@ -277,5 +302,7 @@ public class DePercentageServiceImpl implements DePercentageService{
 		  //  String dateStr = sim.format(date);
 		  //  return dateStr;
 		  }
+
+
 		
 }
