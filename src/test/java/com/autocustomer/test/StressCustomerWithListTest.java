@@ -7,8 +7,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
@@ -22,7 +24,7 @@ import net.sf.json.JSONObject;
 /**
  * Created by house on 17-5-15.
  */
-public class StressCustomerTest {
+public class StressCustomerWithListTest {
 	
 	private static String domain ="https://api.convertlab.com/";
 	private static String appid ="cl002115d78a615d2";
@@ -102,6 +104,16 @@ public class StressCustomerTest {
          int j = 0;
          Map<String, Object> checkrepeateventmap = new HashMap<String, Object>();
          Map<String, Object> enevtmap = new HashMap<String, Object>();
+         
+    	 Map<String, Object> eventlistmap = new HashMap<String, Object>();
+		 eventlistmap.put("c_scanBeiJing4S", "北京中普4S到店扫码");
+		 eventlistmap.put("c_getCoupon", "北京中普4S_领取优惠券");
+		 eventlistmap.put("c_scanQingDaoCar", "青岛车展扫码");
+		 eventlistmap.put("c_bookShiJia", "青岛车展扫码_预约试驾");
+		 eventlistmap.put("c_daodianKeXiao", "青岛车展扫码_到店核销");
+		 
+		 Map<String, Object> listmap = getAllListId(accessToken);
+         
          while ((str2 = br2.readLine()) != null) {
         	 j = ++j;
          	 if(j==1){
@@ -153,10 +165,12 @@ public class StressCustomerTest {
 			} catch (Exception e) {
 				continue;
 			}
-        	String returnstr = createCustomerEvent(enevtmap, accessToken);
+        	String returnstr = createCustomerEvent(enevtmap, accessToken,eventlistmap,listmap);
         	System.out.println("创建事件返回的json是"+returnstr);
         	 
          }
+         
+         //事件执行完了
         
         } catch (FileNotFoundException e) {
          System.out.println("找不到指定文件");
@@ -202,11 +216,8 @@ public class StressCustomerTest {
 	}
 	
 	private static String getAccessToken(){
-		
 		String url =  domain+"security/accesstoken";
 		String retunrstr = SendUtils.sendGet(url,"grant_type=client_credentials&appid="+appid+"&secret="+sercet+"");
-		// 发送get请求,通过appid和sercet获取accesstoken.
-		// retunrstr ="{\"error_code\":0,\"access_token\":\"123\"}";
 		JsonObject returnData = new JsonParser().parse(retunrstr).getAsJsonObject();
 		String codes = returnData.get("error_code").toString();
 		String access_token = "";
@@ -216,17 +227,73 @@ public class StressCustomerTest {
 		return access_token;
 	}
 	
+	//获得所有的群组
+	public static Map<String, Object> getAllListId(String token){
+		Map<String, Object> listmap = new HashMap<String, Object>();
+		String url = domain + "v1/lists";
+		String json = SendUtils.sendGet(url,"access_token="+token);
+		JSONObject listsjson = JSONObject.fromObject(json);
+		JSONArray arr = listsjson.getJSONArray("rows");
+		for (Object object : arr) {
+			JSONObject list = JSONObject.fromObject(object);
+			Integer id = (Integer)list.get("id");
+			String name =(String)list.get("name");
+			listmap.put(name, id);
+			
+		}
+		return listmap;
+		
+	}
+	
+	//把客户添加到群组中
+	public static String createCustomerList(String customerId,Integer listId,String token){
+		String url = domain + "/v1/listMembers" + "?access_token=" + token;
+		JSONObject data = new JSONObject();
+		JSONObject list = new JSONObject();
+		data.put("customerId", customerId);
+		data.put("listId", listId);
+		list.put("data", data);
+		String returnCode = SendUtils.post(url, list.toString());
+		return returnCode;
+	
+		
+	}
 	
 	
-	public static String createCustomerEvent(Map<String, Object> map,String access_token ){
+	
+	public static String createCustomerEvent(Map<String, Object> map,String access_token,Map<String, Object> eventlistmap,Map<String, Object> listmap){
+
 		String url =  domain+"v1/customerevents?access_token=" + access_token;
 			JSONObject obj = new JSONObject();
+			String customerId = (String)map.get("customerId");
+			String event = (String)map.get("event");
+			String campaignName = (String)map.get("campaignName");
 			obj.put("customerId", map.get("customerId"));
 			obj.put("date", map.get("date"));
 			obj.put("event", map.get("event"));
 			obj.put("source", map.get("source"));
 			obj.put("campaignName", map.get("campaignName"));
 			String returnstr = SendUtils.post(url, obj.toString());
+			
+			//开始加入群组
+			
+			String listname = (String)eventlistmap.get(event);
+			Integer listid =null;
+			if(!(listname == null) && !(listname.equals(""))){
+				 listid = (Integer)listmap.get(listname);
+			}
+			if(event.equals("c_liuzi")&& campaignName.equals("荣威4S到店试驾活动")){
+				listid = (Integer)listmap.get("北京中普4S_留资");
+			}
+			
+			if(event.equals("c_liuzi")&& campaignName.equals("青岛汽车展活动")){
+				listid = (Integer)listmap.get("青岛车展扫码_留资");
+			}
+			if(!(listid == null)){
+				String listresult = createCustomerList(customerId, listid,access_token);
+				System.out.println("创建群组返回的是"+listresult);
+			}
+			
 			return returnstr;
 	}
 	

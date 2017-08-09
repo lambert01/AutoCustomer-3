@@ -12,12 +12,12 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 public class deleteCustomerTest {
-	static String domian = "http://api.convertwork.cn/";
+	static String domian = "http://api.convertlab.com/";
 	static String getaccessToken(){
 
 		String url =domian+"security/accesstoken";
-		String appid ="cl029015d6ef5320a";
-		String sercet ="ddb6172910bd7c59f2c083a11fcd72752d363995";
+		String appid ="cl002115d78a615d2";
+		String sercet ="509369090e4fd3fea899c6d15bc61740a41f81ed";
 		String retunrstr = SendUtils.sendGet(url,"grant_type=client_credentials&appid="+appid+"&secret="+sercet+"");
 		// 发送get请求,通过appid和sercet获取accesstoken.
 		// retunrstr ="{\"error_code\":0,\"access_token\":\"123\"}";

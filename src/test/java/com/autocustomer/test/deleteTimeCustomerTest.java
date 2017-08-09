@@ -16,12 +16,12 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 public class deleteTimeCustomerTest {
-	static String domian = "http://api.convertwork.cn/";
+	static String domian = "https://api.convertlab.com/";
 	static String getaccessToken(){
 
 		String url =domian+"security/accesstoken";
-		String appid ="cl029015d6ef5320a";
-		String sercet ="ddb6172910bd7c59f2c083a11fcd72752d363995";
+		String appid ="cl002115d78a615d2";
+		String sercet ="509369090e4fd3fea899c6d15bc61740a41f81ed";
 		String retunrstr = SendUtils.sendGet(url,"grant_type=client_credentials&appid="+appid+"&secret="+sercet+"");
 		// 发送get请求,通过appid和sercet获取accesstoken.
 		// retunrstr ="{\"error_code\":0,\"access_token\":\"123\"}";
@@ -40,12 +40,13 @@ public class deleteTimeCustomerTest {
 	static void deletecustomer(String starttime,String endtime) throws IOException{
 		String accesstoken = getaccessToken();
 		String queryurl =domian+"v1/customers";
-		String param = "access_token="+accesstoken+"&dateCreatedFrom="+starttime+"&dateCreatedTo="+endtime;
+		String param = "access_token="+accesstoken+"&dateCreatedFrom="+starttime+"&dateCreatedTo="+endtime+"&rows="+106;
 		String json = SendUtils.sendGet(queryurl,param);
 		JSONObject customerjson = JSONObject.fromObject(json);
 		JSONArray arr = customerjson.getJSONArray("rows");
 		System.out.println(arr.size());
-		for (Object object : arr) {
+		return;
+/*		for (Object object : arr) {
 			JSONObject cust = JSONObject.fromObject(object);
 			String id = cust.get("id").toString();
 			System.out.println(id);
@@ -56,7 +57,7 @@ public class deleteTimeCustomerTest {
 				e.printStackTrace();
 			}
 //System.out.println("删除返回的结果"+str);
-		}
+		}*/
 	}
 	
     public static void doDelete(String urlStr,String acctoken) throws Exception{  
@@ -97,8 +98,8 @@ public class deleteTimeCustomerTest {
 	public static void main(String[] args) {
 		try {
 			//时间格式 2016-11-11 11:11:11
-			String starttime = "2015-07-01 00:00:00";
-			String endtime = "2017-07-29 00:00:00";
+			String starttime = "2017-08-01 00:00:00";
+			String endtime = "2017-08-09 16:50:00";
 			
 			starttime = transTime(starttime);
 			endtime = transTime(endtime);
